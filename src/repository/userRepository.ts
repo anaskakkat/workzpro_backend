@@ -27,7 +27,11 @@ class UserRepository implements UserRepo {
       new: true,
     };
     try {
-      return await NonUserModel.findOneAndUpdate(filter, update, options).exec();
+      return await NonUserModel.findOneAndUpdate(
+        filter,
+        update,
+        options
+      ).exec();
     } catch (error) {
       throw new Error("Failed to save or update non-verified user data.");
     }
@@ -50,6 +54,22 @@ class UserRepository implements UserRepo {
     } catch (error) {
       throw new Error("Failed to save OTP.");
     }
+  }
+  async findOtpByEmail(email: string) {
+    return OtpModel.findOne({ email: email });
+  }
+  async deleteOtpByEmail(email: string) {
+    return OtpModel.deleteMany({ email: email });
+  }
+  async findNonVerifiedUserByEmail(email: string) {
+    return NonUserModel.findOne({ email: email });
+  }
+  async saveVerifiedUser(userData: any) {
+    const verifiedUser = new UserModel(userData);
+    return verifiedUser.save();
+  }
+  async deleteNonVerifiedUserByEmail(email: string) {
+    return NonUserModel.deleteOne({ email: email });
   }
 }
 

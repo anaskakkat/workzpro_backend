@@ -7,6 +7,7 @@ import './frameworks/database/mongoDb'
 
 
 app.get("/", (req, res) => res.send("Server is  Ready.."));
+
 app.listen(PORT, () => {
     console.log(`Server is running on port http://localhost:${PORT}`);
   });

@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
 const getEnv = (key: string, defaultValue?: string): string => {
@@ -14,3 +14,5 @@ export const MONGO_URI = getEnv("DATABASE_URI");
 
 export const AUTH_MAIL = getEnv("AUTH_MAIL");
 export const AUTH_MAIL_PASSWORD = getEnv("AUTH_MAIL_PASSWORD");
+export const SECRET_KEY = getEnv("SECRET_KEY");
+export const NODE_ENV = getEnv("NODE_ENV");

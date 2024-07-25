@@ -8,6 +8,7 @@ import GenerateOtp from "../utils/generateOtp";
 import EncryptOtp from "../utils/bcryptOtp";
 import EncryptPassword from "../utils/bcryptPassword";
 import NodemailerEmailService from "../utils/sentMail";
+import JWTService from "../utils/generateToken";
 
 const userRouter = express.Router();
 
@@ -16,6 +17,7 @@ const generateOtp = new GenerateOtp();
 const encryptOtp = new EncryptOtp();
 const encryptPassword = new EncryptPassword();
 const nodeMailerService = new NodemailerEmailService();
+const jwtService = new JWTService();
 //repository's------------
 const userRepository = new UserRepository();
 
@@ -25,7 +27,8 @@ const userCase = new UserUsecase(
   generateOtp,
   encryptOtp,
   encryptPassword,
-  nodeMailerService
+  nodeMailerService,
+  jwtService
 );
 
 //controllers-------------
@@ -36,7 +39,16 @@ userRouter.post("/signup", (req, res, next) => {
 
   userController.signUp(req, res, next);
 });
+userRouter.post("/otp", (req, res, next) => {
+  userController.otpVerification(req, res, next);
+});
+
+userRouter.post('/resend_otp',(req,res,next)=>{
+  userController.resendOtp(req, res, next);
+
+})
 
 userRouter.use(errorHandle);
 
 export default userRouter;
+ 
