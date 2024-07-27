@@ -43,12 +43,16 @@ userRouter.post("/otp", (req, res, next) => {
   userController.otpVerification(req, res, next);
 });
 
-userRouter.post('/resend_otp',(req,res,next)=>{
+userRouter.post("/resend_otp", (req, res, next) => {
   userController.resendOtp(req, res, next);
-
-})
+});
+userRouter.post("/login", (req, res, next) => {
+  userController.login(req, res, next);
+});
+userRouter.post("/logout", (req, res, next) => {
+  userController.logout(req, res, next);
+});
 
 userRouter.use(errorHandle);
 
 export default userRouter;
- 

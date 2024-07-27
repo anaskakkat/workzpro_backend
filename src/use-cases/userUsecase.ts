@@ -31,7 +31,9 @@ class UserUsecase {
 
   async checkExist(email: string, phoneNumber: number) {
     try {
-      const userExist = await this._userRepository.findbyEmail(email);
+      console.log('phoneNumber',phoneNumber);
+      
+      const userExist = await this._userRepository.findUserByEmail(email);
       const phoneNumberExist = await this._userRepository.findPhoneNumber(
         phoneNumber
       );
@@ -44,7 +46,7 @@ class UserUsecase {
       }
       return { status: 200, message: "User Does Not Exist" };
     } catch (error) {
-      console.error(error); // Improved error logging
+      console.error(error);
       return { status: 400, message: "An error occurred" };
     }
   }
@@ -92,10 +94,10 @@ class UserUsecase {
       const otpGeneratedAt = new Date(otpData.otpGeneratedAt).getTime();
       const otpExpiration = 1 * 60 * 1000;
 
-      // if (now - otpGeneratedAt > otpExpiration) {
-      //   await this._userRepository.deleteOtpByEmail(email);
-      //   return { status: 400, message: "OTP has expired" };
-      // }
+      if (now - otpGeneratedAt > otpExpiration) {
+        await this._userRepository.deleteOtpByEmail(email);
+        return { status: 400, message: "OTP has expired" };
+      }
       const isOtpValid = await this._encryptOtp.compare(otp, otpData.otp);
       if (!isOtpValid) {
         return { status: 400, message: "Invalid OTP" };
@@ -118,7 +120,7 @@ class UserUsecase {
         phoneNumber: userData.phoneNumber,
         status: "verified",
       };
-      const savedUser = await this._userRepository.saveVerifiedUser(user);
+      let savedUser = await this._userRepository.saveVerifiedUser(user);
       if (!savedUser) {
         return { status: 500, message: "Failed to save user" };
       }
@@ -128,11 +130,15 @@ class UserUsecase {
         savedUser._id,
         savedUser.email
       );
-      console.log("token:", token);
+      // console.log("token:", token);
 
       return {
         status: 200,
-        savedUser,
+        userData: {
+          email: savedUser.email,
+          username: savedUser.userName,
+          phone: savedUser.phoneNumber,
+        },
         message: "Welcome to WorkzPro!",
         token,
       };
@@ -164,6 +170,44 @@ class UserUsecase {
         message: "An error occurred while verifying OTP",
       };
     }
+  }
+  async verfyLogin(email: string, password: string) {
+    const user = await this._userRepository.findUserByEmail(email);
+    if (!user) {
+      // console.log("User not found");
+      return {
+        statu: 400,
+        message: "User not found",
+      };
+    }
+
+  
+    
+    const isPasswordCorrect = await this._encryptPassword.compare(
+     
+      password,
+      user.password
+    );
+    
+    if (!isPasswordCorrect) {
+      return {
+        status: 400,
+        message: "Password is incorrect",
+      };
+    }
+    const token = this._genrateToken.generateToken(user._id, user.email);
+    // console.log("token:", token);
+
+    return {
+      status: 200,
+      user: {
+        email: user.email,
+        username: user.userName,
+        phone: user.phoneNumber,
+      },
+      message: "User Login Successfully",
+      token,
+    };
   }
 }
 

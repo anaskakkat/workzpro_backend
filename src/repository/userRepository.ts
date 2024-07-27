@@ -3,18 +3,18 @@ import Otp from "../entities/otp";
 import OtpModel from "../frameworks/models/otpModel";
 import NonUserModel from "../frameworks/models/nonVerifyUser";
 import UserModel from "../frameworks/models/userModel";
-import UserRepo from "../use-cases/interfaces/users/IuserRepo";
+import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
 
-class UserRepository implements UserRepo {
-  async findbyEmail(email: string): Promise<User | null> {
+class UserRepository implements IUserRepo {
+  async findUserByEmail(email: string) {
     return UserModel.findOne({ email: email }).exec();
   }
 
-  async findPhoneNumber(phoneNumber: number): Promise<User | null> {
+  async findPhoneNumber(phoneNumber: number) {
     return UserModel.findOne({ phoneNumber: phoneNumber }).exec();
   }
 
-  async saveUserDataTemp(user: User): Promise<User | null> {
+  async saveUserDataTemp(user: User) {
     const filter = { email: user.email };
     const update = {
       userName: user.userName,
@@ -37,7 +37,7 @@ class UserRepository implements UserRepo {
     }
   }
 
-  async saveOtp(email: string, otp: string): Promise<any> {
+  async saveOtp(email: string, otp: string): Promise<Otp | null> {
     const filter = { email };
     const update: any = {
       email,

@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from 'cookie-parser';
 import userRoutes from '../routes/userRoutes'
 import morgan from 'morgan'
+import workerRoutes from "../routes/workerRoutes";
 dotenv.config()
 const app = express();
 app.use(express.json());
@@ -23,5 +24,6 @@ app.use(
 
 
 app.use('/api/user',userRoutes)
+app.use('api/worker',workerRoutes)
 
 export default app;
