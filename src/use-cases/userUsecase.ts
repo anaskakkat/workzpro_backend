@@ -31,8 +31,8 @@ class UserUsecase {
 
   async checkExist(email: string, phoneNumber: number) {
     try {
-      console.log('phoneNumber',phoneNumber);
-      
+      console.log("phoneNumber", phoneNumber);
+
       const userExist = await this._userRepository.findUserByEmail(email);
       const phoneNumberExist = await this._userRepository.findPhoneNumber(
         phoneNumber
@@ -85,6 +85,8 @@ class UserUsecase {
   }
   async verifyOtp(email: string, otp: number) {
     try {
+      // console.log(email,'-',otp);
+
       const otpData = await this._userRepository.findOtpByEmail(email);
       // console.log("otpData:", otpData);
 
@@ -105,7 +107,7 @@ class UserUsecase {
       const userData = await this._userRepository.findNonVerifiedUserByEmail(
         email
       );
-      console.log("userData", userData);
+      // console.log("userData", userData);
 
       if (!userData)
         return {
@@ -154,6 +156,8 @@ class UserUsecase {
   async resendOtp(email: string) {
     try {
       const otp = this._generateOtp.createOtp();
+      const hashedOtp = await this._encryptOtp.encrypt(otp);
+      await this._userRepository.saveOtp(email, hashedOtp);
       await this._emailService.sendEmail(email, otp);
 
       console.log(otp);
@@ -172,6 +176,8 @@ class UserUsecase {
     }
   }
   async verfyLogin(email: string, password: string) {
+    console.log(email, " ", password);
+
     const user = await this._userRepository.findUserByEmail(email);
     if (!user) {
       // console.log("User not found");
@@ -180,15 +186,10 @@ class UserUsecase {
         message: "User not found",
       };
     }
-
-  
-    
     const isPasswordCorrect = await this._encryptPassword.compare(
-     
       password,
       user.password
     );
-    
     if (!isPasswordCorrect) {
       return {
         status: 400,

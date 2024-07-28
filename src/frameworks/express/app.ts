@@ -24,6 +24,6 @@ app.use(
 
 
 app.use('/api/user',userRoutes)
-app.use('api/worker',workerRoutes)
+app.use('/api/worker',workerRoutes)
 
 export default app;

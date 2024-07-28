@@ -18,6 +18,7 @@ const encryptOtp = new EncryptOtp();
 const encryptPassword = new EncryptPassword();
 const nodeMailerService = new NodemailerEmailService();
 const jwtService = new JWTService();
+
 //repository's------------
 const userRepository = new UserRepository();
 

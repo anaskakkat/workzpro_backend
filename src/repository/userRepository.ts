@@ -15,6 +15,7 @@ class UserRepository implements IUserRepo {
   }
 
   async saveUserDataTemp(user: User) {
+    try {
     const filter = { email: user.email };
     const update = {
       userName: user.userName,
@@ -26,7 +27,6 @@ class UserRepository implements IUserRepo {
       upsert: true,
       new: true,
     };
-    try {
       return await NonUserModel.findOneAndUpdate(
         filter,
         update,
