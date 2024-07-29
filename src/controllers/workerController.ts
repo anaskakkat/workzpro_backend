@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import WorkerUsecase from "../use-cases/workerUsecse";
+import { NODE_ENV } from "../frameworks/constants/env";
 
 class WorkerController {
   private _workerUseCase: WorkerUsecase;
 
-  constructor(workerUsecase: WorkerUsecase) { 
+  constructor(workerUsecase: WorkerUsecase) {
     this._workerUseCase = workerUsecase;
   }
 
@@ -16,7 +17,7 @@ class WorkerController {
         email,
         phoneNumber
       );
-    //   console.log("verifyWorker:", verifyWorker);
+      //   console.log("verifyWorker:", verifyWorker);
 
       if (verifyWorker.status === 200) {
         const worker = await this._workerUseCase.signup(
@@ -29,13 +30,71 @@ class WorkerController {
 
         return res
           .status(worker.status)
-          .json({ message: worker.message,email:worker.email });
+          .json({ message: worker.message, email: worker.email });
       }
       res.status(200).json(verifyWorker.message);
     } catch (error) {
       next(error);
     }
   }
+  async otpVerify(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, otp } = req.body;
+
+      const verified = await this._workerUseCase.verifyOtp(email, otp);
+      // console.log("verified:--", verified);
+
+      if (verified.status === 200 && verified.token) {
+        res.cookie("workerToken", verified.token, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000, 
+          sameSite: "strict",
+        });
+        return res.status(verified.status).json({ message: verified.message,user:verified.userData });
+      } else {
+        console.log("Verification failed:",verified.message);
+        return res.status(verified.status).json({ message: verified.message });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      res.cookie("workerToken", "", {
+        httpOnly: true,
+        secure: NODE_ENV !== "development",
+        expires: new Date(0),
+        sameSite: "strict",
+      });
+
+      return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async login(req: Request, res: Response, next: NextFunction) {
+    const { email, password } = req.body;
+
+    const verified = await this._workerUseCase.verfyLogin(email, password);
+
+    if (verified.status === 200 && verified.token) {
+      res.cookie("workerToken", verified.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== "development",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        sameSite: "strict",
+      });
+    }
+    return res.json({
+      message: verified.message,
+      user: verified.user,
+    });
+  }
 }
+
+
+
 
 export default WorkerController;

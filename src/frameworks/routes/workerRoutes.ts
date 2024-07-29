@@ -5,7 +5,7 @@ import EncryptOtp from "../utils/bcryptOtp";
 import EncryptPassword from "../utils/bcryptPassword";
 import NodemailerEmailService from "../utils/sentMail";
 import JWTService from "../utils/generateToken";
-import WorkerRepository from "../../repository/workerReposotory";
+import WorkerRepository from "../../repository/workerRepository";
 import WorkerUsecase from "../../use-cases/workerUsecse";
 import WorkerController from "../../controllers/workerController";
 
@@ -16,6 +16,7 @@ const generateOtp = new GenerateOtp();
 const encryptOtp = new EncryptOtp();
 const encryptPassword = new EncryptPassword();
 const nodeMailerService = new NodemailerEmailService();
+const jwtService = new JWTService();
 //repository's------------
 const workerRepository = new WorkerRepository();
 
@@ -25,7 +26,8 @@ const workerUsecase = new WorkerUsecase(
   generateOtp,
   encryptOtp,
   encryptPassword,
-  nodeMailerService
+  nodeMailerService,
+  jwtService
 );
 
 const workerController = new WorkerController(workerUsecase);
@@ -35,9 +37,15 @@ workerRouter.post("/signup", (req, res, next) => {
   //   console.log("signUp reached", req.body);
   workerController.signUp(req, res, next);
 });
-// workerRouter.post("/otp", (req, res, next) => {
-//   workerController.verify(req, res, next);
-// });
+workerRouter.post("/otp", (req, res, next) => {
+  workerController.otpVerify(req, res, next);
+});
+workerRouter.post("/logout", (req, res, next) => {
+  workerController.logout(req, res, next);
+});
+workerRouter.post("/login", (req, res, next) => {
+  workerController.login(req, res, next);
+});
 
 // Error handling middleware
 workerRouter.use(errorHandle);

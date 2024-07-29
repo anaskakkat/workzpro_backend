@@ -5,7 +5,6 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
   {
     workerId: {
       type: Number,
-      required: true,
     },
     name: {
       type: String,
@@ -28,7 +27,6 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     },
     experience: {
       type: Number,
-      required: true,
     },
     location: {
       type: String,
