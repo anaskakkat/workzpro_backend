@@ -8,6 +8,7 @@ interface Worker {
     service?: any; 
     experience?: number;
     location?: string;
+    role?: "worker";
     identityProof?: string;
     wallet?: number;
     profilePicture?: string;

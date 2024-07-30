@@ -29,7 +29,7 @@ const userCase = new UserUsecase(
   encryptOtp,
   encryptPassword,
   nodeMailerService,
-  jwtService
+  jwtService,
 );
 
 //controllers-------------
@@ -53,6 +53,7 @@ userRouter.post("/login", (req, res, next) => {
 userRouter.post("/logout", (req, res, next) => {
   userController.logout(req, res, next);
 });
+
 
 userRouter.use(errorHandle);
 

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../use-cases/userUsecase";
 import { NODE_ENV } from "../frameworks/constants/env";
+import logger from "../frameworks/config/logger";
 
 class UserController {
   private _userUsecase: UserUsecase;
@@ -12,13 +13,12 @@ class UserController {
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(req.body);
-      
+
       const verifyUser = await this._userUsecase.checkExist(
         req.body.email,
         req.body.mobile
       );
-      console.log('verifyUser:',verifyUser);
-
+      console.log("verifyUser:", verifyUser);
 
       if (verifyUser.status === 200) {
         const user = await this._userUsecase.signup(
@@ -42,14 +42,20 @@ class UserController {
       const { email, otp } = req.body;
 
       const verified = await this._userUsecase.verifyOtp(email, otp);
-
+      logger.info("otp--", verified);
       if (verified.status === 200 && verified.token) {
-        res.cookie("jwt", verified.token, {
+        res.cookie("user_access_token", verified.token, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          maxAge: 30 * 24 * 60 * 60 * 1000,
+          maxAge: 60 * 60 * 1000,
           sameSite: "strict",
         });
+        // res.cookie("user_refresh_token", verified.tokens.refreshToken, {
+        //   httpOnly: true,
+        //   secure: process.env.NODE_ENV !== "development",
+        //   maxAge: 30 * 24 * 60 * 60 * 1000,
+        //   sameSite: "strict",
+        // });
         return res
           .status(verified.status)
           .json({ message: verified.message, user: verified.userData });
@@ -74,24 +80,51 @@ class UserController {
   async login(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
 
-    const verified = await this._userUsecase.verfyLogin(email, password);
-
-    if (verified.status === 200 && verified.token) {
-      res.cookie("jwt", verified.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "development",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: "strict",
-      });
+    try {
+      const verified = await this._userUsecase.verfyLogin(email, password);
+      // console.log("v----", verified);
+      if (
+        verified?.status === 200 &&
+        verified?.tokens?.accessToken &&
+        verified.tokens.refreshToken
+      ) {
+        res.cookie("user_access_token", verified.tokens.accessToken, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 15 * 1000,
+          sameSite: "strict",
+        });
+        res.cookie("user_refresh_token", verified.tokens.refreshToken, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        return res.status(verified.status).json({
+          message: verified.message,
+          user: verified.user,
+        });
+      } else {
+        // console.log('touched',verified);
+        
+        return res.status(verified?.status || 400).json({
+          message: verified?.message,
+        });
+      }
+    } catch (error) {
+      
+      next(error);
     }
-    return res.json({
-      message: verified.message,
-      user: verified.user,
-    });
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.cookie("jwt", "", {
+      res.cookie("user_access_Token", "", {
+        httpOnly: true,
+        secure: NODE_ENV !== "development",
+        expires: new Date(0),
+        sameSite: "strict",
+      });
+      res.cookie("user_refresh_token", "", {
         httpOnly: true,
         secure: NODE_ENV !== "development",
         expires: new Date(0),
@@ -104,5 +137,4 @@ class UserController {
     }
   }
 }
-
 export default UserController;

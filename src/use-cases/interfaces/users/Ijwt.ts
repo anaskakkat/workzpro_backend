@@ -1,5 +1,7 @@
+import { ITokens } from "./ITokens";
+
 interface JWT {
-  generateToken(userId: string, email: string): string;
+  generateToken(userId: string | undefined, email: string): ITokens;
 }
 
 export default JWT;

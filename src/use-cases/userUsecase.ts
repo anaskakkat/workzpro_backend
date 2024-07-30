@@ -3,8 +3,9 @@ import UserRepository from "../repository/userRepository";
 import EncryptOtp from "../frameworks/utils/bcryptOtp";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import NodemailerEmailService from "../frameworks/utils/sentMail";
-import { log } from "console";
 import JWTService from "../frameworks/utils/generateToken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import logger from "../frameworks/config/logger";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -128,10 +129,7 @@ class UserUsecase {
       }
       await this._userRepository.deleteNonVerifiedUserByEmail(email);
 
-      const token = this._genrateToken.generateToken(
-        savedUser._id,
-        savedUser.email
-      );
+      const token = this._genrateToken.generateToken(savedUser._id);
       // console.log("token:", token);
 
       return {
@@ -176,40 +174,45 @@ class UserUsecase {
     }
   }
   async verfyLogin(email: string, password: string) {
-    console.log(email, " ", password);
+    try {
+      const user = await this._userRepository.findUserByEmail(email);
+      if (!user) {
+        // console.log("User not found");
+        return {
+          status: 400,
+          message: "User not found",
+        };
+      }
+      const isPasswordCorrect = await this._encryptPassword.compare(
+        password,
+        user.password
+      );
+      if (!isPasswordCorrect) {
+        return {
+          status: 400,
+          message: "Password is incorrect",
+        };
+      }
+      const tokens = this._genrateToken.generateToken(user._id);
+      console.log("tokens--:", tokens);
 
-    const user = await this._userRepository.findUserByEmail(email);
-    if (!user) {
-      // console.log("User not found");
       return {
-        statu: 400,
-        message: "User not found",
+        status: 200,
+        user: {
+          email: user.email,
+          username: user.userName,
+          phone: user.phoneNumber,
+        },
+        message: "User Login Successfully",
+        tokens,
       };
+    } catch (error) {
+      console.log(error);
+      
+      logger.info(error);
     }
-    const isPasswordCorrect = await this._encryptPassword.compare(
-      password,
-      user.password
-    );
-    if (!isPasswordCorrect) {
-      return {
-        status: 400,
-        message: "Password is incorrect",
-      };
-    }
-    const token = this._genrateToken.generateToken(user._id, user.email);
-    // console.log("token:", token);
-
-    return {
-      status: 200,
-      user: {
-        email: user.email,
-        username: user.userName,
-        phone: user.phoneNumber,
-      },
-      message: "User Login Successfully",
-      token,
-    };
   }
+
 }
 
 export default UserUsecase;

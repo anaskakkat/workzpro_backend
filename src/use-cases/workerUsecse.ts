@@ -127,7 +127,6 @@ class WorkerUsecase {
 
       const token = this._genrateToken.generateToken(
         savedUser._id,
-        savedUser.email
       );
       // console.log("token:", token);
 
@@ -150,7 +149,7 @@ class WorkerUsecase {
     }
   }
   async verfyLogin(email: string, password: string) {
-    console.log(email, " ", password);
+    console.log(email, "-", password);
 
     const user = await this._WorkerRepository.findWorkerByEmail(email);
     if (!user) {
@@ -170,8 +169,8 @@ class WorkerUsecase {
         message: "Password is incorrect",
       };
     }
-    const token = this._genrateToken.generateToken(user._id, user.email);
-    // console.log("token:", token);
+    const token = this._genrateToken.generateToken(user._id);
+    console.log("token:", token);
 
     return {
       status: 200,

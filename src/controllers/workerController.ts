@@ -42,7 +42,7 @@ class WorkerController {
       const { email, otp } = req.body;
 
       const verified = await this._workerUseCase.verifyOtp(email, otp);
-      // console.log("verified:--", verified);
+      console.log("verified:--", verified);
 
       if (verified.status === 200 && verified.token) {
         res.cookie("workerToken", verified.token, {
