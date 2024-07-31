@@ -15,7 +15,7 @@ class AdminController {
     try {
       const { email, password } = req.body;
       const verified = await this._adminUsecase.verifylogin(email, password);
-      console.log(verified);
+      console.log("admin:", verified);
       if (
         verified?.status === 200 &&
         verified?.tokens?.accessToken &&
@@ -62,6 +62,42 @@ class AdminController {
       });
 
       return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getUsers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this._adminUsecase.userData();
+      return res
+        .status(result.status)
+        .json({ message: result.message, data: result.userdata });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async blockUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.id;
+      console.log("uid-", userId);
+
+      const result = await this._adminUsecase.blockuser(userId);
+      return res
+        .status(result.status)
+        .json({ message: result.message, data: result.userdata });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async unblockUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.id;
+      // console.log("uid-", userId);
+
+      const result = await this._adminUsecase.unblockUser(userId);
+      return res
+        .status(result.status)
+        .json({ message: result.message, data: result.userdata });
     } catch (error) {
       next(error);
     }

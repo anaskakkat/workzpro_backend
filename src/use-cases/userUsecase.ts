@@ -176,6 +176,13 @@ class UserUsecase {
   async verfyLogin(email: string, password: string) {
     try {
       const user = await this._userRepository.findUserByEmail(email);
+      console.log("------", user);
+      if (user?.isBlocked) {
+        return {
+          status: 400,
+          message: "Sorry, you are blocked.",
+        };
+      }
       if (!user) {
         // console.log("User not found");
         return {
@@ -193,8 +200,9 @@ class UserUsecase {
           message: "Password is incorrect",
         };
       }
+
       const tokens = this._genrateToken.generateToken(user._id);
-      console.log("tokens--:", tokens);
+      // console.log("tokens--:", tokens);
 
       return {
         status: 200,
@@ -208,11 +216,10 @@ class UserUsecase {
       };
     } catch (error) {
       console.log(error);
-      
+
       logger.info(error);
     }
   }
-
 }
 
 export default UserUsecase;

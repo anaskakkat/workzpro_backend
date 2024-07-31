@@ -61,7 +61,7 @@ class AdminUsecase {
           email: admin.email,
           name: admin.name,
         },
-        message: "User Login Successfully",
+        message: "admin Login Successfully",
         tokens,
       };
     } catch (error) {
@@ -69,8 +69,6 @@ class AdminUsecase {
     }
   }
 
-
-  
   async signup(name: string, email: string, password: string) {
     try {
       const hashedPassword = await this._encryptPassword.encrypt(password);
@@ -87,6 +85,67 @@ class AdminUsecase {
         status: 200,
         message: "admin registered successfully",
       };
+    } catch (error) {
+      return { status: 400, message: "An error occurred" };
+    }
+  }
+  async userData() {
+    try {
+      const userdata = await this._adminRepository.getAllUsersdata();
+      console.log(userdata);
+
+      return {
+        status: 200,
+        userdata,
+        message: "Data fetched successfully",
+      };
+    } catch (error) {
+      return { status: 400, message: "An error occurred" };
+    }
+  }
+  async blockuser(id: any) {
+    try {
+      const userdata = await this._adminRepository.FindUserById(id);
+      if (userdata) {
+        userdata.isBlocked = true;
+
+        await userdata.save();
+
+        return {
+          status: 200,
+          userdata,
+          message: "User blocked successfully",
+        };
+      } else {
+        return {
+          status: 404,
+          message: "User not found",
+        };
+      }
+    } catch (error) {
+      return { status: 400, message: "An error occurred" };
+    }
+  }
+  async unblockUser(id: any) {
+    try {
+      const userdata = await this._adminRepository.FindUserById(id);
+      if (userdata) {
+        userdata.isBlocked = false;
+
+        await userdata.save();
+        // console.log("userdata", userdata);
+ 
+        return {
+          status: 200,
+          userdata,
+          message: "User  unblock successfully",
+        };
+      } else {
+        return {
+          status: 404,
+          message: "User not found",
+        };
+      }
     } catch (error) {
       return { status: 400, message: "An error occurred" };
     }
