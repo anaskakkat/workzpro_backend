@@ -45,6 +45,10 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       type: Boolean,
       default: false,
     },
+    isProfileSetup: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
       default: "notVerified",

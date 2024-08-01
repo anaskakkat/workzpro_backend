@@ -10,8 +10,6 @@ class AdminController {
   }
 
   async login(req: Request, res: Response, next: NextFunction) {
-    console.log("touched");
-
     try {
       const { email, password } = req.body;
       const verified = await this._adminUsecase.verifylogin(email, password);
@@ -79,8 +77,6 @@ class AdminController {
   async blockUser(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.params.id;
-      console.log("uid-", userId);
-
       const result = await this._adminUsecase.blockuser(userId);
       return res
         .status(result.status)
@@ -99,6 +95,19 @@ class AdminController {
         .status(result.status)
         .json({ message: result.message, data: result.userdata });
     } catch (error) {
+      next(error);
+    }
+  }
+  async createServices(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      const { name, description } = req.body;
+      const result = await this._adminUsecase.createServices(name, description);
+      
+      res.status(result.status).json({
+        message: result.message,
+      });
+    } catch (error) {      
       next(error);
     }
   }

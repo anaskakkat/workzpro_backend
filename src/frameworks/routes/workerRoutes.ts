@@ -47,7 +47,7 @@ workerRouter.post("/login", (req, res, next) => {
   workerController.login(req, res, next);
 });
 
-// Error handling middleware
-workerRouter.use(errorHandle);
+// // Error handling middleware
+// workerRouter.use(errorHandle);
 
 export default workerRouter;

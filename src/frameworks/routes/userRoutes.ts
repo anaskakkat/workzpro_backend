@@ -55,6 +55,6 @@ userRouter.post("/logout", (req, res, next) => {
 });
 
 
-userRouter.use(errorHandle);
+// userRouter.use(errorHandle);
 
 export default userRouter;

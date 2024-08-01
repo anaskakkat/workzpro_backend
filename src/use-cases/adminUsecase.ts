@@ -1,3 +1,4 @@
+import { CostumeError } from "../frameworks/middlewares/customError";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import JWTService from "../frameworks/utils/generateToken";
 import AdminRepository from "../repository/adminRepository";
@@ -134,7 +135,7 @@ class AdminUsecase {
 
         await userdata.save();
         // console.log("userdata", userdata);
- 
+
         return {
           status: 200,
           userdata,
@@ -147,6 +148,34 @@ class AdminUsecase {
         };
       }
     } catch (error) {
+      return { status: 400, message: "An error occurred" };
+    }
+  }
+  async createServices(name: string, description: string) {
+    try {
+      const exist = await this._adminRepository.existServices(name);
+      console.log("exist-", exist);
+      if (exist?.name === name) {
+        throw new CostumeError(400, "Duplicate found");
+      }
+      const serviceData = await this._adminRepository.saveServices(
+        name,
+        description
+      );
+      if (serviceData) {
+        return {
+          status: 200,
+          message: "Service saved successfully",
+          data: serviceData,
+        };
+      } else {
+        return {
+          status: 404,
+          message: "Service not found or created",
+        };
+      }
+    } catch (error) {
+      throw error;
       return { status: 400, message: "An error occurred" };
     }
   }

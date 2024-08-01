@@ -5,6 +5,7 @@ import AdminRepository from "../../repository/adminRepository";
 import AdminUsecase from "../../use-cases/adminUsecase";
 import EncryptPassword from "../utils/bcryptPassword";
 import JWTService from "../utils/generateToken";
+import { log } from "console";
 
 const adminRouter = express.Router();
 
@@ -39,7 +40,11 @@ adminRouter.patch("/users/:id/block", (req, res, next) => {
 adminRouter.patch("/users/:id/unblock", (req, res, next) => {
   adminController.unblockUser(req, res, next);
 });
+adminRouter.post("/services", (req, res, next) => {
+  
+  adminController.createServices(req, res, next);
+});
 
-adminRouter.use(errorHandle);
+// adminRouter.use(errorHandle);
 
 export default adminRouter;

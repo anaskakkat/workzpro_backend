@@ -6,6 +6,8 @@ import userRoutes from "../routes/userRoutes";
 import morgan from "morgan";
 import workerRoutes from "../routes/workerRoutes";
 import adminRoutes from "../routes/adminRoutes";
+import { CostumeError } from "../middlewares/customError";
+import errorHandle from "../middlewares/errorHandle";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -26,5 +28,6 @@ app.use(
 app.use("/api/user", userRoutes);
 app.use("/api/worker", workerRoutes);
 app.use("/api/admin", adminRoutes);
+app.use(errorHandle);
 
 export default app;
