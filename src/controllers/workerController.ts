@@ -48,12 +48,14 @@ class WorkerController {
         res.cookie("workerToken", verified.token, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          maxAge: 30 * 24 * 60 * 60 * 1000, 
+          maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
-        return res.status(verified.status).json({ message: verified.message,user:verified.userData });
+        return res
+          .status(verified.status)
+          .json({ message: verified.message, user: verified.userData });
       } else {
-        console.log("Verification failed:",verified.message);
+        console.log("Verification failed:", verified.message);
         return res.status(verified.status).json({ message: verified.message });
       }
     } catch (error) {
@@ -76,25 +78,37 @@ class WorkerController {
   }
   async login(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
+    try {
+      const verified = await this._workerUseCase.verfyLogin(email, password);
 
-    const verified = await this._workerUseCase.verfyLogin(email, password);
+      if (verified.status === 200 && verified.token) {
+        res.cookie("workerToken", verified.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+      }
+      console.log("verified:", verified);
 
-    if (verified.status === 200 && verified.token) {
-      res.cookie("workerToken", verified.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "development",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-        sameSite: "strict",
+      return res.json({
+        message: verified.message,
+        worker: verified.worker,
       });
+    } catch (error) {
+      next(error);
     }
-    return res.json({
-      message: verified.message,
-      user: verified.user,
-    });
+  }
+
+  async services(req: Request, res: Response, next: NextFunction) {
+    try {
+      const services = await this._workerUseCase.services();
+      // console.log('services---touched',services);
+      return res.status(200).json(services);
+    } catch (error) {
+      next(error);
+    }
   }
 }
-
-
-
 
 export default WorkerController;

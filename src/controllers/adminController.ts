@@ -150,11 +150,68 @@ class AdminController {
     try {
       const { id } = req.params;
       const { name, description } = req.body;
-      const result = await this._adminUsecase.editServices(id,name,description);
+      const result = await this._adminUsecase.editServices(
+        id,
+        name,
+        description
+      );
 
       res.status(result.status).json({
         message: result.message,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getWorkers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this._adminUsecase.getWorkers();
+      console.log("re", result);
+
+      res.status(result.status).json({
+        message: result.message,
+        workers: result.data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async blockWorker(req: Request, res: Response, next: NextFunction) {
+    try {
+      const WorkerId = req.params.id;
+      const result = await this._adminUsecase.blockWorker(WorkerId);
+
+      return res
+        .status(result.status)
+        .json({ message: result.message});
+    } catch (error) {
+      next(error);
+    }
+  }
+  async unblockWorker(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.id;
+      // console.log("uid-", userId);
+
+      const result = await this._adminUsecase.unblockWorker(userId);
+      return res
+        .status(result.status)
+        .json({ message: result.message });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async worker_request(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.params.id;
+      // console.log("uid-", userId);
+
+      const result = await this._adminUsecase.worker_request(userId);
+      return res
+        .status(result.status)
+        .json({ message: result.message });
     } catch (error) {
       next(error);
     }

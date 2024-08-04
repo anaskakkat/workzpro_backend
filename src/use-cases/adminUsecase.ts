@@ -54,7 +54,7 @@ class AdminUsecase {
           message: "Password is incorrect",
         };
       }
-      const tokens = this._genrateToken.generateToken(admin._id);
+      const tokens = this._genrateToken.generateToken(admin._id,admin.role as string);
       //   console.log('tokens:tokens',tokens);
       return {
         status: 200,
@@ -252,6 +252,87 @@ class AdminUsecase {
         };
       } else {
         throw new CostumeError(400, " no service found");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getWorkers() {
+    try {
+      const serviceData = await this._adminRepository.getWorkers();
+      // console.log("serviceData-", serviceData);
+
+      if (serviceData) {
+        return {
+          status: 200,
+          message: "Service data fethed successfully",
+          data: serviceData,
+        };
+      } else {
+        throw new CostumeError(400, "not get service data");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async blockWorker(id: any) {
+    try {
+      const userdata = await this._adminRepository.FindWorkerById(id);
+      if (userdata) {
+        userdata.isBlocked = true;
+
+        await userdata.save();
+
+        return {
+          status: 200,
+          userdata,
+          message: "Worker blocked successfully",
+        };
+      } else {
+        throw new CostumeError(404,"Worker not found")
+      
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async unblockWorker(id: any) {
+    try {
+      const userdata = await this._adminRepository.FindWorkerById(id);
+      if (userdata) {
+        userdata.isBlocked = false;
+
+        await userdata.save();
+
+        return {
+          status: 200,
+          userdata,
+          message: "Worker unblocked successfully",
+        };
+      } else {
+        throw new CostumeError(404,"Worker not found")
+      
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async worker_request(id: any) {
+    try {
+      const userdata = await this._adminRepository.FindWorkerById(id);
+      if (userdata) {
+        userdata.isProfileSetup = true;
+
+        await userdata.save();
+
+        return {
+          status: 200,
+          userdata,
+          message: "Worker request accepted ",
+        };
+      } else {
+        throw new CostumeError(404,"Worker not found")
+      
       }
     } catch (error) {
       throw error;

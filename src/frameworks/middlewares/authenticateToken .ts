@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { SECRET_KEY } from "../constants/env";
 import JWTService from "../utils/generateToken";
 import UserRepository from "../../repository/userRepository";
 
@@ -15,12 +13,19 @@ declare global {
   }
 }
 
-const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+const authenticateToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let userToken = req.cookies.user_access_token;
   const userRefreshTokens = req.cookies.user_refresh_token;
+  // console.log("userRefreshTokens:--", userRefreshTokens);
 
   if (!userRefreshTokens) {
-    return res.status(401).json({ message: "Not authorized, no refresh token" });
+    return res
+      .status(401)
+      .json({ message: "Not authorized, no refresh token" });
   }
 
   if (!userToken) {
@@ -34,17 +39,20 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
       });
       userToken = newUserToken;
     } catch (error) {
-      return res.status(401).json({ message: "Failed to refresh access token" });
+      return res
+        .status(401)
+        .json({ message: "Failed to refresh access token" });
     }
   }
 
   try {
-    const decodedData = _jwtToken.verifyToken(userToken);
+    const decodedData = _jwtToken.verifyToken(userToken.accessToken);
     if (!decodedData?.success) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    const user = await _userRepo.findUserByEmail(decodedData.decoded.userId);
+    console.log("decodedData:----", decodedData);
+    const user = await _userRepo.findUserById(decodedData.decoded.userId);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
@@ -54,7 +62,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
     if (!decodedData.decoded.role || decodedData.decoded.role !== "user") {
       return res.status(401).json({ message: "Not authorized, invalid role" });
     }
-    
+
     req.userId = decodedData.decoded.userId;
     next();
   } catch (error) {
@@ -66,7 +74,13 @@ const refreshAccessToken = async (refreshToken: string) => {
   try {
     if (!refreshToken) throw new Error("No refresh token found");
     const decoded = _jwtToken.verifyRefreshToken(refreshToken);
-    const newAccessToken = _jwtToken.generateToken(decoded?.decoded.userId, decoded?.role);
+    if (!decoded) {
+      throw new Error("Invalid refresh token");
+    }
+    const newAccessToken = _jwtToken.generateToken(
+      decoded.decoded.userId,
+      decoded.decoded.role
+    );
     return newAccessToken;
   } catch (error) {
     throw new Error("Invalid refresh token");

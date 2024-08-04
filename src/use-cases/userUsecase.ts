@@ -131,7 +131,10 @@ class UserUsecase {
       await this._userRepository.deleteNonVerifiedUserByEmail(email);
 
       console.log("savedUser:---", savedUser);
-      const token = this._genrateToken.generateToken(savedUser._id,savedUser.role); 
+      const token = this._genrateToken.generateToken(
+        savedUser._id,
+        savedUser.role as string
+      );
 
       return {
         status: 200,
@@ -193,8 +196,9 @@ class UserUsecase {
           message: "Password is incorrect",
         };
       }
+// console.log("user:---",user);
 
-      const tokens = this._genrateToken.generateToken(user._id,user.role);
+      const tokens = this._genrateToken.generateToken(user._id, user.role as string);
       // console.log("tokens--:", tokens);
 
       return {
@@ -211,6 +215,17 @@ class UserUsecase {
       console.log(error);
 
       logger.info(error);
+    }
+  }
+  async services() {
+    try {
+      const services = this._userRepository.getServices();
+      if (!services) {
+        throw new CostumeError(400, "not fetched service data");
+      }
+      return services;
+    } catch (error) {
+      throw error;
     }
   }
 }

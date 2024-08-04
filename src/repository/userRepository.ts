@@ -4,10 +4,14 @@ import OtpModel from "../frameworks/models/otpModel";
 import NonUserModel from "../frameworks/models/nonVerifyUser";
 import UserModel from "../frameworks/models/userModel";
 import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
+import serviceModel from "../frameworks/models/serviceModel";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
     return UserModel.findOne({ email: email }).exec();
+  }
+  async findUserById(id:string) {
+    return UserModel.findById(id).exec();
   }
 
   async findPhoneNumber(phoneNumber: number) {
@@ -70,6 +74,9 @@ class UserRepository implements IUserRepo {
   }
   async deleteNonVerifiedUserByEmail(email: string) {
     return NonUserModel.deleteOne({ email: email });
+  }
+  async getServices() {
+    return serviceModel.find();
   }
 }
 

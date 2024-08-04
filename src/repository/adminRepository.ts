@@ -2,6 +2,7 @@ import Admin from "../entities/admin";
 import AdminModel from "../frameworks/models/adminModel";
 import serviceModel from "../frameworks/models/serviceModel";
 import UserModel from "../frameworks/models/userModel";
+import WorkerModel from "../frameworks/models/workerModel";
 
 import IAdminRepo from "../use-cases/interfaces/admin/IAdminRepo";
 
@@ -14,6 +15,9 @@ class AdminRepository implements IAdminRepo {
   }
   async FindUserById(id: any) {
     return UserModel.findById(id);
+  }
+  async FindWorkerById(id: any) {
+    return WorkerModel.findById(id);
   }
   async saveAdmin(admin: Admin) {
     try {
@@ -58,6 +62,11 @@ class AdminRepository implements IAdminRepo {
   async getServices() {
     return serviceModel.find();
   }
+  async getWorkers() {
+    return WorkerModel.find();
+  }
+
+
   async findServicesById(id: any) {
     return serviceModel.findById(id);
   }

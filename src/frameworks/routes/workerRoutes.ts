@@ -46,6 +46,10 @@ workerRouter.post("/logout", (req, res, next) => {
 workerRouter.post("/login", (req, res, next) => {
   workerController.login(req, res, next);
 });
+workerRouter.get("/services", (req, res, next) => {
+  
+  workerController.services(req, res, next);
+});
 
 // // Error handling middleware
 // workerRouter.use(errorHandle);

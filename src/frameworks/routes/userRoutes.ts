@@ -30,7 +30,7 @@ const userCase = new UserUsecase(
   encryptOtp,
   encryptPassword,
   nodeMailerService,
-  jwtService,
+  jwtService
 );
 
 //controllers-------------
@@ -51,12 +51,18 @@ userRouter.post("/resend_otp", (req, res, next) => {
 userRouter.post("/login", (req, res, next) => {
   userController.login(req, res, next);
 });
-
-userRouter.use(authenticateToken)
 userRouter.post("/logout", (req, res, next) => {
   userController.logout(req, res, next);
 });
 
+
+userRouter.use(authenticateToken);
+
+
+userRouter.get("/services", (req, res, next) => {
+  
+  userController.services(req, res, next);
+});
 
 // userRouter.use(errorHandle);
 

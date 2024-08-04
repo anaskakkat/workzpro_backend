@@ -5,23 +5,22 @@ import { ITokens } from "../../use-cases/interfaces/users/ITokens";
 import logger from "../config/logger";
 
 class JWTService implements JWT {
-  generateToken(userId: string,role:string|undefined): ITokens {
+  generateToken(userId: string, role: string): ITokens {
     try {
-      const accessToken = jwt.sign({ userId,role}, SECRET_KEY, {
-        expiresIn: "10s",
+      console.log("generateToken:",role,userId);
+      
+      const tokenPayload = { userId,role };
+      const accessToken = jwt.sign(tokenPayload, SECRET_KEY, {
+        expiresIn: "10m",
       });
-      const refreshToken = jwt.sign({ userId,role}, REFRESH_KEY, {
+      const refreshToken = jwt.sign({ userId, role }, REFRESH_KEY, {
         expiresIn: "30d",
       });
 
       return { accessToken, refreshToken };
     } catch (error) {
-      const err = error as Error;
-      logger.error("Error generating token:", {
-        message: err.message,
-        stack: err.stack,
-      });
-      throw new Error("Failed to generate token");
+      console.error(error);
+      throw error;
     }
   }
 
@@ -38,13 +37,15 @@ class JWTService implements JWT {
     return null;
   }
   verifyToken(token: string): JwtPayload | null {
+    // console.log("verifyToken:-", token);
+
     try {
       if (SECRET_KEY) {
         const decoded = jwt.verify(token, SECRET_KEY) as JwtPayload;
         return { success: true, decoded };
       }
     } catch (error) {
-      console.log(error);
+      console.log("verifyToken:- error---", error);
     }
     return null;
   }

@@ -4,6 +4,7 @@ import NonVerifyWorkerModel from "../frameworks/models/nonVerifyWorker";
 import OtpModel from "../frameworks/models/otpModel";
 import IworkerRepo from "../use-cases/interfaces/workers/IworkerRepo";
 import workerModel from "../frameworks/models/workerModel";
+import serviceModel from "../frameworks/models/serviceModel";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -71,6 +72,9 @@ class WorkerRepository implements IworkerRepo {
   }
   async deleteNonVerifiedWorkerByEmail(email: string) {
     return NonVerifyWorkerModel.deleteOne({ email: email });
+  }
+  async getServices() {
+    return serviceModel.find();
   }
 }
 

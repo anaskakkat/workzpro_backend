@@ -131,7 +131,17 @@ class UserController {
         sameSite: "strict",
       });
 
-      return res.status(200).json({ message: "Logout successful" });
+      return res.status(200).json({ message: "Logout successfull" });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async services(req: Request, res: Response, next: NextFunction) {
+    try { 
+      
+      const services = await this._userUsecase.services();
+      // console.log('services---touched',services);
+      return res.status(200).json(services);
     } catch (error) {
       next(error);
     }

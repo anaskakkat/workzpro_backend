@@ -55,7 +55,17 @@ adminRouter.patch("/services/:id/unblock", (req, res, next) => {
 adminRouter.put("/services/:id/edit", (req, res, next) => {
   adminController.editServices(req, res, next);
 });
-
-// adminRouter.use(errorHandle);
+adminRouter.get("/get_workers", (req, res, next) => {
+  adminController.getWorkers(req, res, next);
+});
+adminRouter.patch("/workers/:id/block", (req, res, next) => {
+  adminController.blockWorker(req, res, next);
+});
+adminRouter.patch("/workers/:id/unblock", (req, res, next) => {
+  adminController.unblockWorker(req, res, next);
+});
+adminRouter.patch("/request/:id/worker_request", (req, res, next) => {
+  adminController.worker_request(req, res, next);
+});
 
 export default adminRouter;

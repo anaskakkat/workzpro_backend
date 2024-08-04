@@ -4,6 +4,7 @@ import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import NodemailerEmailService from "../frameworks/utils/sentMail";
 import JWTService from "../frameworks/utils/generateToken";
 import WorkerRepository from "../repository/workerRepository";
+import { CostumeError } from "../frameworks/middlewares/customError";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -127,6 +128,7 @@ class WorkerUsecase {
 
       const token = this._genrateToken.generateToken(
         savedUser._id,
+        savedUser.role as string
       );
       // console.log("token:", token);
 
@@ -149,39 +151,45 @@ class WorkerUsecase {
     }
   }
   async verfyLogin(email: string, password: string) {
-    console.log(email, "-", password);
-
-    const user = await this._WorkerRepository.findWorkerByEmail(email);
-    if (!user) {
-      // console.log("User not found");
+    try {
+      console.log("Attempting login with email:", email);
+  
+      const user = await this._WorkerRepository.findWorkerByEmail(email);
+      if (!user) {
+        throw new CostumeError(400, "Worker not found");
+      }
+      const isPasswordCorrect = await this._encryptPassword.compare(password, user.password);
+      if (!isPasswordCorrect) {
+        throw new CostumeError(400, "Password is incorrect");
+      }
+      if (user.isBlocked) {
+        throw new CostumeError(400, "You are blocked... please contact Admin");
+      }
+      const token = this._genrateToken.generateToken(user._id, user.role as string);
+      console.log("User found:", user);
+  
       return {
-        statu: 400,
-        message: "User not found",
+        status: 200,
+        worker: user,
+        message: "Login Successfully",
+        token,
       };
+    } catch (error) {
+      console.error("Error during login:", error); // Improved logging
+      throw error;
     }
-    const isPasswordCorrect = await this._encryptPassword.compare(
-      password,
-      user.password
-    );
-    if (!isPasswordCorrect) {
-      return {
-        status: 400,
-        message: "Password is incorrect",
-      };
+  }
+  
+  async services() {
+    try {
+      const services = this._WorkerRepository.getServices();
+      if (!services) {
+        throw new CostumeError(400, "not fetched service data");
+      }
+      return services;
+    } catch (error) {
+      throw error;
     }
-    const token = this._genrateToken.generateToken(user._id);
-    console.log("token:", token);
-
-    return {
-      status: 200,
-      user: {
-        email: user.email,
-        username: user.name,
-        phone: user.phoneNumber,
-      },
-      message: "User Login Successfully",
-      token,
-    };
   }
 }
 
