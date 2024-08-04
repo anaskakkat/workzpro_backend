@@ -26,6 +26,10 @@ const userSchema: Schema<User & Document> = new Schema(
     profilePicture: {
       type: String,
     },
+    role: {
+      type: String,
+      default: "user",
+    },
     isBlocked: {
       type: Boolean,
       default: false,

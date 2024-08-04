@@ -5,12 +5,12 @@ import { ITokens } from "../../use-cases/interfaces/users/ITokens";
 import logger from "../config/logger";
 
 class JWTService implements JWT {
-  generateToken(userId: string | undefined): ITokens {
+  generateToken(userId: string,role:string|undefined): ITokens {
     try {
-      const accessToken = jwt.sign({ userId: userId }, SECRET_KEY, {
+      const accessToken = jwt.sign({ userId,role}, SECRET_KEY, {
         expiresIn: "10s",
       });
-      const refreshToken = jwt.sign({ userId: userId }, REFRESH_KEY, {
+      const refreshToken = jwt.sign({ userId,role}, REFRESH_KEY, {
         expiresIn: "30d",
       });
 

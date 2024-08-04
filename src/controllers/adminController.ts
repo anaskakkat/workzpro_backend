@@ -100,14 +100,62 @@ class AdminController {
   }
   async createServices(req: Request, res: Response, next: NextFunction) {
     try {
-
       const { name, description } = req.body;
       const result = await this._adminUsecase.createServices(name, description);
-      
+
       res.status(result.status).json({
         message: result.message,
       });
-    } catch (error) {      
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this._adminUsecase.getServices();
+      console.log("re", result);
+
+      res.status(result.status).json({
+        message: result.message,
+        service: result.data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async blockServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this._adminUsecase.blockServices(req.params.id);
+      // console.log("re", result);
+
+      res.status(result.status).json({
+        message: result.message,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async unblockServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await this._adminUsecase.unblockServices(req.params.id);
+
+      res.status(result.status).json({
+        message: result.message,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async editServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { name, description } = req.body;
+      const result = await this._adminUsecase.editServices(id,name,description);
+
+      res.status(result.status).json({
+        message: result.message,
+      });
+    } catch (error) {
       next(error);
     }
   }

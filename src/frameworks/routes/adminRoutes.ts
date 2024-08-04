@@ -41,8 +41,19 @@ adminRouter.patch("/users/:id/unblock", (req, res, next) => {
   adminController.unblockUser(req, res, next);
 });
 adminRouter.post("/services", (req, res, next) => {
-  
   adminController.createServices(req, res, next);
+});
+adminRouter.post("/get_services", (req, res, next) => {
+  adminController.getServices(req, res, next);
+});
+adminRouter.patch("/services/:id/block", (req, res, next) => {
+  adminController.blockServices(req, res, next);
+});
+adminRouter.patch("/services/:id/unblock", (req, res, next) => {
+  adminController.unblockServices(req, res, next);
+});
+adminRouter.put("/services/:id/edit", (req, res, next) => {
+  adminController.editServices(req, res, next);
 });
 
 // adminRouter.use(errorHandle);

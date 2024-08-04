@@ -22,8 +22,13 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      default: "worker",
+    },
     service: {
-      type: Object,
+      type: Schema.Types.ObjectId,
+      ref: "Service",
     },
     experience: {
       type: Number,

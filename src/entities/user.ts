@@ -5,7 +5,7 @@ interface User {
   phoneNumber: number;
   password: string;
   wallet?: number;
-  role?: "user";
+  role?:string;
   profilePicture?: string;
   isBlocked?: boolean;
   createdAt?: Date; 

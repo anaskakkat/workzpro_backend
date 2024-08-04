@@ -19,6 +19,10 @@ const nonVerifyuserSchema: Schema<User & Document> = new Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      default: "user",
+    },
     wallet: {
       type: Number,
       default: 0,
@@ -30,11 +34,11 @@ const nonVerifyuserSchema: Schema<User & Document> = new Schema(
       type: Boolean,
       default: false,
     },
-    status:{
-      type:String,
-      default:'notVerfied',
-      required:true
-    }
+    status: {
+      type: String,
+      default: "notVerfied",
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../use-cases/userUsecase";
 import { NODE_ENV } from "../frameworks/constants/env";
 import logger from "../frameworks/config/logger";
+import { CostumeError } from "../frameworks/middlewares/customError";
 
 class UserController {
   private _userUsecase: UserUsecase;
@@ -12,26 +13,26 @@ class UserController {
 
   async signUp(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.body);
+      // console.log('req.body-----',req.body);
 
       const verifyUser = await this._userUsecase.checkExist(
         req.body.email,
-        req.body.mobile
+        req.body.phoneNumber
       );
-      console.log("verifyUser:", verifyUser);
+      // console.log("verifyUser:", verifyUser);
 
       if (verifyUser.status === 200) {
         const user = await this._userUsecase.signup(
           req.body.name,
           req.body.email,
           req.body.password,
-          req.body.mobile
+          req.body.phoneNumber
         );
         return res
           .status(user.status)
           .json({ message: user.message, email: user.email });
       } else {
-        return res.status(verifyUser.status).json(verifyUser);
+        throw new CostumeError(verifyUser.status, verifyUser.message);
       }
     } catch (error) {
       next(error);
@@ -42,7 +43,7 @@ class UserController {
       const { email, otp } = req.body;
 
       const verified = await this._userUsecase.verifyOtp(email, otp);
-      logger.info("otp--", verified);
+      // logger.info("otp--", verified);
       if (verified.status === 200 && verified.token) {
         res.cookie("user_access_token", verified.token, {
           httpOnly: true,
@@ -50,17 +51,17 @@ class UserController {
           maxAge: 60 * 60 * 1000,
           sameSite: "strict",
         });
-        // res.cookie("user_refresh_token", verified.tokens.refreshToken, {
-        //   httpOnly: true,
-        //   secure: process.env.NODE_ENV !== "development",
-        //   maxAge: 30 * 24 * 60 * 60 * 1000,
-        //   sameSite: "strict",
-        // });
+        res.cookie("user_refresh_token", verified.token.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
         return res
           .status(verified.status)
           .json({ message: verified.message, user: verified.userData });
       }
-      return res.status(verified.status).json(verified.message);
+      // throw new CostumeError(verified.status, verified.message);
     } catch (error) {
       next(error);
     }
@@ -106,13 +107,12 @@ class UserController {
         });
       } else {
         // console.log('touched',verified);
-        
+
         return res.status(verified?.status || 400).json({
           message: verified?.message,
         });
       }
     } catch (error) {
-      
       next(error);
     }
   }

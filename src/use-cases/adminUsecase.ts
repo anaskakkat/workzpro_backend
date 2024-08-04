@@ -66,7 +66,7 @@ class AdminUsecase {
         tokens,
       };
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 
@@ -87,13 +87,12 @@ class AdminUsecase {
         message: "admin registered successfully",
       };
     } catch (error) {
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
   async userData() {
     try {
       const userdata = await this._adminRepository.getAllUsersdata();
-      console.log(userdata);
 
       return {
         status: 200,
@@ -101,7 +100,7 @@ class AdminUsecase {
         message: "Data fetched successfully",
       };
     } catch (error) {
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
   async blockuser(id: any) {
@@ -124,7 +123,7 @@ class AdminUsecase {
         };
       }
     } catch (error) {
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
   async unblockUser(id: any) {
@@ -148,7 +147,7 @@ class AdminUsecase {
         };
       }
     } catch (error) {
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
   async createServices(name: string, description: string) {
@@ -176,7 +175,86 @@ class AdminUsecase {
       }
     } catch (error) {
       throw error;
-      return { status: 400, message: "An error occurred" };
+    }
+  }
+  async getServices() {
+    try {
+      const serviceData = await this._adminRepository.getServices();
+      // console.log("serviceData-", serviceData);
+
+      if (serviceData) {
+        return {
+          status: 200,
+          message: "Service data fethed successfully",
+          data: serviceData,
+        };
+      } else {
+        throw new CostumeError(400, "not get service data");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async blockServices(id: any) {
+    try {
+      const data = await this._adminRepository.findServicesById(id);
+      console.log(data);
+
+      if (data) {
+        data.isBlocked = true;
+
+        await data.save();
+
+        return {
+          status: 200,
+          message: "Services blocked successfully",
+        };
+      } else {
+        throw new CostumeError(400, " no service found");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async unblockServices(id: any) {
+    try {
+      const data = await this._adminRepository.findServicesById(id);
+      // console.log(data);
+
+      if (data) {
+        data.isBlocked = false;
+
+        await data.save();
+
+        return {
+          status: 200,
+          message: "Services unblocked successfully",
+        };
+      } else {
+        throw new CostumeError(400, " no service found");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async editServices(id: any, name: string, desc: string) {
+    try {
+      const data = await this._adminRepository.findServicesById(id);
+
+      if (data) {
+        data.name = name;
+        data.description = desc;
+        await data.save();
+
+        return {
+          status: 200,
+          message: "Services unblocked successfully",
+        };
+      } else {
+        throw new CostumeError(400, " no service found");
+      }
+    } catch (error) {
+      throw error;
     }
   }
 }

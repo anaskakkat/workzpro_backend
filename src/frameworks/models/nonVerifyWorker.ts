@@ -23,6 +23,10 @@ const nonWorkerSchema: Schema<Worker & Document> = new Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      default: "worker",
+    },
     service: {
       type: Object,
     },
@@ -59,9 +63,8 @@ const nonWorkerSchema: Schema<Worker & Document> = new Schema(
   { timestamps: true }
 );
 
-const NonVerifyWorkerModel: Model<Worker & Document> = mongoose.model<Worker & Document>(
-  "NonVerifyWorker",
-  nonWorkerSchema
-);
+const NonVerifyWorkerModel: Model<Worker & Document> = mongoose.model<
+  Worker & Document
+>("NonVerifyWorker", nonWorkerSchema);
 
 export default NonVerifyWorkerModel;

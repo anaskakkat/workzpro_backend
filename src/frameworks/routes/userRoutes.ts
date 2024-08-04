@@ -9,6 +9,7 @@ import EncryptOtp from "../utils/bcryptOtp";
 import EncryptPassword from "../utils/bcryptPassword";
 import NodemailerEmailService from "../utils/sentMail";
 import JWTService from "../utils/generateToken";
+import authenticateToken from "../middlewares/authenticateToken ";
 
 const userRouter = express.Router();
 
@@ -50,6 +51,8 @@ userRouter.post("/resend_otp", (req, res, next) => {
 userRouter.post("/login", (req, res, next) => {
   userController.login(req, res, next);
 });
+
+userRouter.use(authenticateToken)
 userRouter.post("/logout", (req, res, next) => {
   userController.logout(req, res, next);
 });

@@ -55,6 +55,25 @@ class AdminRepository implements IAdminRepo {
       throw new Error("Failed to save or update non-verified user data.");
     }
   }
+  async getServices() {
+    return serviceModel.find();
+  }
+  async findServicesById(id: any) {
+    return serviceModel.findById(id);
+  }
+  async editServices(id: string, name: string, description: string) {
+    try {
+      const filter = { id };
+      const update = { name, description };
+      const options = { new: true, upsert: true };
+
+      return await serviceModel
+        .findOneAndUpdate(filter, update, options)
+        .exec();
+    } catch (error) {
+      throw new Error("Failed to save or update non-verified user data.");
+    }
+  }
 }
 
 export default AdminRepository;

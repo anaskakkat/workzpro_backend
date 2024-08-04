@@ -6,6 +6,7 @@ import NodemailerEmailService from "../frameworks/utils/sentMail";
 import JWTService from "../frameworks/utils/generateToken";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../frameworks/config/logger";
+import { CostumeError } from "../frameworks/middlewares/customError";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -48,7 +49,7 @@ class UserUsecase {
       return { status: 200, message: "User Does Not Exist" };
     } catch (error) {
       console.error(error);
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
 
@@ -81,7 +82,7 @@ class UserUsecase {
       };
     } catch (error) {
       console.error(error);
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
   async verifyOtp(email: string, otp: number) {
@@ -91,7 +92,7 @@ class UserUsecase {
       const otpData = await this._userRepository.findOtpByEmail(email);
       // console.log("otpData:", otpData);
 
-      if (!otpData) return { status: 400, messsage: "Invalid OTP" };
+      if (!otpData) throw new CostumeError(400, "Invalid OTP");
 
       const now = new Date().getTime();
       const otpGeneratedAt = new Date(otpData.otpGeneratedAt).getTime();
@@ -99,22 +100,22 @@ class UserUsecase {
 
       if (now - otpGeneratedAt > otpExpiration) {
         await this._userRepository.deleteOtpByEmail(email);
-        return { status: 400, message: "OTP has expired" };
+        throw new CostumeError(400, "OTP has expired");
       }
       const isOtpValid = await this._encryptOtp.compare(otp, otpData.otp);
       if (!isOtpValid) {
-        return { status: 400, message: "Invalid OTP" };
+        throw new CostumeError(400, "Invalid OTP");
       }
       const userData = await this._userRepository.findNonVerifiedUserByEmail(
         email
       );
-      // console.log("userData", userData);
+      console.log("userData", userData);
 
       if (!userData)
-        return {
-          status: 404,
-          message: "User data not found in non-verified collection",
-        };
+        throw new CostumeError(
+          404,
+          "User data not found in non-verified collection"
+        );
 
       const user = {
         userName: userData.userName,
@@ -125,12 +126,12 @@ class UserUsecase {
       };
       let savedUser = await this._userRepository.saveVerifiedUser(user);
       if (!savedUser) {
-        return { status: 500, message: "Failed to save user" };
+        throw new CostumeError(500, "Failed to save user");
       }
       await this._userRepository.deleteNonVerifiedUserByEmail(email);
 
-      const token = this._genrateToken.generateToken(savedUser._id);
-      // console.log("token:", token);
+      console.log("savedUser:---", savedUser);
+      const token = this._genrateToken.generateToken(savedUser._id,savedUser.role); 
 
       return {
         status: 200,
@@ -143,11 +144,7 @@ class UserUsecase {
         token,
       };
     } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        message: "An error occurred while verifying OTP",
-      };
+      throw error;
     }
   }
 
@@ -158,7 +155,7 @@ class UserUsecase {
       await this._userRepository.saveOtp(email, hashedOtp);
       await this._emailService.sendEmail(email, otp);
 
-      console.log(otp);
+      console.log("Resnd_OTP:--", otp);
       return {
         status: 200,
         data: {
@@ -166,11 +163,7 @@ class UserUsecase {
         },
       };
     } catch (error) {
-      console.log(error);
-      return {
-        status: 500,
-        message: "An error occurred while verifying OTP",
-      };
+      throw error;
     }
   }
   async verfyLogin(email: string, password: string) {
@@ -201,7 +194,7 @@ class UserUsecase {
         };
       }
 
-      const tokens = this._genrateToken.generateToken(user._id);
+      const tokens = this._genrateToken.generateToken(user._id,user.role);
       // console.log("tokens--:", tokens);
 
       return {
