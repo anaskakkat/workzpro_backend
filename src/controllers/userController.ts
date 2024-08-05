@@ -92,7 +92,7 @@ class UserController {
         res.cookie("user_access_token", verified.tokens.accessToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          maxAge: 15 * 1000,
+          maxAge: 15 * 60 * 60 * 1000,
           sameSite: "strict",
         });
         res.cookie("user_refresh_token", verified.tokens.refreshToken, {
@@ -101,13 +101,25 @@ class UserController {
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
+        // console.log("Login touched", verified);
+        const userData = {
+          _id: verified.user._id,
+          userName: verified.user.userName,
+          email: verified.user.email,
+          phoneNumber: verified.user.phoneNumber,
+          wallet: verified.user.wallet,
+          role: verified.user.role,
+          isBlocked: verified.user.isBlocked,
+          status: verified.user.status,
+          createdAt: verified.user.createdAt,
+          updatedAt: verified.user.updatedAt,
+        };
         return res.status(verified.status).json({
           message: verified.message,
-          user: verified.user,
+          user: userData,
         });
       } else {
-        // console.log('touched',verified);
-
+        // throw new CostumeError(verified?.status||400,verified?.message)
         return res.status(verified?.status || 400).json({
           message: verified?.message,
         });
@@ -118,7 +130,7 @@ class UserController {
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.cookie("user_access_Token", "", {
+      res.cookie("user_access_token", "", {
         httpOnly: true,
         secure: NODE_ENV !== "development",
         expires: new Date(0),
@@ -137,8 +149,7 @@ class UserController {
     }
   }
   async services(req: Request, res: Response, next: NextFunction) {
-    try { 
-      
+    try {
       const services = await this._userUsecase.services();
       // console.log('services---touched',services);
       return res.status(200).json(services);

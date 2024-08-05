@@ -10,12 +10,8 @@ class JWTService implements JWT {
       console.log("generateToken:",role,userId);
       
       const tokenPayload = { userId,role };
-      const accessToken = jwt.sign(tokenPayload, SECRET_KEY, {
-        expiresIn: "10m",
-      });
-      const refreshToken = jwt.sign({ userId, role }, REFRESH_KEY, {
-        expiresIn: "30d",
-      });
+      const accessToken = jwt.sign(tokenPayload, SECRET_KEY);
+      const refreshToken = jwt.sign({ userId, role }, REFRESH_KEY);
 
       return { accessToken, refreshToken };
     } catch (error) {
@@ -38,10 +34,11 @@ class JWTService implements JWT {
   }
   verifyToken(token: string): JwtPayload | null {
     // console.log("verifyToken:-", token);
-
     try {
       if (SECRET_KEY) {
+        // console.log('iam secret key',SECRET_KEY,'ism tokrn',token)
         const decoded = jwt.verify(token, SECRET_KEY) as JwtPayload;
+        // console.log('iam decoded',decoded)
         return { success: true, decoded };
       }
     } catch (error) {

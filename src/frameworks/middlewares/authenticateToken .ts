@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import JWTService from "../utils/generateToken";
 import UserRepository from "../../repository/userRepository";
+import { CostumeError } from "./customError";
 
 const _jwtToken = new JWTService();
 const _userRepo = new UserRepository();
@@ -20,70 +21,66 @@ const authenticateToken = async (
 ) => {
   let userToken = req.cookies.user_access_token;
   const userRefreshTokens = req.cookies.user_refresh_token;
-  // console.log("userRefreshTokens:--", userRefreshTokens);
 
   if (!userRefreshTokens) {
-    return res
-      .status(401)
-      .json({ message: "Not authorized, no refresh token" });
+    return next(new CostumeError(401, "Not authorized, no refresh token"));
   }
 
   if (!userToken) {
     try {
+      console.log('i dont have access ')
       const newUserToken = await refreshAccessToken(userRefreshTokens);
       res.cookie("user_access_token", newUserToken, {
-        maxAge: 60 * 60 * 1000,
+        maxAge: 15 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "strict",
         secure: process.env.NODE_ENV !== "development",
       });
       userToken = newUserToken;
     } catch (error) {
-      return res
-        .status(401)
-        .json({ message: "Failed to refresh access token" });
+      return next(new CostumeError(401, "Failed to refresh access token"));
     }
   }
 
   try {
-    const decodedData = _jwtToken.verifyToken(userToken.accessToken);
+    const decodedData = _jwtToken.verifyToken(userToken);
+    // console.log("decodedData:", decodedData);
     if (!decodedData?.success) {
-      return res.status(401).json({ message: "Invalid token" });
+      return next(new CostumeError(401, "Invalid token!!"));
     }
 
-    console.log("decodedData:----", decodedData);
     const user = await _userRepo.findUserById(decodedData.decoded.userId);
     if (!user) {
-      return res.status(401).json({ message: "User not found" });
+      return next(new CostumeError(401, "User not found"));
     }
     if (user.isBlocked) {
-      return res.status(401).json({ message: "You are blocked by admin!" });
+      return next(new CostumeError(401, "You are blocked by admin"));
     }
     if (!decodedData.decoded.role || decodedData.decoded.role !== "user") {
-      return res.status(401).json({ message: "Not authorized, invalid role" });
+      return next(new CostumeError(401, "Not authorized, invalid role"));
     }
 
     req.userId = decodedData.decoded.userId;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Authentication failed" });
+    return next(new CostumeError(401, "Authentication failed"));
   }
 };
 
 const refreshAccessToken = async (refreshToken: string) => {
   try {
     if (!refreshToken) throw new Error("No refresh token found");
-    const decoded = _jwtToken.verifyRefreshToken(refreshToken);
+    const decoded = await _jwtToken.verifyRefreshToken(refreshToken);
     if (!decoded) {
       throw new Error("Invalid refresh token");
     }
-    const newAccessToken = _jwtToken.generateToken(
+    const {accessToken} = _jwtToken.generateToken(
       decoded.decoded.userId,
       decoded.decoded.role
     );
-    return newAccessToken;
+    return accessToken;
   } catch (error) {
-    throw new Error("Invalid refresh token");
+    throw new CostumeError(401, "Invalid refresh token");
   }
 };
 
