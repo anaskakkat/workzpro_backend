@@ -134,11 +134,7 @@ class WorkerUsecase {
 
       return {
         status: 200,
-        userData: {
-          email: savedUser.email,
-          username: savedUser.name,
-          phone: savedUser.phoneNumber,
-        },
+        userData:savedUser,
         message: "Welcome to WorkzPro!",
         token,
       };

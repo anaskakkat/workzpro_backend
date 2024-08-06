@@ -51,9 +51,12 @@ class WorkerController {
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
+
+        console.log('verified:---',verified);
+        
         return res
           .status(verified.status)
-          .json({ message: verified.message, user: verified.userData });
+          .json({ message: verified.message, data: verified.userData });
       } else {
         console.log("Verification failed:", verified.message);
         return res.status(verified.status).json({ message: verified.message });

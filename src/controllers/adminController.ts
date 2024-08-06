@@ -22,13 +22,11 @@ class AdminController {
         res.cookie("admin_access_token", verified.tokens.accessToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
           sameSite: "strict",
         });
         res.cookie("admin_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           sameSite: "strict",
         });
         return res.status(verified.status).json({
@@ -209,9 +207,11 @@ class AdminController {
       // console.log("uid-", userId);
 
       const result = await this._adminUsecase.worker_request(userId);
+      console.log('result:',result);
+      
       return res
         .status(result.status)
-        .json({ message: result.message });
+        .json({ message: result.message,data:result.userdata});
     } catch (error) {
       next(error);
     }
