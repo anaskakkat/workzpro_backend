@@ -8,6 +8,7 @@ import JWTService from "../utils/generateToken";
 import WorkerRepository from "../../repository/workerRepository";
 import WorkerUsecase from "../../use-cases/workerUsecse";
 import WorkerController from "../../controllers/workerController";
+import { upload } from "../middlewares/multer";
 
 const workerRouter = express.Router();
 
@@ -50,8 +51,9 @@ workerRouter.get("/services", (req, res, next) => {
   
   workerController.services(req, res, next);
 });
+workerRouter.post("/setProfile", upload.fields([{ name: 'profilePic' }, { name: 'identityProof' }]), (req, res, next) => {
+  workerController.setProfile(req, res, next);
+});
 
-// // Error handling middleware
-// workerRouter.use(errorHandle);
 
 export default workerRouter;

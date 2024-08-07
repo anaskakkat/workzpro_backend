@@ -5,13 +5,20 @@ import OtpModel from "../frameworks/models/otpModel";
 import IworkerRepo from "../use-cases/interfaces/workers/IworkerRepo";
 import workerModel from "../frameworks/models/workerModel";
 import serviceModel from "../frameworks/models/serviceModel";
+import WorkerModel from "../frameworks/models/workerModel";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
-    console.log(email);
-    
     return workerModel.findOne({ email: email }).exec();
   }
+  async findWorkerById(id: string) {
+    return workerModel.findById(id).exec();
+  }
+
+  async updateWorkerById(workerId: string, updateData: any) {
+    return WorkerModel.findByIdAndUpdate(workerId, updateData, { new: true });
+  }
+
   async findWorkerPhoneNumber(phoneNumber: number) {
     return workerModel.findOne({ phoneNumber: phoneNumber }).exec();
   }
@@ -57,7 +64,8 @@ class WorkerRepository implements IworkerRepo {
       console.error("Error saving/updating non-verified worker data:", error);
       throw new Error("Failed to save or update non-verified worker data.");
     }
-  }async findOtpByEmail(email: string) {
+  }
+  async findOtpByEmail(email: string) {
     return OtpModel.findOne({ email: email });
   }
   async deleteOtpByEmail(email: string) {

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import WorkerUsecase from "../use-cases/workerUsecse";
 import { NODE_ENV } from "../frameworks/constants/env";
+import { MulterRequest } from "../frameworks/middlewares/multer";
 
 class WorkerController {
   private _workerUseCase: WorkerUsecase;
@@ -52,8 +53,8 @@ class WorkerController {
           sameSite: "strict",
         });
 
-        console.log('verified:---',verified);
-        
+        console.log("verified:---", verified);
+
         return res
           .status(verified.status)
           .json({ message: verified.message, data: verified.userData });
@@ -108,6 +109,19 @@ class WorkerController {
       const services = await this._workerUseCase.services();
       // console.log('services---touched',services);
       return res.status(200).json(services);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async setProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const profileData = req.body;
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const updatedWorker = await this._workerUseCase.setProfile(
+        profileData,
+        files
+      );
+      res.status(200).json({ success: true, data: updatedWorker });
     } catch (error) {
       next(error);
     }

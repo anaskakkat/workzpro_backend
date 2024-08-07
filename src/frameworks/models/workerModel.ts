@@ -54,6 +54,10 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       type: Boolean,
       default: false,
     },
+    loginAccess: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
       default: "notVerified",

@@ -5,6 +5,8 @@ import NodemailerEmailService from "../frameworks/utils/sentMail";
 import JWTService from "../frameworks/utils/generateToken";
 import WorkerRepository from "../repository/workerRepository";
 import { CostumeError } from "../frameworks/middlewares/customError";
+import { FileData } from "./interfaces/workers/fileData";
+import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -87,7 +89,7 @@ class WorkerUsecase {
       console.log(email, "-", otp);
 
       const otpData = await this._WorkerRepository.findOtpByEmail(email);
-      console.log("otpData:", otpData);
+      // console.log("otpData:", otpData);
 
       if (!otpData) return { status: 400, message: "Invalid OTP" };
 
@@ -105,7 +107,7 @@ class WorkerUsecase {
       }
       const userData =
         await this._WorkerRepository.findNonVerifiedWorkerByEmail(email);
-      console.log("userData", userData);
+      // console.log("userData", userData);
 
       if (!userData)
         return {
@@ -134,7 +136,7 @@ class WorkerUsecase {
 
       return {
         status: 200,
-        userData:savedUser,
+        userData: savedUser,
         message: "Welcome to WorkzPro!",
         token,
       };
@@ -148,22 +150,31 @@ class WorkerUsecase {
   }
   async verfyLogin(email: string, password: string) {
     try {
-      console.log("Attempting login with email:", email);
-  
+      // console.log("Attempting login with email:", email);
+
       const user = await this._WorkerRepository.findWorkerByEmail(email);
       if (!user) {
         throw new CostumeError(400, "Worker not found");
       }
-      const isPasswordCorrect = await this._encryptPassword.compare(password, user.password);
-      if (!isPasswordCorrect) {
-        throw new CostumeError(400, "Password is incorrect");
-      }
       if (user.isBlocked) {
         throw new CostumeError(400, "You are blocked... please contact Admin");
       }
-      const token = this._genrateToken.generateToken(user._id, user.role as string);
-      console.log("User found:", user);
-  
+      if (!user.loginAccess) {
+        throw new CostumeError(400, "Admin not verified yet");
+      }
+      const isPasswordCorrect = await this._encryptPassword.compare(
+        password,
+        user.password
+      );
+      if (!isPasswordCorrect) {
+        throw new CostumeError(400, "Password is incorrect");
+      }
+      const token = this._genrateToken.generateToken(
+        user._id,
+        user.role as string
+      );
+      // console.log("User found:", user);
+
       return {
         status: 200,
         worker: user,
@@ -175,7 +186,7 @@ class WorkerUsecase {
       throw error;
     }
   }
-  
+
   async services() {
     try {
       const services = this._WorkerRepository.getServices();
@@ -183,6 +194,51 @@ class WorkerUsecase {
         throw new CostumeError(400, "not fetched service data");
       }
       return services;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async setProfile(
+    profileData: any,
+    files: { [fieldname: string]: Express.Multer.File[] }
+  ) {
+    try {
+      // console.log("profileData::--", profileData);
+
+      const worker = await this._WorkerRepository.findWorkerById(
+        profileData.workerId
+      );
+      if (!worker) {
+        throw new CostumeError(400, "Worker not found");
+      }
+      let profilePictureUrl: string | undefined;
+      let identityProofUrl: string | undefined;
+
+      if (files?.profilePic) {
+        profilePictureUrl = await uploadToCloudinary(
+          files.profilePic[0],
+          "profile_pictures"
+        );
+      }
+
+      if (files?.identityProof) {
+        identityProofUrl = await uploadToCloudinary(
+          files.identityProof[0],
+          "identity_proofs"
+        );
+      }
+      const updatedWorker = await this._WorkerRepository.updateWorkerById(
+        worker._id,
+        {
+          experience: profileData.experience,
+          wageDay: profileData.wageDay,
+          location: profileData.location,
+          service: profileData.service,
+          profilePicture: profilePictureUrl,
+          identityProof: identityProofUrl,
+        }
+      );
+      return updatedWorker;
     } catch (error) {
       throw error;
     }

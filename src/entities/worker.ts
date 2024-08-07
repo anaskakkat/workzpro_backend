@@ -18,6 +18,7 @@ interface Worker {
   status?: string;
   images?: string[];
   isProfileSetup?: boolean;
+  loginAccess?:boolean
 
 }
 

@@ -34,10 +34,10 @@ class AdminUsecase {
           message: "Password must be at least 8 characters long",
         };
       }
-      console.log(email, password);
+      // console.log(email, password);
 
       const admin = await this._adminRepository.FindAdminByEmail(email);
-      console.log(admin);
+      // console.log(admin);
       if (!admin) {
         return {
           status: 400,
@@ -54,7 +54,10 @@ class AdminUsecase {
           message: "Password is incorrect",
         };
       }
-      const tokens = this._genrateToken.generateToken(admin._id,admin.role as string);
+      const tokens = this._genrateToken.generateToken(
+        admin._id,
+        admin.role as string
+      );
       //   console.log('tokens:tokens',tokens);
       return {
         status: 200,
@@ -153,9 +156,9 @@ class AdminUsecase {
   async createServices(name: string, description: string) {
     try {
       const exist = await this._adminRepository.existServices(name);
-      console.log("exist-", exist);
+      // console.log("exist-", exist);
       if (exist?.name === name) {
-        throw new CostumeError(400, "Duplicate found");
+        throw new CostumeError(400, "Service with this name already exists");
       }
       const serviceData = await this._adminRepository.saveServices(
         name,
@@ -289,8 +292,7 @@ class AdminUsecase {
           message: "Worker blocked successfully",
         };
       } else {
-        throw new CostumeError(404,"Worker not found")
-      
+        throw new CostumeError(404, "Worker not found");
       }
     } catch (error) {
       throw error;
@@ -310,8 +312,7 @@ class AdminUsecase {
           message: "Worker unblocked successfully",
         };
       } else {
-        throw new CostumeError(404,"Worker not found")
-      
+        throw new CostumeError(404, "Worker not found");
       }
     } catch (error) {
       throw error;
@@ -322,6 +323,7 @@ class AdminUsecase {
       const userdata = await this._adminRepository.FindWorkerById(id);
       if (userdata) {
         userdata.isProfileSetup = true;
+        userdata.loginAccess = true;
 
         await userdata.save();
 
@@ -331,8 +333,7 @@ class AdminUsecase {
           message: "Worker request accepted ",
         };
       } else {
-        throw new CostumeError(404,"Worker not found")
-      
+        throw new CostumeError(404, "Worker not found");
       }
     } catch (error) {
       throw error;
