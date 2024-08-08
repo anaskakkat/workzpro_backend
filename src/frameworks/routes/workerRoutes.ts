@@ -48,12 +48,20 @@ workerRouter.post("/login", (req, res, next) => {
   workerController.login(req, res, next);
 });
 workerRouter.get("/services", (req, res, next) => {
-  
   workerController.services(req, res, next);
 });
-workerRouter.post("/setProfile", upload.fields([{ name: 'profilePic' }, { name: 'identityProof' }]), (req, res, next) => {
-  workerController.setProfile(req, res, next);
+workerRouter.post(
+  "/setProfile",
+  upload.fields([{ name: "profilePic" }, { name: "identityProof" }]),
+  (req, res, next) => {
+    workerController.setProfile(req, res, next);
+  }
+);
+workerRouter.post("/slots/setSlots", (req, res, next) => {
+  workerController.setSlots(req, res, next);
 });
-
+workerRouter.get("/slots/:id/fetchSlots", (req, res, next) => {
+  workerController.fetchSlots(req, res, next);
+});
 
 export default workerRouter;

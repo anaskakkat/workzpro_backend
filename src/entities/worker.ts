@@ -5,7 +5,8 @@ interface Worker {
   email: string;
   phoneNumber: number;
   password: string;
-  service?: any;
+  service?: string;
+  slots?: string;
   experience?: number;
   location?: string;
   role?: "worker";
@@ -18,8 +19,7 @@ interface Worker {
   status?: string;
   images?: string[];
   isProfileSetup?: boolean;
-  loginAccess?:boolean
-
+  loginAccess?: boolean;
 }
 
 export default Worker;

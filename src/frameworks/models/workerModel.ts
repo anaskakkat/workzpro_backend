@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 import Worker from "../../entities/worker";
+import { type } from "os";
 
 const WorkerSchema: Schema<Worker & Document> = new Schema(
   {
@@ -66,7 +67,12 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     images: {
       type: [String],
     },
+    slots:{
+      type: Schema.Types.ObjectId,
+      ref: "Slots",
+    }
   },
+  
   { timestamps: true }
 );
 

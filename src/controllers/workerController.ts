@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import WorkerUsecase from "../use-cases/workerUsecse";
 import { NODE_ENV } from "../frameworks/constants/env";
 import { MulterRequest } from "../frameworks/middlewares/multer";
+import Slot from "../entities/slots";
 
 class WorkerController {
   private _workerUseCase: WorkerUsecase;
@@ -122,6 +123,24 @@ class WorkerController {
         files
       );
       res.status(200).json({ success: true, data: updatedWorker });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async setSlots(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("--body--", req.body);
+      const slotData: Slot = req.body;
+      const updatedWorker = await this._workerUseCase.setSlots(slotData);
+      // res.status(200).json({ success: true, data: updatedWorker });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async fetchSlots(req: Request, res: Response, next: NextFunction) {
+    try {
+      const slots = await this._workerUseCase.fetchSlots(req.params.id);
+      res.status(200).json({ success: true, data: slots });
     } catch (error) {
       next(error);
     }

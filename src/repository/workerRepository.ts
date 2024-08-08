@@ -6,6 +6,9 @@ import IworkerRepo from "../use-cases/interfaces/workers/IworkerRepo";
 import workerModel from "../frameworks/models/workerModel";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
+import Slot from "../entities/slots";
+import { Schema } from "mongoose";
+import SlotModel from "../frameworks/models/slotsModel";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -83,6 +86,34 @@ class WorkerRepository implements IworkerRepo {
   }
   async getServices() {
     return serviceModel.find();
+  }
+  async saveSlots(slots: any, workerid: Schema.Types.ObjectId) {
+    try {
+      let slotDoc = await SlotModel.findOne({ workerId: workerid });
+      // console.log(slotDoc);
+      if (slotDoc) {
+        slotDoc.slots.push(slots.data);
+        slotDoc.isCreated = true;
+      } else {
+        slotDoc = new SlotModel({
+          workerId: workerid,
+          slots: [slots.data],
+          isCreated: true,
+        });
+      }
+      await slotDoc.save();
+    } catch (error) {
+      console.error("worker-repo", error);
+      throw error;
+    }
+  }
+  async getSlotsById(id: string) {
+    try {
+      const slots = SlotModel.findOne({ workerId: id });
+      return slots;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

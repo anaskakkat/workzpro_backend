@@ -5,8 +5,8 @@ import NodemailerEmailService from "../frameworks/utils/sentMail";
 import JWTService from "../frameworks/utils/generateToken";
 import WorkerRepository from "../repository/workerRepository";
 import { CostumeError } from "../frameworks/middlewares/customError";
-import { FileData } from "./interfaces/workers/fileData";
 import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
+import Slot from "../entities/slots";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -240,6 +240,42 @@ class WorkerUsecase {
       );
       return updatedWorker;
     } catch (error) {
+      throw error;
+    }
+  }
+  async setSlots(slotData: Slot): Promise<any> {
+    try {
+      // console.log("slotData:::", slotData);
+
+      const workerData = await this._WorkerRepository.findWorkerById(
+        slotData.workerId.toString()
+      );
+      if (!workerData) {
+        throw new CostumeError(
+          400,
+          `Worker with ID ${slotData.workerId} not found`
+        );
+      }
+
+      const savedSlot = await this._WorkerRepository.saveSlots(
+        slotData,
+        workerData.id
+      );
+
+      // return savedSlot;
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async fetchSlots(id: string): Promise<any> {
+    try {
+      const slots = await this._WorkerRepository.getSlotsById(id);
+      if (slots) {
+        return slots;
+      }
+    } catch (error) {
+      console.error("Error setting slots:", error);
       throw error;
     }
   }
