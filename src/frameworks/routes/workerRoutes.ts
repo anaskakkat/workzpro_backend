@@ -57,7 +57,7 @@ workerRouter.post(
     workerController.setProfile(req, res, next);
   }
 );
-workerRouter.post("/slots/setSlots", (req, res, next) => {
+workerRouter.post("/slots/:id/setSlots", (req, res, next) => {
   workerController.setSlots(req, res, next);
 });
 workerRouter.get("/slots/:id/fetchSlots", (req, res, next) => {

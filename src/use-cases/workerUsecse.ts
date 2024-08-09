@@ -7,6 +7,7 @@ import WorkerRepository from "../repository/workerRepository";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 import Slot from "../entities/slots";
+import { ObjectId } from "mongoose";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -243,13 +244,11 @@ class WorkerUsecase {
       throw error;
     }
   }
-  async setSlots(slotData: Slot): Promise<any> {
+  async setSlots(slotData: Slot, id: string): Promise<any> {
     try {
-      // console.log("slotData:::", slotData);
+      // console.log("slotData:::", slotData,id);
 
-      const workerData = await this._WorkerRepository.findWorkerById(
-        slotData.workerId.toString()
-      );
+      const workerData = await this._WorkerRepository.findWorkerById(id);
       if (!workerData) {
         throw new CostumeError(
           400,
@@ -259,8 +258,9 @@ class WorkerUsecase {
 
       const savedSlot = await this._WorkerRepository.saveSlots(
         slotData,
-        workerData.id
+        workerData._id
       );
+// console.log('savedSlot:',savedSlot);
 
       // return savedSlot;
     } catch (error) {

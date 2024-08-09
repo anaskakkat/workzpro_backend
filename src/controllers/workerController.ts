@@ -130,8 +130,10 @@ class WorkerController {
   async setSlots(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("--body--", req.body);
+      // console.log("--body--", req.params.id);
+
       const slotData: Slot = req.body;
-      const updatedWorker = await this._workerUseCase.setSlots(slotData);
+      const updatedWorker = await this._workerUseCase.setSlots(slotData,req.params.id);
       // res.status(200).json({ success: true, data: updatedWorker });
     } catch (error) {
       next(error);
@@ -142,7 +144,7 @@ class WorkerController {
       const slots = await this._workerUseCase.fetchSlots(req.params.id);
       res.status(200).json({ success: true, data: slots });
     } catch (error) {
-      next(error);
+      next(error); 
     }
   }
 }

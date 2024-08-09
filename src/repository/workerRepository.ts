@@ -87,17 +87,18 @@ class WorkerRepository implements IworkerRepo {
   async getServices() {
     return serviceModel.find();
   }
-  async saveSlots(slots: any, workerid: Schema.Types.ObjectId) {
+  async saveSlots(slots: any, workerid:string) {
     try {
       let slotDoc = await SlotModel.findOne({ workerId: workerid });
-      // console.log(slotDoc);
+      // console.log('slots',slots);
+      // console.log('slotDoc',slotDoc);
       if (slotDoc) {
-        slotDoc.slots.push(slots.data);
+        slotDoc.slots.push(slots);
         slotDoc.isCreated = true;
       } else {
         slotDoc = new SlotModel({
           workerId: workerid,
-          slots: [slots.data],
+          slots: [slots],
           isCreated: true,
         });
       }
