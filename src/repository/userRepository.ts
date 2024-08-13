@@ -5,12 +5,14 @@ import NonUserModel from "../frameworks/models/nonVerifyUser";
 import UserModel from "../frameworks/models/userModel";
 import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
 import serviceModel from "../frameworks/models/serviceModel";
+import WorkerModel from "../frameworks/models/workerModel";
+import { ObjectId } from "mongoose";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
     return UserModel.findOne({ email: email }).exec();
   }
-  async findUserById(id:string) {
+  async findUserById(id: string) {
     return UserModel.findById(id).exec();
   }
 
@@ -20,17 +22,17 @@ class UserRepository implements IUserRepo {
 
   async saveUserDataTemp(user: User) {
     try {
-    const filter = { email: user.email };
-    const update = {
-      userName: user.userName,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      password: user.password,
-    };
-    const options = {
-      upsert: true,
-      new: true,
-    };
+      const filter = { email: user.email };
+      const update = {
+        userName: user.userName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        password: user.password,
+      };
+      const options = {
+        upsert: true,
+        new: true,
+      };
       return await NonUserModel.findOneAndUpdate(
         filter,
         update,
@@ -77,6 +79,12 @@ class UserRepository implements IUserRepo {
   }
   async getServices() {
     return serviceModel.find();
+  }
+  async fetchWorkers() {
+    return WorkerModel.find({}).populate("service").populate("slots");
+  }
+  async fetchWorkerByID(id: string) {
+    return WorkerModel.findById(id);
   }
 }
 

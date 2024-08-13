@@ -7,6 +7,7 @@ import JWTService from "../frameworks/utils/generateToken";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../frameworks/config/logger";
 import { CostumeError } from "../frameworks/middlewares/customError";
+import { ObjectId } from "mongoose";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -223,6 +224,30 @@ class UserUsecase {
         throw new CostumeError(400, "not fetched service data");
       }
       return services;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async fetchWorkers() {
+    try {
+      const Workers = this._userRepository.fetchWorkers();
+      if (!Workers) {
+        throw new CostumeError(400, "not fetched Workers data");
+      }
+
+      return Workers;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async fetchWorkerByID(id: string) {
+    try {
+      const Workers = this._userRepository.fetchWorkerByID(id);
+      if (!Workers) {
+        throw new CostumeError(400, "not fetched Workers data");
+      }
+
+      return Workers;
     } catch (error) {
       throw error;
     }

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import WorkerUsecase from "../use-cases/workerUsecse";
 import { NODE_ENV } from "../frameworks/constants/env";
-import { MulterRequest } from "../frameworks/middlewares/multer";
 import Slot from "../entities/slots";
 
 class WorkerController {
@@ -140,7 +139,7 @@ class WorkerController {
     }
   }
   async fetchSlots(req: Request, res: Response, next: NextFunction) {
-    try {
+    try { 
       const slots = await this._workerUseCase.fetchSlots(req.params.id);
       res.status(200).json({ success: true, data: slots });
     } catch (error) {

@@ -157,5 +157,23 @@ class UserController {
       next(error);
     }
   }
+  async fetchWorkers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const Workers = await this._userUsecase.fetchWorkers();
+      // console.log('Workers---touched',Workers);
+      return res.status(200).json(Workers);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async fetchWorkerByID(req: Request, res: Response, next: NextFunction) {
+    try {
+      const Workers = await this._userUsecase.fetchWorkerByID(req.params.id);
+      // console.log('Workers---touched',Workers);
+      return res.status(200).json(Workers);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 export default UserController;

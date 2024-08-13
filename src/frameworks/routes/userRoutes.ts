@@ -63,6 +63,14 @@ userRouter.get("/services", (req, res, next) => {
   
   userController.services(req, res, next);
 });
+userRouter.get("/fetchWorkers", (req, res, next) => {
+  
+  userController.fetchWorkers(req, res, next);
+});
+userRouter.get("/fetchWorkers/:id", (req, res, next) => {
+  
+  userController.fetchWorkerByID(req, res, next);
+});
 
 // userRouter.use(errorHandle);
 
