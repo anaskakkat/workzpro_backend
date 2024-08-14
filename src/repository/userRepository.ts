@@ -84,7 +84,7 @@ class UserRepository implements IUserRepo {
     return WorkerModel.find({}).populate("service").populate("slots");
   }
   async fetchWorkerByID(id: string) {
-    return WorkerModel.findById(id);
+    return WorkerModel.findById(id).populate('service');
   }
 }
 
