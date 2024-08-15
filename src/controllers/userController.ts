@@ -175,5 +175,28 @@ class UserController {
       next(error);
     }
   }
+  async fetchSlotById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const slot = await this._userUsecase.fetchSlotById(req.params.id);
+      // console.log('slot---touched',slot);
+      return res.status(200).json(slot);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async booking(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(req.params.id);
+      console.log(req.body);
+      const bookingData = await this._userUsecase.booking(
+        req.params.id,
+        req.body
+      );
+      console.log("slot---touched", bookingData);
+      return res.status(200).json(bookingData);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 export default UserController;

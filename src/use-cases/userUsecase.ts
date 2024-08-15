@@ -8,6 +8,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../frameworks/config/logger";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import { ObjectId } from "mongoose";
+import bookingModel from "../frameworks/models/bookingsModel";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -242,12 +243,35 @@ class UserUsecase {
   }
   async fetchWorkerByID(id: string) {
     try {
-      const Workers = this._userRepository.fetchWorkerByID(id);
+      const Workers = await this._userRepository.fetchWorkerByID(id);
       if (!Workers) {
         throw new CostumeError(400, "not fetched Workers data");
       }
 
       return Workers;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async fetchSlotById(id: string) {
+    try {
+      const slot = await this._userRepository.fetchSlotById(id);
+      if (!slot) {
+        throw new CostumeError(400, "not fetched slot data");
+      }
+      // console.log('slot---touched',slot);
+
+      return slot;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async booking(userId: string, data: any) {
+    try {
+      const bookingData = await this._userRepository.saveBooking(userId, data);
+      console.log("slot--data::", bookingData);
+
+      return bookingData;
     } catch (error) {
       throw error;
     }

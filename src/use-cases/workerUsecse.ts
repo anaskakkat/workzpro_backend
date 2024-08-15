@@ -204,7 +204,7 @@ class WorkerUsecase {
     files: { [fieldname: string]: Express.Multer.File[] }
   ) {
     try {
-      // console.log("profileData::--", profileData);
+      console.log("profileData::--", profileData);
 
       const worker = await this._WorkerRepository.findWorkerById(
         profileData.workerId
@@ -246,23 +246,14 @@ class WorkerUsecase {
   }
   async setSlots(slotData: Slot, id: string): Promise<any> {
     try {
-      // console.log("slotData:::", slotData,id);
+      console.log("slotData::----------------------:", slotData, id);
 
-      const workerData = await this._WorkerRepository.findWorkerById(id);
-      if (!workerData) {
-        throw new CostumeError(
-          400,
-          `Worker with ID ${slotData.workerId} not found`
-        );
-      }
+   
 
-      const savedSlot = await this._WorkerRepository.saveSlots(
-        slotData,
-        workerData._id
-      );
-// console.log('savedSlot:',savedSlot);
+      const savedSlot = await this._WorkerRepository.saveSlots(slotData, id);
+      // console.log('savedSlot:',savedSlot);
 
-      // return savedSlot;
+      return savedSlot;
     } catch (error) {
       console.error("Error setting slots:", error);
       throw error;

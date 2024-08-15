@@ -55,23 +55,28 @@ userRouter.post("/logout", (req, res, next) => {
   userController.logout(req, res, next);
 });
 
-
+//----auth------------------------------
 userRouter.use(authenticateToken);
-
+//--------------------------------------
 
 userRouter.get("/services", (req, res, next) => {
-  
   userController.services(req, res, next);
 });
+
 userRouter.get("/fetchWorkers", (req, res, next) => {
-  
   userController.fetchWorkers(req, res, next);
 });
+
 userRouter.get("/fetchWorkers/:id", (req, res, next) => {
-  
   userController.fetchWorkerByID(req, res, next);
 });
 
-// userRouter.use(errorHandle);
+userRouter.get("/fetchSlot/:id", (req, res, next) => {
+  userController.fetchSlotById(req, res, next);
+});``
+userRouter.post("/booking/:id", (req, res, next) => {
+  userController.booking(req, res, next);
+});
+
 
 export default userRouter;

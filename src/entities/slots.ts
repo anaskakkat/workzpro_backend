@@ -3,8 +3,8 @@ import { ObjectId, Schema } from "mongoose";
 interface Slot {
   type: any;
   workerId: Schema.Types.ObjectId;
-  isCreated: boolean;
   slots: {
+    isBooked: boolean;
     date: Date;
     time: string;
     booked: {

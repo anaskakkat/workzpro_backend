@@ -128,12 +128,12 @@ class WorkerController {
   }
   async setSlots(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log("--body--", req.body);
-      // console.log("--body--", req.params.id);
+      // console.log("-controller-body--", req.body);
+      // console.log("-controller-body--", req.params.id);
 
       const slotData: Slot = req.body;
       const updatedWorker = await this._workerUseCase.setSlots(slotData,req.params.id);
-      // res.status(200).json({ success: true, data: updatedWorker });
+      res.status(200).json({ success: true, data: updatedWorker });
     } catch (error) {
       next(error);
     }

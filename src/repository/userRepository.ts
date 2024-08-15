@@ -6,7 +6,10 @@ import UserModel from "../frameworks/models/userModel";
 import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
+import SlotModel from "../frameworks/models/slotsModel";
+import { log } from "console";
+import bookingModel from "../frameworks/models/bookingsModel";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
@@ -81,10 +84,37 @@ class UserRepository implements IUserRepo {
     return serviceModel.find();
   }
   async fetchWorkers() {
-    return WorkerModel.find({}).populate("service").populate("slots");
+    return WorkerModel.find({}).populate("service");
   }
   async fetchWorkerByID(id: string) {
-    return WorkerModel.findById(id).populate('service');
+    return WorkerModel.findById(id).populate("service");
+  }
+  async fetchSlotById(id: string) {
+    // console.log('id:',id)
+    return await SlotModel.find({ workerId: id });
+  }
+  async findSlotById(id: string) {
+    console.log("id:", id);
+
+    return await SlotModel.aggregate([
+      { $unwind: "$slots" },
+      { $match: { "slots._id": new mongoose.Types.ObjectId(id) } },
+      { $project: { _id: 0, workerId: 0 } },
+    ]);
+  }
+  async saveBooking(userId: string, data: any) {
+    const newBooking = new bookingModel({
+      userId: userId,
+      workerId: data.workerId,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      address: data.address,
+      selectedSlot: data.selectedSlot,
+      location: data.location,
+      date: data.date,
+    });
+    return await newBooking.save();
   }
 }
 

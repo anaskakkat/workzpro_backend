@@ -1,45 +1,49 @@
-import mongoose, { Schema, Document, Model, ObjectId } from "mongoose";
-import Slot from "../../entities/slots";
-import { time } from "console";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Define the Mongoose schema based on the Slot entity
-const slotSchema: Schema = new Schema(
+interface ISlot extends Document {
+  workerId: mongoose.Types.ObjectId;
+  date: Date;
+  startTime: Date;
+  endTime: Date;
+  isBooked: boolean;
+  bookedUserId?: mongoose.Types.ObjectId;
+  service: mongoose.Types.ObjectId;
+}
+
+const SlotSchema: Schema = new Schema(
   {
     workerId: {
       type: Schema.Types.ObjectId,
       ref: "Worker",
       required: true,
+      index: true,
     },
-    isCreated: {
+    date: {
+      type: Date,
+      required: true,
+      index: true,
+    },
+    time: {
+      type: String,
+      enum: ["fullDay", "morning", "afternoon"],
+      required: true,
+    },
+    isBooked: {
       type: Boolean,
       default: false,
     },
-    slots: [
-      {
-        date: {type: Date,required: true,},
-        time: {type: String,enum: ["fullDay", "morning", "afternoon"],required: true,},
-        booked: [
-          {
-            userId: {
-              type: Schema.Types.ObjectId,
-              ref: "User",
-              
-            },
-            status: {
-              type: Boolean,
-            },
-          },
-        ],
-      },
-    ],
+    bookedUserId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );
 
-// Define the SlotModel using the Slot entity interface for type safety
-const SlotModel: Model<Slot & Document> = mongoose.model<Slot & Document>(
-  "Slot",
-  slotSchema
-);
+// Create compound indexes for efficient querying
+SlotSchema.index({ workerId: 1, date: 1, startTime: 1 });
+SlotSchema.index({ bookedUserId: 1, date: 1 });
+
+const SlotModel: Model<ISlot> = mongoose.model<ISlot>("Slot", SlotSchema);
 
 export default SlotModel;

@@ -87,22 +87,16 @@ class WorkerRepository implements IworkerRepo {
   async getServices() {
     return serviceModel.find();
   }
-  async saveSlots(slots: any, workerid:string) {
+  async saveSlots(slots: any, workerid: string) {
     try {
-      let slotDoc = await SlotModel.findOne({ workerId: workerid });
-      // console.log('slots',slots);
-      // console.log('slotDoc',slotDoc);
-      if (slotDoc) {
-        slotDoc.slots.push(slots);
-        slotDoc.isCreated = true;
-      } else {
-        slotDoc = new SlotModel({
-          workerId: workerid,
-          slots: [slots],
-          isCreated: true,
-        });
-      }
-      await slotDoc.save();
+      const newSlot = new SlotModel({
+        workerId: workerid,
+        date: new Date(slots.date),
+        isBooked: false,
+        time: slots.time,
+      });
+
+      await newSlot.save();
     } catch (error) {
       console.error("worker-repo", error);
       throw error;
@@ -110,7 +104,7 @@ class WorkerRepository implements IworkerRepo {
   }
   async getSlotsById(id: string) {
     try {
-      const slots = SlotModel.findOne({ workerId: id });
+      const slots = SlotModel.find({ workerId: id });
       return slots;
     } catch (error) {
       throw error;
