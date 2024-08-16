@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import WorkerUsecase from "../use-cases/workerUsecse";
 import { NODE_ENV } from "../frameworks/constants/env";
 import Slot from "../entities/slots";
+import { log } from "console";
 
 class WorkerController {
   private _workerUseCase: WorkerUsecase;
@@ -43,7 +44,7 @@ class WorkerController {
       const { email, otp } = req.body;
 
       const verified = await this._workerUseCase.verifyOtp(email, otp);
-      console.log("verified:--", verified);
+      // console.log("verified:--", verified);
 
       if (verified.status === 200 && verified.token) {
         res.cookie("workerToken", verified.token, {
@@ -53,7 +54,7 @@ class WorkerController {
           sameSite: "strict",
         });
 
-        console.log("verified:---", verified);
+        // console.log("verified:---", verified);
 
         return res
           .status(verified.status)
@@ -132,18 +133,31 @@ class WorkerController {
       // console.log("-controller-body--", req.params.id);
 
       const slotData: Slot = req.body;
-      const updatedWorker = await this._workerUseCase.setSlots(slotData,req.params.id);
-      res.status(200).json({ success: true, data: updatedWorker });
+      const updatedWorker = await this._workerUseCase.setSlots(
+        slotData,
+        req.params.id
+      );
+      return res.status(200).json({ success: true, data: updatedWorker });
     } catch (error) {
       next(error);
     }
   }
   async fetchSlots(req: Request, res: Response, next: NextFunction) {
-    try { 
+    try {
       const slots = await this._workerUseCase.fetchSlots(req.params.id);
       res.status(200).json({ success: true, data: slots });
     } catch (error) {
-      next(error); 
+      next(error);
+    }
+  }
+  async deleteSlot(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("i", req.params.id);
+      const data = await this._workerUseCase.deleteSlot(req.params.id);
+      return res.status(200).json({ message: "Slot SucussFully Deleted" });
+
+    } catch (error) {
+      next(error);
     }
   }
 }

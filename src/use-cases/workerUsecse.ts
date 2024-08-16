@@ -7,7 +7,7 @@ import WorkerRepository from "../repository/workerRepository";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 import Slot from "../entities/slots";
-import { ObjectId } from "mongoose";
+import { generateWorkerId } from "../frameworks/utils/generateId";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -63,16 +63,20 @@ class WorkerUsecase {
 
       const hashedOtp = await this._encryptOtp.encrypt(otp);
       const hashedPassword = await this._encryptPassword.encrypt(password);
-      const user = {
+      // - worker id generator
+      const workerId = generateWorkerId();
+      // console.log("workerId:",  workerId);
+      const worker = {
+        workerId,
         name,
         email,
         phoneNumber,
         password: hashedPassword,
       };
-      console.log("touched-------", user);
+      // console.log("touched-------",  worker);
 
       await this._WorkerRepository.saveOtp(email, hashedOtp);
-      await this._WorkerRepository.saveWorkerDataTemp(user);
+      await this._WorkerRepository.saveWorkerDataTemp(worker);
       await this._emailService.sendEmail(email, otp);
 
       return {
@@ -117,6 +121,7 @@ class WorkerUsecase {
         };
 
       const worker = {
+        workerId:userData.workerId,
         name: userData.name,
         email: userData.email,
         password: userData.password,
@@ -204,7 +209,7 @@ class WorkerUsecase {
     files: { [fieldname: string]: Express.Multer.File[] }
   ) {
     try {
-      console.log("profileData::--", profileData);
+      // console.log("profileData::-w-u-", profileData);
 
       const worker = await this._WorkerRepository.findWorkerById(
         profileData.workerId
@@ -228,6 +233,7 @@ class WorkerUsecase {
           "identity_proofs"
         );
       }
+
       const updatedWorker = await this._WorkerRepository.updateWorkerById(
         worker._id,
         {
@@ -246,9 +252,7 @@ class WorkerUsecase {
   }
   async setSlots(slotData: Slot, id: string): Promise<any> {
     try {
-      console.log("slotData::----------------------:", slotData, id);
-
-   
+      // console.log("slotData::----------------------:", slotData, id);
 
       const savedSlot = await this._WorkerRepository.saveSlots(slotData, id);
       // console.log('savedSlot:',savedSlot);
@@ -264,6 +268,21 @@ class WorkerUsecase {
       const slots = await this._WorkerRepository.getSlotsById(id);
       if (slots) {
         return slots;
+      }
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async deleteSlot(id: string): Promise<any> {
+    try {
+      const slots = await this._WorkerRepository.deleteSlot(id);
+      console.log('slots:',slots);
+
+      if (slots) {
+        return slots;
+      }else{
+        new CostumeError(400,'fething slots an error')
       }
     } catch (error) {
       console.error("Error setting slots:", error);

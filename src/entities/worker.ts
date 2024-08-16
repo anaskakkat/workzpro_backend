@@ -1,6 +1,6 @@
 interface Worker {
   _id?: string;
-  workerId?: number;
+  workerId?: string;
   name: string;
   email: string;
   phoneNumber: number;
@@ -12,6 +12,7 @@ interface Worker {
   role?: "worker";
   identityProof?: string;
   wallet?: number;
+  wageDay?: number;
   profilePicture?: string;
   isBlocked?: boolean;
   createdAt?: Date;

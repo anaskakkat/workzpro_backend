@@ -10,6 +10,8 @@ import mongoose, { ObjectId } from "mongoose";
 import SlotModel from "../frameworks/models/slotsModel";
 import { log } from "console";
 import bookingModel from "../frameworks/models/bookingsModel";
+import Slot from "../entities/slots";
+import IBooking from "../entities/booking";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
@@ -93,6 +95,10 @@ class UserRepository implements IUserRepo {
     // console.log('id:',id)
     return await SlotModel.find({ workerId: id });
   }
+  async fetchSlotID(id: ObjectId) {
+    // console.log('id:',id)
+    return await SlotModel.findById(id);
+  }
   async findSlotById(id: string) {
     console.log("id:", id);
 
@@ -102,7 +108,7 @@ class UserRepository implements IUserRepo {
       { $project: { _id: 0, workerId: 0 } },
     ]);
   }
-  async saveBooking(userId: string, data: any) {
+  async saveBooking(userId: string, data: IBooking) {
     const newBooking = new bookingModel({
       userId: userId,
       workerId: data.workerId,
@@ -114,7 +120,23 @@ class UserRepository implements IUserRepo {
       location: data.location,
       date: data.date,
     });
-    return await newBooking.save();
+    const savedBooking = await newBooking.save();
+    const populatedBooking = await bookingModel
+      .findById(savedBooking._id)
+      .populate("userId")
+      .populate("workerId")
+      .populate("selectedSlot")
+      .exec();
+
+    return populatedBooking;
+  }
+
+  async updateSlot(slotId: ObjectId) {
+    return SlotModel.findByIdAndUpdate(
+      slotId,
+      { isBooked: true },
+      { new: true }
+    ).exec();
   }
 }
 

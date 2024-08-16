@@ -6,7 +6,6 @@ import userRoutes from "../routes/userRoutes";
 import morgan from "morgan";
 import workerRoutes from "../routes/workerRoutes";
 import adminRoutes from "../routes/adminRoutes";
-import { CostumeError } from "../middlewares/customError";
 import errorHandle from "../middlewares/errorHandle";
 dotenv.config();
 const app = express();

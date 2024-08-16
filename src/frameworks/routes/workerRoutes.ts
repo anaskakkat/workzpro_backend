@@ -63,5 +63,8 @@ workerRouter.post("/slots/:id/setSlots", (req, res, next) => {
 workerRouter.get("/slots/:id/fetchSlots", (req, res, next) => {
   workerController.fetchSlots(req, res, next);
 });
+workerRouter.delete("/slots/:id/deleteSlot", (req, res, next) => {
+  workerController.deleteSlot(req, res, next);
+});
 
 export default workerRouter;

@@ -9,6 +9,8 @@ import logger from "../frameworks/config/logger";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import { ObjectId } from "mongoose";
 import bookingModel from "../frameworks/models/bookingsModel";
+import IBooking from "../entities/booking";
+import Slot from "../entities/slots";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -266,11 +268,24 @@ class UserUsecase {
       throw error;
     }
   }
-  async booking(userId: string, data: any) {
+  async booking(userId: string, data: IBooking) {
     try {
       const bookingData = await this._userRepository.saveBooking(userId, data);
-      console.log("slot--data::", bookingData);
+      console.log("bookingData::", bookingData);
+      if (!bookingData) {
+        throw new CostumeError(500, "Failed to save booking");
+      }
+      const slot = await this._userRepository.fetchSlotID(
+        bookingData.selectedSlot
+      );
+      if (!slot) {
+        throw new CostumeError(400, "Slot not found");
+      }
+      const updatedSlot = await this._userRepository.updateSlot(slot._id);
 
+      if (!updatedSlot) {
+        throw new CostumeError(500, "Failed to update slot");
+      }
       return bookingData;
     } catch (error) {
       throw error;

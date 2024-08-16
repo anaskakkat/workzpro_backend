@@ -186,13 +186,13 @@ class UserController {
   }
   async booking(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.params.id);
-      console.log(req.body);
+      console.log("---", req.params.id);
+      console.log("---", req.body);
       const bookingData = await this._userUsecase.booking(
         req.params.id,
         req.body
       );
-      console.log("slot---touched", bookingData);
+      // console.log("bookingData::---", bookingData);
       return res.status(200).json(bookingData);
     } catch (error) {
       next(error);

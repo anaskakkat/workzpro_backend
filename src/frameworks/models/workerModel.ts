@@ -43,6 +43,10 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       type: Number,
       default: 0,
     },
+    wageDay: {
+      type: Number,
+      default: 0,
+    },
     profilePicture: {
       type: String,
     },

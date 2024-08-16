@@ -3,7 +3,6 @@ import express from "express";
 import UserController from "../../controllers/userController";
 import UserRepository from "../../repository/userRepository";
 import UserUsecase from "../../use-cases/userUsecase";
-import errorHandle from "../middlewares/errorHandle";
 import GenerateOtp from "../utils/generateOtp";
 import EncryptOtp from "../utils/bcryptOtp";
 import EncryptPassword from "../utils/bcryptPassword";
@@ -73,7 +72,8 @@ userRouter.get("/fetchWorkers/:id", (req, res, next) => {
 
 userRouter.get("/fetchSlot/:id", (req, res, next) => {
   userController.fetchSlotById(req, res, next);
-});``
+});
+``;
 userRouter.post("/booking/:id", (req, res, next) => {
   userController.booking(req, res, next);
 });

@@ -1,17 +1,14 @@
 import { ObjectId, Schema } from "mongoose";
 
 interface Slot {
-  type: any;
+  _id?: ObjectId;
   workerId: Schema.Types.ObjectId;
-  slots: {
-    isBooked: boolean;
-    date: Date;
-    time: string;
-    booked: {
-      userId: Schema.Types.ObjectId;
-      status: boolean;
-    }[];
-  }[];
+  isBooked: boolean;
+  date: Date;
+  time: string;
+  bookedUserId?: Schema.Types.ObjectId;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export default Slot;

@@ -6,8 +6,6 @@ import IworkerRepo from "../use-cases/interfaces/workers/IworkerRepo";
 import workerModel from "../frameworks/models/workerModel";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
-import Slot from "../entities/slots";
-import { Schema } from "mongoose";
 import SlotModel from "../frameworks/models/slotsModel";
 
 class WorkerRepository implements IworkerRepo {
@@ -48,6 +46,7 @@ class WorkerRepository implements IworkerRepo {
     try {
       const filter = { email: user.email };
       const update = {
+        workerId: user.workerId,
         name: user.name,
         email: user.email,
         phoneNumber: user.phoneNumber,
@@ -105,6 +104,14 @@ class WorkerRepository implements IworkerRepo {
   async getSlotsById(id: string) {
     try {
       const slots = SlotModel.find({ workerId: id });
+      return slots;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async deleteSlot(id: string) {
+    try {
+      const slots = SlotModel.findOneAndDelete({ _id: id });
       return slots;
     } catch (error) {
       throw error;
