@@ -36,6 +36,11 @@ const bookingSchema: Schema<IBooking & Document> = new Schema(
     location: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "completed", "cancelled"],
+      default: "pending",
+    },
     comments: {
       type: String,
       default: "", 
@@ -51,8 +56,8 @@ const bookingSchema: Schema<IBooking & Document> = new Schema(
 );
 
 // Create the booking model
-const bookingModel: Model<IBooking & Document> = mongoose.model<
+const BookingModel: Model<IBooking & Document> = mongoose.model<
   IBooking & Document
 >("Booking", bookingSchema);
 
-export default bookingModel;
+export default BookingModel;

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 
 interface IBooking {
-  _id?: ObjectId
+  _id?: ObjectId;
   userId: String;
   workerId: String;
   name: String;
@@ -11,6 +11,7 @@ interface IBooking {
   selectedSlot: ObjectId;
   location: String;
   comments?: String;
+  status: string;
   date?: String;
 }
 

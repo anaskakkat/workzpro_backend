@@ -47,14 +47,18 @@ class WorkerController {
       // console.log("verified:--", verified);
 
       if (verified.status === 200 && verified.token) {
-        res.cookie("workerToken", verified.token, {
+        res.cookie("worker_token", verified.token, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        res.cookie("worker_refresh_token", verified.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
-
-        // console.log("verified:---", verified);
 
         return res
           .status(verified.status)
@@ -87,7 +91,13 @@ class WorkerController {
       const verified = await this._workerUseCase.verfyLogin(email, password);
 
       if (verified.status === 200 && verified.token) {
-        res.cookie("workerToken", verified.token, {
+        res.cookie("worker_token", verified.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        res.cookie("worker_refresh_token", verified.token, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -155,7 +165,6 @@ class WorkerController {
       // console.log("i", req.params.id);
       const data = await this._workerUseCase.deleteSlot(req.params.id);
       return res.status(200).json({ message: "Slot SucussFully Deleted" });
-
     } catch (error) {
       next(error);
     }

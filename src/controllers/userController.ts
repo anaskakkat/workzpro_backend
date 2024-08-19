@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import UserUsecase from "../use-cases/userUsecase";
 import { NODE_ENV } from "../frameworks/constants/env";
-import logger from "../frameworks/config/logger";
 import { CostumeError } from "../frameworks/middlewares/customError";
 
 class UserController {
@@ -186,12 +185,23 @@ class UserController {
   }
   async booking(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("---", req.params.id);
-      console.log("---", req.body);
+      // console.log("---", req.params.id);
+      // console.log("---", req.body);
       const bookingData = await this._userUsecase.booking(
         req.params.id,
         req.body
       );
+      // console.log("bookingData::---", bookingData);
+      return res.status(200).json(bookingData);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getBooking(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("-req--", req.params.id);
+      const bookingData = await this._userUsecase.getBooking(
+        req.params.id);
       // console.log("bookingData::---", bookingData);
       return res.status(200).json(bookingData);
     } catch (error) {

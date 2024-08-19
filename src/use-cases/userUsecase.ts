@@ -4,13 +4,9 @@ import EncryptOtp from "../frameworks/utils/bcryptOtp";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import NodemailerEmailService from "../frameworks/utils/sentMail";
 import JWTService from "../frameworks/utils/generateToken";
-import jwt, { JwtPayload } from "jsonwebtoken";
 import logger from "../frameworks/config/logger";
 import { CostumeError } from "../frameworks/middlewares/customError";
-import { ObjectId } from "mongoose";
-import bookingModel from "../frameworks/models/bookingsModel";
 import IBooking from "../entities/booking";
-import Slot from "../entities/slots";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -271,7 +267,7 @@ class UserUsecase {
   async booking(userId: string, data: IBooking) {
     try {
       const bookingData = await this._userRepository.saveBooking(userId, data);
-      console.log("bookingData::", bookingData);
+      // console.log("--uc-bookingData::", bookingData);
       if (!bookingData) {
         throw new CostumeError(500, "Failed to save booking");
       }
@@ -286,6 +282,19 @@ class UserUsecase {
       if (!updatedSlot) {
         throw new CostumeError(500, "Failed to update slot");
       }
+      return bookingData;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getBooking(id: string) {
+    try {
+      const bookingData = await this._userRepository.findBookingById(id);
+    if(!bookingData){
+      new CostumeError(400,'no booking data')
+    }
+    // console.log('boking::_-',bookingData);
+    
       return bookingData;
     } catch (error) {
       throw error;

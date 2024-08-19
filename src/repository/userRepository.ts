@@ -8,10 +8,8 @@ import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 import mongoose, { ObjectId } from "mongoose";
 import SlotModel from "../frameworks/models/slotsModel";
-import { log } from "console";
-import bookingModel from "../frameworks/models/bookingsModel";
-import Slot from "../entities/slots";
 import IBooking from "../entities/booking";
+import BookingModel from "../frameworks/models/bookingsModel";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
@@ -109,7 +107,9 @@ class UserRepository implements IUserRepo {
     ]);
   }
   async saveBooking(userId: string, data: IBooking) {
-    const newBooking = new bookingModel({
+    // console.log('booking-repo',data);
+
+    const newBooking = new BookingModel({
       userId: userId,
       workerId: data.workerId,
       name: data.name,
@@ -121,14 +121,8 @@ class UserRepository implements IUserRepo {
       date: data.date,
     });
     const savedBooking = await newBooking.save();
-    const populatedBooking = await bookingModel
-      .findById(savedBooking._id)
-      .populate("userId")
-      .populate("workerId")
-      .populate("selectedSlot")
-      .exec();
 
-    return populatedBooking;
+    return savedBooking;
   }
 
   async updateSlot(slotId: ObjectId) {
@@ -137,6 +131,12 @@ class UserRepository implements IUserRepo {
       { isBooked: true },
       { new: true }
     ).exec();
+  }
+  async findBookingById(id: string) {
+    return BookingModel.findById(id)
+      .populate("userId")
+      .populate("workerId")
+      .populate("selectedSlot");
   }
 }
 

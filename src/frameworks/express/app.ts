@@ -7,6 +7,7 @@ import morgan from "morgan";
 import workerRoutes from "../routes/workerRoutes";
 import adminRoutes from "../routes/adminRoutes";
 import errorHandle from "../middlewares/errorHandle";
+import bookingRouter from "../routes/bookingRoutes";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use(
 app.use("/api/user", userRoutes);
 app.use("/api/worker", workerRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/booking", bookingRouter);
 app.use(errorHandle);
 
 export default app;
