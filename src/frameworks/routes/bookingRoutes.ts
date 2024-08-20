@@ -20,5 +20,8 @@ bookingRouter.use(authenticateToken);
 bookingRouter.get("/:id/userId", (req, res, next) => {    
   bookingController.getBooking(req, res, next); 
 });
+bookingRouter.get("/:id/WorkerId", (req, res, next) => {    
+  bookingController.getBookingWorker(req, res, next); 
+});
 
 export default bookingRouter

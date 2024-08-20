@@ -7,6 +7,7 @@ import workerModel from "../frameworks/models/workerModel";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 import SlotModel from "../frameworks/models/slotsModel";
+import BookingModel from "../frameworks/models/bookingsModel";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -112,6 +113,18 @@ class WorkerRepository implements IworkerRepo {
   async deleteSlot(id: string) {
     try {
       const slots = SlotModel.findOneAndDelete({ _id: id });
+      return slots;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async bookingAccept(id: string) {
+    try {
+      const slots = await BookingModel.findByIdAndUpdate(
+        id,
+        { status: "accepted" },
+        { new: true }
+      );
       return slots;
     } catch (error) {
       throw error;

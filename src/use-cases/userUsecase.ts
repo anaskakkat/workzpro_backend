@@ -130,7 +130,7 @@ class UserUsecase {
       }
       await this._userRepository.deleteNonVerifiedUserByEmail(email);
 
-      console.log("savedUser:---", savedUser);
+      // console.log("savedUser:---", savedUser);
       const token = this._genrateToken.generateToken(
         savedUser._id,
         savedUser.role as string
@@ -216,6 +216,57 @@ class UserUsecase {
       logger.info(error);
     }
   }
+  async googleLogin(
+    email: string,
+    name: string,
+    picture: string,
+    googleId: string
+  ) {
+    try {
+      const user = await this._userRepository.findUserByEmail(email);
+      // console.log("---user---", user);
+
+      if (user) {
+        if (user?.isBlocked) {
+          throw new CostumeError(400, "Sorry...., you are blocked!.");
+        }
+        const tokens = this._genrateToken.generateToken(
+          user._id,
+          user.role as string
+        );
+        return {
+          status: 200,
+          message: "Login successful",
+          tokens,
+          user: user,
+        };
+      } else {
+        const hashedPassword = await this._encryptPassword.encrypt(googleId);
+
+        const userData = await this._userRepository.createUser({
+          email,
+          name,
+          picture,
+          hashedPassword,
+          user: "",
+        });
+        // console.log("--userData--", userData);
+        const tokens = this._genrateToken.generateToken(
+          userData._id,
+          userData.role as string
+        );
+        return {
+          status: 200,
+          user: userData,
+          message: "User Login Successfully",
+          tokens,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
   async services() {
     try {
       const services = this._userRepository.getServices();
@@ -290,11 +341,11 @@ class UserUsecase {
   async getBooking(id: string) {
     try {
       const bookingData = await this._userRepository.findBookingById(id);
-    if(!bookingData){
-      new CostumeError(400,'no booking data')
-    }
-    // console.log('boking::_-',bookingData);
-    
+      if (!bookingData) {
+        new CostumeError(400, "no booking data");
+      }
+      // console.log('boking::_-',bookingData);
+
       return bookingData;
     } catch (error) {
       throw error;

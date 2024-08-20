@@ -169,6 +169,15 @@ class WorkerController {
       next(error);
     }
   }
+  async bookingAccept(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("i", req.params.id);
+      const data = await this._workerUseCase.bookingAccept(req.params.id);
+      return res.status(200).json({ message: "Booking Request Accepted" });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default WorkerController;

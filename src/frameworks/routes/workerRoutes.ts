@@ -57,14 +57,17 @@ workerRouter.post(
     workerController.setProfile(req, res, next);
   }
 );
-workerRouter.post("/slots/:id/setSlots", (req, res, next) => {
+workerRouter.post("/slots/:id", (req, res, next) => {
   workerController.setSlots(req, res, next);
 });
-workerRouter.get("/slots/:id/fetchSlots", (req, res, next) => {
+workerRouter.get("/slots/:id", (req, res, next) => {
   workerController.fetchSlots(req, res, next);
 });
-workerRouter.delete("/slots/:id/deleteSlot", (req, res, next) => {
+workerRouter.delete("/slots/:id", (req, res, next) => {
   workerController.deleteSlot(req, res, next);
+});
+workerRouter.patch("/booking/:id", (req, res, next) => {
+  workerController.bookingAccept(req, res, next);
 });
 
 export default workerRouter;

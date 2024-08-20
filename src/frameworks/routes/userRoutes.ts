@@ -36,50 +36,46 @@ const userCase = new UserUsecase(
 const userController = new UserController(userCase);
 
 userRouter.post("/signup", (req, res, next) => {
-  // console.log("signUp reached",req.body);
-
   userController.signUp(req, res, next);
 });
 userRouter.post("/otp", (req, res, next) => {
   userController.otpVerification(req, res, next);
 });
-
 userRouter.post("/resend_otp", (req, res, next) => {
   userController.resendOtp(req, res, next);
 });
 userRouter.post("/login", (req, res, next) => {
   userController.login(req, res, next);
-});
-userRouter.post("/logout", (req, res, next) => {
+}); 
+userRouter.post("/googleLogin", (req, res, next) => {
+  userController.googleLogin(req, res, next);
+}); 
+
+userRouter.post("/logout", authenticateToken, (req, res, next) => {
   userController.logout(req, res, next);
 });
 
-//----auth------------------------------
-userRouter.use(authenticateToken);
-//--------------------------------------
-
-userRouter.get("/services", (req, res, next) => {
+userRouter.get("/services", authenticateToken, (req, res, next) => {
   userController.services(req, res, next);
 });
 
-userRouter.get("/fetchWorkers", (req, res, next) => {
+userRouter.get("/fetchWorkers", authenticateToken, (req, res, next) => {
   userController.fetchWorkers(req, res, next);
 });
 
-userRouter.get("/fetchWorkers/:id", (req, res, next) => {
+userRouter.get("/fetchWorkers/:id", authenticateToken, (req, res, next) => {
   userController.fetchWorkerByID(req, res, next);
 });
 
-userRouter.get("/fetchSlot/:id", (req, res, next) => {
+userRouter.get("/fetchSlot/:id", authenticateToken, (req, res, next) => {
   userController.fetchSlotById(req, res, next);
 });
 ``;
-userRouter.post("/booking/:id", (req, res, next) => {
+userRouter.post("/booking/:id", authenticateToken, (req, res, next) => {
   userController.booking(req, res, next);
 });
-userRouter.get("/booking/:id", (req, res, next) => {
+userRouter.get("/booking/:id", authenticateToken, (req, res, next) => {
   userController.getBooking(req, res, next);
 });
-
 
 export default userRouter;

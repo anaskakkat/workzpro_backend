@@ -100,7 +100,6 @@ class UserController {
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
-        // console.log("Login touched", verified);
         const userData = {
           _id: verified.user._id,
           userName: verified.user.userName,
@@ -118,7 +117,59 @@ class UserController {
           user: userData,
         });
       } else {
-        // throw new CostumeError(verified?.status||400,verified?.message)
+        return res.status(verified?.status || 400).json({
+          message: verified?.message,
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  async googleLogin(req: Request, res: Response, next: NextFunction) {
+    const { email, name, picture, googleId } = req.body;
+
+    try {
+      const verified = await this._userUsecase.googleLogin(
+        email,
+        name,
+        picture,
+        googleId
+      );
+      // console.log("--cntrl--", verified);
+      if (
+        verified?.status === 200 &&
+        verified?.tokens?.accessToken &&
+        verified.tokens.refreshToken
+      ) {
+        res.cookie("user_access_token", verified.tokens.accessToken, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 15 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        res.cookie("user_refresh_token", verified.tokens.refreshToken, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        const userData = {
+          _id: verified.user._id,
+          userName: verified.user.userName,
+          email: verified.user.email,
+          phoneNumber: verified.user.phoneNumber,
+          wallet: verified.user.wallet,
+          role: verified.user.role,
+          isBlocked: verified.user.isBlocked,
+          status: verified.user.status,
+          createdAt: verified.user.createdAt,
+          updatedAt: verified.user.updatedAt,
+        };
+        return res.status(verified.status).json({
+          message: verified.message,
+          user: userData,
+        });
+      } else {
         return res.status(verified?.status || 400).json({
           message: verified?.message,
         });
@@ -200,8 +251,7 @@ class UserController {
   async getBooking(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("-req--", req.params.id);
-      const bookingData = await this._userUsecase.getBooking(
-        req.params.id);
+      const bookingData = await this._userUsecase.getBooking(req.params.id);
       // console.log("bookingData::---", bookingData);
       return res.status(200).json(bookingData);
     } catch (error) {

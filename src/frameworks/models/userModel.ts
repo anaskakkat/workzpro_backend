@@ -13,7 +13,7 @@ const userSchema: Schema<User & Document> = new Schema(
     },
     phoneNumber: {
       type: Number,
-      required: true,
+      // required: true,
     },
     password: {
       type: String,

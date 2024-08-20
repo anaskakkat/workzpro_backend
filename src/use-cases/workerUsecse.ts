@@ -121,7 +121,7 @@ class WorkerUsecase {
         };
 
       const worker = {
-        workerId:userData.workerId,
+        workerId: userData.workerId,
         name: userData.name,
         email: userData.email,
         password: userData.password,
@@ -277,13 +277,26 @@ class WorkerUsecase {
   async deleteSlot(id: string): Promise<any> {
     try {
       const slots = await this._WorkerRepository.deleteSlot(id);
-      console.log('slots:',slots);
+      console.log("slots:", slots);
 
       if (slots) {
         return slots;
-      }else{
-        new CostumeError(400,'fething slots an error')
+      } else {
+        new CostumeError(400, "fething slots an error");
       }
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async bookingAccept(id: string): Promise<any> {
+    try {
+      const booking = await this._WorkerRepository.bookingAccept(id);
+      // console.log('booking---:',booking);
+      if (!booking) {
+        throw new CostumeError(400, "Booking not found");
+      }
+      return booking;
     } catch (error) {
       console.error("Error setting slots:", error);
       throw error;

@@ -16,7 +16,7 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     },
     phoneNumber: {
       type: Number,
-      required: true,
+      // required: true,
     },
     password: {
       type: String,
@@ -64,6 +64,7 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     },
     status: {
       type: String,
+      enum: ["notVerified", "verified"],
       default: "notVerified",
       required: true,
     },

@@ -45,6 +45,25 @@ class UserRepository implements IUserRepo {
       throw new Error("Failed to save or update non-verified user data.");
     }
   }
+  async createUser(userData: {
+    name: string;
+    email: string;
+    user: string;
+    picture: string;
+    hashedPassword: string;
+  }) {
+    const user = new UserModel({
+      email: userData.email,
+      userName: userData.name,
+      picture: userData.picture,
+      password: userData.hashedPassword,
+      status: "verified",
+    });
+    const data = await user.save();
+    // console.log("--data--", data);
+
+    return data;
+  }
 
   async saveOtp(email: string, otp: string): Promise<Otp | null> {
     const filter = { email };
