@@ -8,6 +8,7 @@ import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 import SlotModel from "../frameworks/models/slotsModel";
 import BookingModel from "../frameworks/models/bookingsModel";
+import UserModel from "../frameworks/models/nonVerifyUser";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -63,6 +64,29 @@ class WorkerRepository implements IworkerRepo {
       //   console.log('updatedWorker:-',updatedWorker);
 
       return updatedWorker;
+    } catch (error) {
+      console.error("Error saving/updating non-verified worker data:", error);
+      throw new Error("Failed to save or update non-verified worker data.");
+    }
+  }
+  async createWorker(worker: {
+    name: String;
+    email: string;
+    picture: string;
+    hashedPassword: string;
+  }) {
+    try {
+      const workerData = new WorkerModel({
+        email: worker.email,
+        name: worker.name,
+        profilePicture: worker.picture,
+        password: worker.hashedPassword,
+        status: "verified",
+      });
+      // console.log("---workerData:--", workerData);
+      const data = await workerData.save();
+      // console.log("---workerData:--", data);
+      return data;
     } catch (error) {
       console.error("Error saving/updating non-verified worker data:", error);
       throw new Error("Failed to save or update non-verified worker data.");

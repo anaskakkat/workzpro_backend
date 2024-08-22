@@ -10,6 +10,7 @@ import mongoose, { ObjectId } from "mongoose";
 import SlotModel from "../frameworks/models/slotsModel";
 import IBooking from "../entities/booking";
 import BookingModel from "../frameworks/models/bookingsModel";
+import { error } from "console";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
@@ -52,17 +53,22 @@ class UserRepository implements IUserRepo {
     picture: string;
     hashedPassword: string;
   }) {
-    const user = new UserModel({
-      email: userData.email,
-      userName: userData.name,
-      picture: userData.picture,
-      password: userData.hashedPassword,
-      status: "verified",
-    });
-    const data = await user.save();
-    // console.log("--data--", data);
+    try {
+      const user = new UserModel({
+        email: userData.email,
+        userName: userData.name,
+        picture: userData.picture,
+        password: userData.hashedPassword,
+        status: "verified",
+      });
+      const data = await user.save();
 
-    return data;
+      // console.log("--data--", data);
+      return data;
+    } catch (error) {}
+    console.log(error);
+    throw error;
+
   }
 
   async saveOtp(email: string, otp: string): Promise<Otp | null> {

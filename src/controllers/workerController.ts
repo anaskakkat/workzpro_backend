@@ -47,7 +47,7 @@ class WorkerController {
       // console.log("verified:--", verified);
 
       if (verified.status === 200 && verified.token) {
-        res.cookie("worker_token", verified.token, {
+        res.cookie("worker_access_token", verified.token, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 60 * 60 * 1000,
@@ -73,7 +73,7 @@ class WorkerController {
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      res.cookie("workerToken", "", {
+      res.cookie("worker_access_token", "", {
         httpOnly: true,
         secure: NODE_ENV !== "development",
         expires: new Date(0),
@@ -91,20 +91,21 @@ class WorkerController {
       const verified = await this._workerUseCase.verfyLogin(email, password);
 
       if (verified.status === 200 && verified.token) {
-        res.cookie("worker_token", verified.token, {
+        res.cookie("worker_access_token", verified.token.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 60 * 60 * 1000,
+          // maxAge: 15 * 1000,
           sameSite: "strict",
         });
-        res.cookie("worker_refresh_token", verified.token, {
+        res.cookie("worker_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
       }
-      console.log("verified:", verified);
+      // console.log("verified:", verified);
 
       return res.json({
         message: verified.message,
@@ -174,6 +175,59 @@ class WorkerController {
       // console.log("i", req.params.id);
       const data = await this._workerUseCase.bookingAccept(req.params.id);
       return res.status(200).json({ message: "Booking Request Accepted" });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async googleAuth(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, name, picture, googleId } = req.body;
+      // console.log("-------------i------------------------", );
+      const verified = await this._workerUseCase.googleAuth(
+        email,
+        name,
+        picture,
+        googleId
+      );
+      console.log("--cntrl-data-", verified);
+      if (
+        verified?.status === 200 &&
+        verified?.tokens?.accessToken &&
+        verified.tokens.refreshToken
+      ) {
+        res.cookie("worker_access_token", verified.tokens.accessToken, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 15 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        res.cookie("worker_refresh_token", verified.tokens.refreshToken, {
+          httpOnly: true,
+          secure: NODE_ENV !== "development",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          sameSite: "strict",
+        });
+        const workerData = {
+          _id: verified.data._id,
+          name: verified.data.name,
+          email: verified.data.email,
+          phoneNumber: verified.data.phoneNumber,
+          wallet: verified.data.wallet,
+          role: verified.data.role,
+          isBlocked: verified.data.isBlocked,
+          status: verified.data.status,
+          createdAt: verified.data.createdAt,
+          updatedAt: verified.data.updatedAt,
+        };
+        return res.status(verified.status).json({
+          message: verified.message,
+          data: workerData,
+        });
+      } else {
+        return res.status(verified?.status || 400).json({
+          message: verified?.message,
+        });
+      }
     } catch (error) {
       next(error);
     }

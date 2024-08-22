@@ -3,15 +3,25 @@ import JWT from "../../use-cases/interfaces/users/Ijwt";
 import { REFRESH_KEY, SECRET_KEY } from "../constants/env";
 import { ITokens } from "../../use-cases/interfaces/users/ITokens";
 import logger from "../config/logger";
+import { CostumeError } from "../middlewares/customError";
 
 class JWTService implements JWT {
-  generateToken(userId: string, role: string): ITokens {
+  generateToken(id: string, role: string): ITokens {
     try {
-      console.log("generateToken:",role,userId);
-      
-      const tokenPayload = { userId,role };
+      // console.log("-----generateToken--:",role,'<-->',id);
+      if (!id) {
+        console.log("generateToken not get id");
+
+        throw Error("generateToken not get id");
+      }
+      if (!role) {
+        console.log("generateToken not get role");
+
+        throw Error("generateToken not get role");
+      }
+      const tokenPayload = { id, role };
       const accessToken = jwt.sign(tokenPayload, SECRET_KEY);
-      const refreshToken = jwt.sign({ userId, role }, REFRESH_KEY);
+      const refreshToken = jwt.sign({ id, role }, REFRESH_KEY);
 
       return { accessToken, refreshToken };
     } catch (error) {

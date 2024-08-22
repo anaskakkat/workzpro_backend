@@ -37,7 +37,7 @@ class AdminUsecase {
       // console.log(email, password);
 
       const admin = await this._adminRepository.FindAdminByEmail(email);
-      // console.log(admin);
+      console.log('---admin----',admin);
       if (!admin) {
         return {
           status: 400,

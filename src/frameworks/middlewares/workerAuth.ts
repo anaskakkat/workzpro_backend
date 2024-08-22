@@ -14,13 +14,11 @@ declare global {
   }
 }
 
-const authenticateToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  let workerToken = req.cookies.worker_token;
+const workerAuth = async (req: Request, res: Response, next: NextFunction) => {
+  let workerToken = req.cookies.worker_access_token;
   const workerRefreshTokens = req.cookies.worker_refresh_token;
+  // console.log("---workerToken--:",workerToken);
+  // console.log("---workerRefreshTokens--:",workerRefreshTokens);
 
   if (!workerRefreshTokens) {
     return next(new CostumeError(401, "Not authorized, no refresh token"));
@@ -28,10 +26,12 @@ const authenticateToken = async (
 
   if (!workerToken) {
     try {
-      console.log("i dont have access ");
+      console.log("worker i dont have access tokan ");
       const newWorkerToken = await refreshAccessToken(workerRefreshTokens);
-      res.cookie("worker_token", newWorkerToken, {
-        maxAge: 15 * 60 * 60 * 1000,
+      // console.log('newWorkerToken:',newWorkerToken);
+
+      res.cookie("worker_access_token", newWorkerToken, {
+        maxAge: 15 * 60 * 1000,
         httpOnly: true,
         sameSite: "strict",
         secure: process.env.NODE_ENV !== "development",
@@ -44,21 +44,21 @@ const authenticateToken = async (
 
   try {
     const decodedData = _jwtToken.verifyToken(workerToken);
-    // console.log("decodedData:", decodedData);
+    // console.log("----decodedData---:", decodedData?.decoded);
     if (!decodedData?.success) {
       return next(new CostumeError(401, "Invalid token!!"));
     }
 
-    const worker = await _WorkerRepo.findWorkerById(
-      decodedData.decoded.WorkerId
-    );
+    const worker = await _WorkerRepo.findWorkerById(decodedData.decoded.id);
+    // console.log("----worker---:", worker);
+
     if (!worker) {
       return next(new CostumeError(401, "Worker not found"));
     }
     if (worker.isBlocked) {
       return next(new CostumeError(401, "You are blocked by admin"));
     }
-    if (!decodedData.decoded.role || decodedData.decoded.role !== "Worker") {
+    if (!decodedData.decoded.role || decodedData.decoded.role !== "worker") {
       return next(new CostumeError(401, "Not authorized, invalid role"));
     }
 
@@ -76,8 +76,11 @@ const refreshAccessToken = async (refreshToken: string) => {
     if (!decoded) {
       throw new Error("Invalid refresh token");
     }
+
+    // console.log("=refreshAccessToken-worker-decoded-",decoded);
+
     const { accessToken } = _jwtToken.generateToken(
-      decoded.decoded.workerId,
+      decoded.decoded.id,
       decoded.decoded.role
     );
     return accessToken;
@@ -86,4 +89,4 @@ const refreshAccessToken = async (refreshToken: string) => {
   }
 };
 
-export default authenticateToken;
+export default workerAuth;

@@ -236,7 +236,7 @@ class UserUsecase {
         );
         return {
           status: 200,
-          message: "Login successful",
+          message: "Login Successful",
           tokens,
           user: user,
         };

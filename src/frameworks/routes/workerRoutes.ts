@@ -9,6 +9,7 @@ import WorkerRepository from "../../repository/workerRepository";
 import WorkerUsecase from "../../use-cases/workerUsecse";
 import WorkerController from "../../controllers/workerController";
 import { upload } from "../middlewares/multer";
+import workerAuth from "../middlewares/workerAuth";
 
 const workerRouter = express.Router();
 
@@ -41,32 +42,37 @@ workerRouter.post("/signup", (req, res, next) => {
 workerRouter.post("/otp", (req, res, next) => {
   workerController.otpVerify(req, res, next);
 });
-workerRouter.post("/logout", (req, res, next) => {
-  workerController.logout(req, res, next);
-});
 workerRouter.post("/login", (req, res, next) => {
   workerController.login(req, res, next);
 });
-workerRouter.get("/services", (req, res, next) => {
+workerRouter.post("/googleAuth/", (req, res, next) => {
+  workerController.googleAuth(req, res, next);
+});
+
+workerRouter.post("/logout", workerAuth, (req, res, next) => {
+  workerController.logout(req, res, next);
+});
+workerRouter.get("/services", workerAuth, (req, res, next) => {
   workerController.services(req, res, next);
 });
 workerRouter.post(
   "/setProfile",
+  workerAuth,
   upload.fields([{ name: "profilePic" }, { name: "identityProof" }]),
   (req, res, next) => {
     workerController.setProfile(req, res, next);
   }
 );
-workerRouter.post("/slots/:id", (req, res, next) => {
+workerRouter.post("/slots/:id", workerAuth, (req, res, next) => {
   workerController.setSlots(req, res, next);
 });
-workerRouter.get("/slots/:id", (req, res, next) => {
+workerRouter.get("/slots/:id", workerAuth, (req, res, next) => {
   workerController.fetchSlots(req, res, next);
 });
-workerRouter.delete("/slots/:id", (req, res, next) => {
+workerRouter.delete("/slots/:id", workerAuth, (req, res, next) => {
   workerController.deleteSlot(req, res, next);
 });
-workerRouter.patch("/booking/:id", (req, res, next) => {
+workerRouter.patch("/booking/:id", workerAuth, (req, res, next) => {
   workerController.bookingAccept(req, res, next);
 });
 

@@ -22,6 +22,11 @@ const authenticateToken = async (
   let userToken = req.cookies.user_access_token;
   const userRefreshTokens = req.cookies.user_refresh_token;
 
+//   console.log("---userToken--:",userToken);
+// console.log("---workerToken--:",userRefreshTokens);
+
+
+
   if (!userRefreshTokens) {
     return next(new CostumeError(401, "Not authorized, no refresh token"));
   }
@@ -44,12 +49,12 @@ const authenticateToken = async (
 
   try {
     const decodedData = _jwtToken.verifyToken(userToken);
-    // console.log("decodedData:", decodedData);
+    // console.log("--user--decodedData--:", decodedData);
     if (!decodedData?.success) {
       return next(new CostumeError(401, "Invalid token!!"));
     }
 
-    const user = await _userRepo.findUserById(decodedData.decoded.userId);
+    const user = await _userRepo.findUserById(decodedData.decoded.id);
     if (!user) {
       return next(new CostumeError(401, "User not found"));
     }

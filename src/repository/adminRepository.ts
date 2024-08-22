@@ -10,6 +10,9 @@ class AdminRepository implements IAdminRepo {
   async FindAdminByEmail(email: string) {
     return AdminModel.findOne({ email }).exec();
   }
+  async FindAdminById(id: string) {
+    return await AdminModel.findById(id).exec();
+  }
   async getAllUsersdata() {
     return UserModel.find();
   }
@@ -65,7 +68,6 @@ class AdminRepository implements IAdminRepo {
   async getWorkers() {
     return WorkerModel.find();
   }
-
 
   async findServicesById(id: any) {
     return serviceModel.findById(id);

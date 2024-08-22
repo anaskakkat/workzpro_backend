@@ -132,6 +132,8 @@ class WorkerUsecase {
       if (!savedUser) {
         return { status: 500, message: "Failed to save user" };
       }
+      // console.log('--savedworker---',savedUser);
+
       await this._WorkerRepository.deleteNonVerifiedWorkerByEmail(email);
 
       const token = this._genrateToken.generateToken(
@@ -158,37 +160,87 @@ class WorkerUsecase {
     try {
       // console.log("Attempting login with email:", email);
 
-      const user = await this._WorkerRepository.findWorkerByEmail(email);
-      if (!user) {
+      const worker = await this._WorkerRepository.findWorkerByEmail(email);
+      if (!worker) {
         throw new CostumeError(400, "Worker not found");
       }
-      if (user.isBlocked) {
+      if (worker.isBlocked) {
         throw new CostumeError(400, "You are blocked... please contact Admin");
       }
-      if (!user.loginAccess) {
+      if (!worker.loginAccess) {
         throw new CostumeError(400, "Admin not verified yet");
       }
       const isPasswordCorrect = await this._encryptPassword.compare(
         password,
-        user.password
+        worker.password
       );
       if (!isPasswordCorrect) {
         throw new CostumeError(400, "Password is incorrect");
       }
+      // console.log("--savedworker---", worker);
+
       const token = this._genrateToken.generateToken(
-        user._id,
-        user.role as string
+        worker._id,
+        worker.role as string
       );
-      // console.log("User found:", user);
+      // console.log("worker token:", token);
 
       return {
         status: 200,
-        worker: user,
+        worker: worker,
         message: "Login Successfully",
         token,
       };
     } catch (error) {
-      console.error("Error during login:", error); // Improved logging
+      console.error("Error during login:", error);
+      throw error;
+    }
+  }
+  async googleAuth(
+    email: string,
+    name: string,
+    picture: string,
+    googleId: string
+  ) {
+    try {
+      const worker = await this._WorkerRepository.findWorkerByEmail(email);
+      console.log("---worker---", worker);
+      if (worker) {
+        if (worker?.isBlocked) {
+          throw new CostumeError(400, "Sorry...., you are blocked!.");
+        }
+        const tokens = this._genrateToken.generateToken(
+          worker._id,
+          worker.role as string
+        );
+        return {
+          status: 200,
+          message: "Login Successful",
+          tokens,
+          data: worker,
+        };
+      } else {
+        const hashedPassword = await this._encryptPassword.encrypt(googleId);
+
+        const workerData = await this._WorkerRepository.createWorker({
+          email,
+          name,
+          picture,
+          hashedPassword,
+        });
+        const tokens = this._genrateToken.generateToken(
+          workerData._id,
+          workerData.role as string
+        );
+        return {
+          status: 200,
+          message: "worker login succes",
+          data: workerData,
+          tokens,
+        };
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
       throw error;
     }
   }

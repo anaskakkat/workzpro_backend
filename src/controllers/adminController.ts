@@ -13,7 +13,7 @@ class AdminController {
     try {
       const { email, password } = req.body;
       const verified = await this._adminUsecase.verifylogin(email, password);
-      console.log("admin:", verified);
+      // console.log("admin:", verified);
       if (
         verified?.status === 200 &&
         verified?.tokens?.accessToken &&
@@ -21,12 +21,14 @@ class AdminController {
       ) {
         res.cookie("admin_access_token", verified.tokens.accessToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 15 * 1000,
           sameSite: "strict",
         });
         res.cookie("admin_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 15 * 60 * 1000,
           sameSite: "strict",
         });
         return res.status(verified.status).json({
@@ -111,7 +113,7 @@ class AdminController {
   async getServices(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await this._adminUsecase.getServices();
-      console.log("re", result);
+      // console.log("re", result);
 
       res.status(result.status).json({
         message: result.message,
@@ -165,7 +167,7 @@ class AdminController {
   async getWorkers(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await this._adminUsecase.getWorkers();
-      console.log("re", result);
+      // console.log("re", result);
 
       res.status(result.status).json({
         message: result.message,
@@ -181,9 +183,7 @@ class AdminController {
       const WorkerId = req.params.id;
       const result = await this._adminUsecase.blockWorker(WorkerId);
 
-      return res
-        .status(result.status)
-        .json({ message: result.message});
+      return res.status(result.status).json({ message: result.message });
     } catch (error) {
       next(error);
     }
@@ -194,9 +194,7 @@ class AdminController {
       // console.log("uid-", userId);
 
       const result = await this._adminUsecase.unblockWorker(userId);
-      return res
-        .status(result.status)
-        .json({ message: result.message });
+      return res.status(result.status).json({ message: result.message });
     } catch (error) {
       next(error);
     }
@@ -207,11 +205,11 @@ class AdminController {
       // console.log("uid-", userId);
 
       const result = await this._adminUsecase.worker_request(userId);
-      console.log('result:',result);
-      
+      // console.log('result:',result);
+
       return res
         .status(result.status)
-        .json({ message: result.message,data:result.userdata});
+        .json({ message: result.message, data: result.userdata });
     } catch (error) {
       next(error);
     }
