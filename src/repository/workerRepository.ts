@@ -88,8 +88,8 @@ class WorkerRepository implements IworkerRepo {
       // console.log("---workerData:--", data);
       return data;
     } catch (error) {
-      console.error("Error saving/updating non-verified worker data:", error);
-      throw new Error("Failed to save or update non-verified worker data.");
+      console.error("Failed to save or update google auth worker data:", error);
+      throw new Error("Failed to save or update google auth worker data.");
     }
   }
   async findOtpByEmail(email: string) {

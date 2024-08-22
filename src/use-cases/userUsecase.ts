@@ -278,12 +278,13 @@ class UserUsecase {
       throw error;
     }
   }
-  async fetchWorkers() {
+  async fetchWorkers(serviceId: string) {
     try {
-      const Workers = this._userRepository.fetchWorkers();
+      const Workers = await this._userRepository.fetchWorkers(serviceId);
       if (!Workers) {
         throw new CostumeError(400, "not fetched Workers data");
       }
+      // console.log("workers-----", Workers);
 
       return Workers;
     } catch (error) {

@@ -4,6 +4,7 @@ import { REFRESH_KEY, SECRET_KEY } from "../constants/env";
 import { ITokens } from "../../use-cases/interfaces/users/ITokens";
 import logger from "../config/logger";
 import { CostumeError } from "../middlewares/customError";
+import { ObjectId } from "mongoose";
 
 class JWTService implements JWT {
   generateToken(id: string, role: string): ITokens {
@@ -22,7 +23,7 @@ class JWTService implements JWT {
       const tokenPayload = { id, role };
       const accessToken = jwt.sign(tokenPayload, SECRET_KEY);
       const refreshToken = jwt.sign({ id, role }, REFRESH_KEY);
-
+ 
       return { accessToken, refreshToken };
     } catch (error) {
       console.error(error);

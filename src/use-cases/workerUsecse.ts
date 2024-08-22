@@ -40,17 +40,17 @@ class WorkerUsecase {
         await this._WorkerRepository.findWorkerPhoneNumber(phoneNumber);
 
       if (workerExist) {
-        return { status: 400, message: "User Already Exists" };
+        throw new CostumeError(400, "User Already Exists");
       }
       if (phoneNumberExist) {
-        return { status: 400, message: "Phone Number Exists" };
+        throw new CostumeError(400, "Phone Number Exists");
       }
       return { status: 200, message: "User Does Not Exist" };
     } catch (error) {
       console.error(error);
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
-  }
+  } 
   async signup(
     name: string,
     email: string,
@@ -86,7 +86,7 @@ class WorkerUsecase {
       };
     } catch (error) {
       console.error(error);
-      return { status: 400, message: "An error occurred" };
+      throw error;
     }
   }
   async verifyOtp(email: string, otp: number) {
@@ -94,7 +94,7 @@ class WorkerUsecase {
       console.log(email, "-", otp);
 
       const otpData = await this._WorkerRepository.findOtpByEmail(email);
-      // console.log("otpData:", otpData);
+      console.log("otpData:", otpData);
 
       if (!otpData) return { status: 400, message: "Invalid OTP" };
 
@@ -102,22 +102,22 @@ class WorkerUsecase {
       const otpGeneratedAt = new Date(otpData.otpGeneratedAt).getTime();
       const otpExpiration = 1 * 60 * 1000;
 
-      if (now - otpGeneratedAt > otpExpiration) {
-        await this._WorkerRepository.deleteOtpByEmail(email);
-        return { status: 400, message: "OTP has expired" };
-      }
+      // if (now - otpGeneratedAt > otpExpiration) {
+      //   await this._WorkerRepository.deleteOtpByEmail(email);
+      //   return { status: 400, message: "OTP has expired" };
+      // }
       const isOtpValid = await this._encryptOtp.compare(otp, otpData.otp);
       if (!isOtpValid) {
         return { status: 400, message: "Invalid OTP" };
       }
       const userData =
         await this._WorkerRepository.findNonVerifiedWorkerByEmail(email);
-      // console.log("userData", userData);
+      console.log("userData", userData);
 
       if (!userData)
         return {
           status: 404,
-          message: "User data not found in non-verified collection",
+          message: "worker data not found in non-verified collection",
         };
 
       const worker = {
@@ -129,15 +129,16 @@ class WorkerUsecase {
         status: "verified",
       };
       let savedUser = await this._WorkerRepository.saveVerifiedWorker(worker);
+
       if (!savedUser) {
         return { status: 500, message: "Failed to save user" };
       }
-      // console.log('--savedworker---',savedUser);
+      console.log("--savedworker--------------------------------", savedUser);
 
       await this._WorkerRepository.deleteNonVerifiedWorkerByEmail(email);
 
       const token = this._genrateToken.generateToken(
-        savedUser._id,
+        savedUser._id.toString(),
         savedUser.role as string
       );
       // console.log("token:", token);
@@ -206,8 +207,14 @@ class WorkerUsecase {
       const worker = await this._WorkerRepository.findWorkerByEmail(email);
       console.log("---worker---", worker);
       if (worker) {
-        if (worker?.isBlocked) {
+        if (worker.isBlocked) {
           throw new CostumeError(400, "Sorry...., you are blocked!.");
+        }
+        if (!worker.loginAccess) {
+          throw new CostumeError(
+            400,
+            "Sorry...., verification under proccessing!."
+          );
         }
         const tokens = this._genrateToken.generateToken(
           worker._id,
@@ -256,12 +263,13 @@ class WorkerUsecase {
       throw error;
     }
   }
+
   async setProfile(
     profileData: any,
     files: { [fieldname: string]: Express.Multer.File[] }
   ) {
     try {
-      // console.log("profileData::-w-u-", profileData);
+      console.log("profileData::--", profileData);
 
       const worker = await this._WorkerRepository.findWorkerById(
         profileData.workerId
@@ -285,18 +293,29 @@ class WorkerUsecase {
           "identity_proofs"
         );
       }
+      const parsedLocation = JSON.parse(profileData.location);
+      // console.log("parsedLocation:", parsedLocation);
+
+      const locationObj = {
+        type: "Point",
+        coordinates: [parsedLocation.lng, parsedLocation.lat],
+      };
 
       const updatedWorker = await this._WorkerRepository.updateWorkerById(
         worker._id,
         {
           experience: profileData.experience,
           wageDay: profileData.wageDay,
-          location: profileData.location,
+          location: locationObj,
           service: profileData.service,
           profilePicture: profilePictureUrl,
           identityProof: identityProofUrl,
+          locationName: profileData.locationName,
+          workRadius: profileData.workRadius,
         }
       );
+      // console.log("updatedWorker:", updatedWorker);
+
       return updatedWorker;
     } catch (error) {
       throw error;

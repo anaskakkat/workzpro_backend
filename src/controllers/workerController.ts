@@ -19,7 +19,7 @@ class WorkerController {
         email,
         phoneNumber
       );
-      //   console.log("verifyWorker:", verifyWorker);
+      // console.log("status checkking--------------------:", verifyWorker);
 
       if (verifyWorker.status === 200) {
         const worker = await this._workerUseCase.signup(
@@ -47,13 +47,13 @@ class WorkerController {
       // console.log("verified:--", verified);
 
       if (verified.status === 200 && verified.token) {
-        res.cookie("worker_access_token", verified.token, {
+        res.cookie("worker_access_token", verified.token.accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 60 * 60 * 1000,
           sameSite: "strict",
         });
-        res.cookie("worker_refresh_token", verified.token, {
+        res.cookie("worker_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -64,7 +64,7 @@ class WorkerController {
           .status(verified.status)
           .json({ message: verified.message, data: verified.userData });
       } else {
-        console.log("Verification failed:", verified.message);
+        // console.log("Verification failed:", verified.message);
         return res.status(verified.status).json({ message: verified.message });
       }
     } catch (error) {
@@ -127,6 +127,8 @@ class WorkerController {
   }
   async setProfile(req: Request, res: Response, next: NextFunction) {
     try {
+      // console.log('--req.body---',req.body);
+
       const profileData = req.body;
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       const updatedWorker = await this._workerUseCase.setProfile(
@@ -179,10 +181,10 @@ class WorkerController {
       next(error);
     }
   }
-  async googleAuth(req: Request, res: Response, next: NextFunction) {
+  async googleAuth(req: Request, res: Response, next: NextFunction) { 
     try {
       const { email, name, picture, googleId } = req.body;
-      // console.log("-------------i------------------------", );
+      // console.log("-------------i------------------------",email,name );
       const verified = await this._workerUseCase.googleAuth(
         email,
         name,
@@ -218,6 +220,7 @@ class WorkerController {
           status: verified.data.status,
           createdAt: verified.data.createdAt,
           updatedAt: verified.data.updatedAt,
+          profilePicture: verified.data.profilePicture,
         };
         return res.status(verified.status).json({
           message: verified.message,

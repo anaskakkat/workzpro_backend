@@ -56,7 +56,7 @@ adminRouter.patch("/services/:id/unblock", adminAuth, (req, res, next) => {
 adminRouter.put("/services/:id", adminAuth, (req, res, next) => {
   adminController.editServices(req, res, next);
 });
-adminRouter.get("/get_workers", adminAuth, (req, res, next) => {
+adminRouter.get("/getworkers", adminAuth, (req, res, next) => {
   adminController.getWorkers(req, res, next);
 });
 adminRouter.patch("/workers/:id/block", adminAuth, (req, res, next) => {

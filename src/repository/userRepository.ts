@@ -68,7 +68,6 @@ class UserRepository implements IUserRepo {
     } catch (error) {}
     console.log(error);
     throw error;
-
   }
 
   async saveOtp(email: string, otp: string): Promise<Otp | null> {
@@ -108,11 +107,11 @@ class UserRepository implements IUserRepo {
   async getServices() {
     return serviceModel.find();
   }
-  async fetchWorkers() {
-    return WorkerModel.find({}).populate("service");
+  async fetchWorkers(serviceId: string) {
+    return await WorkerModel.find({ service: serviceId }).populate("service");
   }
   async fetchWorkerByID(id: string) {
-    return WorkerModel.findById(id).populate("service");
+    return await WorkerModel.findById(id).populate("service");
   }
   async fetchSlotById(id: string) {
     // console.log('id:',id)

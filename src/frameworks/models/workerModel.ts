@@ -9,7 +9,7 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     name: {
       type: String,
       required: true,
-    }, 
+    },
     email: {
       type: String,
       required: true,
@@ -22,7 +22,7 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       type: String,
       required: true,
     },
-    role: { 
+    role: {
       type: String,
       default: "worker",
     },
@@ -34,7 +34,18 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       type: Number,
     },
     location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+    },
+    locationName: {
       type: String,
+    },
+    workRadius: {
+      type: Number,
+      default: 0,
     },
     identityProof: {
       type: String,
@@ -71,11 +82,13 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     images: {
       type: [String],
     },
- 
   },
-  
+
   { timestamps: true }
 );
+
+// Geospatial Indexing
+WorkerSchema.index({ location: "2dsphere" });
 
 const WorkerModel: Model<Worker & Document> = mongoose.model<Worker & Document>(
   "Worker",

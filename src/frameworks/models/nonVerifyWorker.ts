@@ -35,7 +35,12 @@ const nonWorkerSchema: Schema<Worker & Document> = new Schema(
       required: true,
     },
     location: {
-      type: String,
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: [Number],
     },
     identityProof: {
       type: String,

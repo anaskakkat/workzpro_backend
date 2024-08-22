@@ -8,7 +8,13 @@ interface Worker {
   service?: string;
   slots?: string;
   experience?: number;
-  location?: string;
+  location?: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  // location?: {};
+  locationName?: string;
+  workRadius?: number;
   role?: "worker";
   identityProof?: string;
   wallet?: number;

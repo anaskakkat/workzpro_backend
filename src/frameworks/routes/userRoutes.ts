@@ -46,10 +46,10 @@ userRouter.post("/resend_otp", (req, res, next) => {
 });
 userRouter.post("/login", (req, res, next) => {
   userController.login(req, res, next);
-}); 
+});
 userRouter.post("/googleLogin", (req, res, next) => {
   userController.googleLogin(req, res, next);
-}); 
+});
 
 userRouter.post("/logout", authenticateToken, (req, res, next) => {
   userController.logout(req, res, next);
@@ -59,7 +59,7 @@ userRouter.get("/services", authenticateToken, (req, res, next) => {
   userController.services(req, res, next);
 });
 
-userRouter.get("/fetchWorkers", authenticateToken, (req, res, next) => {
+userRouter.post("/Workers", authenticateToken, (req, res, next) => {
   userController.fetchWorkers(req, res, next);
 });
 

@@ -66,7 +66,7 @@ class AdminRepository implements IAdminRepo {
     return serviceModel.find();
   }
   async getWorkers() {
-    return WorkerModel.find();
+    return WorkerModel.find() 
   }
 
   async findServicesById(id: any) {

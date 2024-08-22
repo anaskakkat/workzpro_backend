@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import { ITokens } from "./ITokens";
 
 interface JWT {
