@@ -63,7 +63,7 @@ userRouter.post("/Workers", authenticateToken, (req, res, next) => {
   userController.fetchWorkers(req, res, next);
 });
 
-userRouter.get("/fetchWorkers/:id", authenticateToken, (req, res, next) => {
+userRouter.get("/workers/:id", authenticateToken, (req, res, next) => {
   userController.fetchWorkerByID(req, res, next);
 });
 

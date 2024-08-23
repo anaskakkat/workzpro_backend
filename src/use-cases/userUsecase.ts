@@ -278,9 +278,15 @@ class UserUsecase {
       throw error;
     }
   }
-  async fetchWorkers(serviceId: string) {
+  async fetchWorkers(
+    serviceId: string,
+    location: { type: string; coordinates: [number, number] }
+  ) {
     try {
-      const Workers = await this._userRepository.fetchWorkers(serviceId);
+      const Workers = await this._userRepository.fetchWorkers(
+        serviceId,
+        location
+      );
       if (!Workers) {
         throw new CostumeError(400, "not fetched Workers data");
       }
@@ -297,6 +303,7 @@ class UserUsecase {
       if (!Workers) {
         throw new CostumeError(400, "not fetched Workers data");
       }
+      // console.log("workers-----", Workers);
 
       return Workers;
     } catch (error) {

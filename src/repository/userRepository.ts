@@ -107,8 +107,27 @@ class UserRepository implements IUserRepo {
   async getServices() {
     return serviceModel.find();
   }
-  async fetchWorkers(serviceId: string) {
-    return await WorkerModel.find({ service: serviceId }).populate("service");
+  async fetchWorkers(
+    serviceId: string,
+    location: { type: string; coordinates: [number, number] }
+  ) {
+    const radiusInKm = 20;
+    const radiusInMeters = radiusInKm * 1000;
+    // console.log("location-------", location);
+    // console.log("serviceId-------", serviceId);
+
+    return await WorkerModel.find({
+      service: serviceId,
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: location.coordinates,
+          },
+          $maxDistance: radiusInMeters,
+        },
+      },
+    }).populate("service");
   }
   async fetchWorkerByID(id: string) {
     return await WorkerModel.findById(id).populate("service");

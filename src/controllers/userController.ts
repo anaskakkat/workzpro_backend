@@ -47,7 +47,7 @@ class UserController {
         res.cookie("user_access_token", verified.token, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          maxAge: 60 * 60 * 1000,
+          maxAge: 15 * 60 * 60 * 1000,
           sameSite: "strict",
         });
         res.cookie("user_refresh_token", verified.token.refreshToken, {
@@ -209,9 +209,9 @@ class UserController {
   }
   async fetchWorkers(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("Workers---touched", req.body);
-      // const Workers = await this._userUsecase.fetchWorkers(req.params.id);
-      // return res.status(200).json(Workers);
+      // console.log("Workers---touched", req.body);
+      const Workers = await this._userUsecase.fetchWorkers(req.body.serviceId,req.body.locationData);
+      return res.status(200).json(Workers);
     } catch (error) {
       next(error);
     }
