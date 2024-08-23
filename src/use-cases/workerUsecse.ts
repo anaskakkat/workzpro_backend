@@ -8,6 +8,7 @@ import { CostumeError } from "../frameworks/middlewares/customError";
 import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 import Slot from "../entities/slots";
 import { generateWorkerId } from "../frameworks/utils/generateId";
+import WorkerModel from "../frameworks/models/workerModel";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -50,7 +51,7 @@ class WorkerUsecase {
       console.error(error);
       throw error;
     }
-  } 
+  }
   async signup(
     name: string,
     email: string,
@@ -263,6 +264,19 @@ class WorkerUsecase {
       throw error;
     }
   }
+  async commonProblams(workerId: string) {
+    try {
+      const commonProblams = await this._WorkerRepository.commonProblams(
+        workerId
+      );
+      if (!commonProblams) {
+        throw new CostumeError(400, "not fetched commonProblams data");
+      }
+      return { commonProblams, status: 200, message: "fetched commonProblams" };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async setProfile(
     profileData: any,
@@ -321,11 +335,15 @@ class WorkerUsecase {
       throw error;
     }
   }
-  async setSlots(slotData: Slot, id: string): Promise<any> {
+  async setSlots(slotData: Slot, Workerid: string): Promise<any> {
     try {
-      // console.log("slotData::----------------------:", slotData, id);
+      const savedSlot: any = await this._WorkerRepository.saveSlots(
+        slotData,
+        Workerid
+      );
+      console.log("slotData::----------------------:", savedSlot);
+      await this._WorkerRepository.workerUpdateSlotsId(Workerid, savedSlot._id);
 
-      const savedSlot = await this._WorkerRepository.saveSlots(slotData, id);
       // console.log('savedSlot:',savedSlot);
 
       return savedSlot;
@@ -339,6 +357,8 @@ class WorkerUsecase {
       const slots = await this._WorkerRepository.getSlotsById(id);
       if (slots) {
         return slots;
+      } else {
+        throw new CostumeError(400, "no slots");
       }
     } catch (error) {
       console.error("Error setting slots:", error);
@@ -368,6 +388,30 @@ class WorkerUsecase {
         throw new CostumeError(400, "Booking not found");
       }
       return booking;
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async addProblam(
+    problemName: string,
+    estimatedHours: string,
+    workerId: string
+  ) {
+    try {
+      const newProblem = await this._WorkerRepository.saveAddProblam(
+        problemName,
+        estimatedHours,
+        workerId
+      );
+      // console.log('newProblem---:',newProblem);
+      if (!newProblem) {
+        throw new CostumeError(400, "newProblem not creted");
+      }
+      return {
+        status: 200,
+        message: "New Problem Created",
+      };
     } catch (error) {
       console.error("Error setting slots:", error);
       throw error;

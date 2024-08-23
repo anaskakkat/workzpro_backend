@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Document } from "mongoose";
+import mongoose, { Model, Schema,ObjectId, Document } from "mongoose";
 import Worker from "../../entities/worker";
 
 const WorkerSchema: Schema<Worker & Document> = new Schema(
@@ -82,6 +82,12 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     images: {
       type: [String],
     },
+    slots: { 
+      type: [mongoose.Schema.Types.ObjectId]
+    },
+    commonProblems: { 
+      type: [mongoose.Schema.Types.ObjectId]
+    }
   },
 
   { timestamps: true }

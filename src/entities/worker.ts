@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 interface Worker {
   _id?: string;
   workerId?: string;
@@ -27,6 +29,7 @@ interface Worker {
   images?: string[];
   isProfileSetup?: boolean;
   loginAccess?: boolean;
+  commonProblems?:ObjectId[]
 }
 
 export default Worker;

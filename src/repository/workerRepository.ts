@@ -9,6 +9,7 @@ import WorkerModel from "../frameworks/models/workerModel";
 import SlotModel from "../frameworks/models/slotsModel";
 import BookingModel from "../frameworks/models/bookingsModel";
 import UserModel from "../frameworks/models/nonVerifyUser";
+import CommonProblemsModel from "../frameworks/models/commonProblams";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -111,6 +112,9 @@ class WorkerRepository implements IworkerRepo {
   async getServices() {
     return serviceModel.find();
   }
+  async commonProblams(workerId: string) {
+    return await CommonProblemsModel.find({ workerId: workerId });
+  }
   async saveSlots(slots: any, workerid: string) {
     try {
       const newSlot = new SlotModel({
@@ -120,9 +124,19 @@ class WorkerRepository implements IworkerRepo {
         time: slots.time,
       });
 
-      await newSlot.save();
+      return await newSlot.save();
     } catch (error) {
       console.error("worker-repo", error);
+      throw error;
+    }
+  }
+  async workerUpdateSlotsId(Workerid: string, slotId: string) {
+    try {
+      return await WorkerModel.updateOne(
+        { _id: Workerid },
+        { $push: { slots: slotId } }
+      );
+    } catch (error) {
       throw error;
     }
   }
@@ -150,6 +164,23 @@ class WorkerRepository implements IworkerRepo {
         { new: true }
       );
       return slots;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async saveAddProblam(
+    problemName: string,
+    estimatedHours: string,
+    workerId: string
+  ) {
+    try {
+      const newProblem = new CommonProblemsModel({
+        workerId,
+        problemName,
+        estimatedHour: estimatedHours,
+      });
+      const savedProblem = await newProblem.save();
+      return savedProblem;
     } catch (error) {
       throw error;
     }

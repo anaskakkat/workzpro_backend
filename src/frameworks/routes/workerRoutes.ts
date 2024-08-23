@@ -63,6 +63,9 @@ workerRouter.post(
     workerController.setProfile(req, res, next);
   }
 );
+workerRouter.post("/addProblam", workerAuth, (req, res, next) => {
+  workerController.addProblam(req, res, next);
+});
 workerRouter.post("/slots/:id", workerAuth, (req, res, next) => {
   workerController.setSlots(req, res, next);
 });
@@ -76,5 +79,7 @@ workerRouter.patch("/booking/:id", workerAuth, (req, res, next) => {
   workerController.bookingAccept(req, res, next);
 });
 
-
+workerRouter.get("/commonProblams/:id", workerAuth, (req, res, next) => {
+  workerController.commonProblams(req, res, next);
+});
 export default workerRouter;

@@ -116,11 +116,36 @@ class WorkerController {
     }
   }
 
+  async addProblam(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("--data--", req.body);
+      const { problemName, estimatedHours, workerId } = req.body;
+      const newProblem = await this._workerUseCase.addProblam(
+        problemName,
+        estimatedHours,
+        workerId
+      );
+      if (newProblem.status === 200) {
+        return res.status(newProblem.status).json(newProblem.message);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
   async services(req: Request, res: Response, next: NextFunction) {
     try {
       const services = await this._workerUseCase.services();
       // console.log('services---touched',services);
       return res.status(200).json(services);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async commonProblams(req: Request, res: Response, next: NextFunction) {
+    try {
+      const Problams = await this._workerUseCase.commonProblams(req.params.id);
+      console.log("commonProblams---touched", Problams);
+      return res.status(Problams.status).json(Problams);
     } catch (error) {
       next(error);
     }
@@ -181,7 +206,7 @@ class WorkerController {
       next(error);
     }
   }
-  async googleAuth(req: Request, res: Response, next: NextFunction) { 
+  async googleAuth(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, name, picture, googleId } = req.body;
       // console.log("-------------i------------------------",email,name );
