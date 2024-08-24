@@ -1,6 +1,23 @@
-import mongoose, { Model, Schema,ObjectId, Document } from "mongoose";
+import mongoose, { Model, Schema, ObjectId, Document } from "mongoose";
 import Worker from "../../entities/worker";
 
+const workingDaySchema: Schema = new Schema({
+  start: {
+    type: String,
+    default: "09:00",
+    required: true,
+  },
+  end: {
+    type: String,
+    default: "17:00",
+    required: true,
+  },
+  isWorking: {
+    type: Boolean,
+    default: false,
+    required: true,
+  },
+});
 const WorkerSchema: Schema<Worker & Document> = new Schema(
   {
     workerId: {
@@ -82,12 +99,37 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
     images: {
       type: [String],
     },
-    slots: { 
-      type: [mongoose.Schema.Types.ObjectId]
+    configuration: {
+      workingDays: {
+        type: [workingDaySchema],
+        default: [
+          { isWorking: false, start: "09:00", end: "17:00" },
+          { isWorking: true, start: "09:00", end: "17:00" },
+          { isWorking: true, start: "09:00", end: "17:00" },
+          { isWorking: true, start: "09:00", end: "17:00" },
+          { isWorking: true, start: "09:00", end: "17:00" },
+          { isWorking: true, start: "09:00", end: "17:00" },
+          { isWorking: true, start: "09:00", end: "17:00" },
+        ],
+      },
+      slotSize: { type: Number, default: 1 },
+      bufferTime: { type: Number, default: 30 },
+      services: [
+        {
+          description: { type: String },
+          amount: { type: Number },
+          slots: { type: Number },
+        },
+      ],
+      leaves: [
+        {
+          date: { type: Date },
+          reason: {
+            type: String,
+          },
+        },
+      ],
     },
-    commonProblems: { 
-      type: [mongoose.Schema.Types.ObjectId]
-    }
   },
 
   { timestamps: true }

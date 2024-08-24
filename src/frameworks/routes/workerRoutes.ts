@@ -82,4 +82,7 @@ workerRouter.patch("/booking/:id", workerAuth, (req, res, next) => {
 workerRouter.get("/commonProblams/:id", workerAuth, (req, res, next) => {
   workerController.commonProblams(req, res, next);
 });
+workerRouter.get("/:id", workerAuth, (req, res, next) => {
+  workerController.getWorker(req, res, next);
+});
 export default workerRouter;

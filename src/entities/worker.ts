@@ -29,7 +29,26 @@ interface Worker {
   images?: string[];
   isProfileSetup?: boolean;
   loginAccess?: boolean;
-  commonProblems?:ObjectId[]
+  commonProblems?: ObjectId[];
+  configuration?: Configuration;
 }
 
 export default Worker;
+
+export interface WorkingDay {
+  start: string;
+  end: string;
+  isWorking: boolean;
+}
+export interface Service {
+  description: string;
+  amount: number;
+  slots: number;
+}
+export interface Configuration {
+  workingDays: WorkingDay[];
+  slotSize: number;
+  bufferTime: number;
+  services: Service[];
+  leaves: { date: string | Date; reason: string }[];
+}

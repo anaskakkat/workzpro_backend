@@ -277,6 +277,19 @@ class WorkerUsecase {
       throw error;
     }
   }
+  async getWorker(workerId: string) {
+    try {
+      const worker = await this._WorkerRepository.findWorkerById(workerId);
+      if (!worker) {
+        throw new CostumeError(400, "not fetched worker data");
+      }
+      console.log('worker---',worker);
+      
+      return { worker, status: 200, message: "fetched worker data" };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async setProfile(
     profileData: any,

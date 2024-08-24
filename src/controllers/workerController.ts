@@ -144,8 +144,18 @@ class WorkerController {
   async commonProblams(req: Request, res: Response, next: NextFunction) {
     try {
       const Problams = await this._workerUseCase.commonProblams(req.params.id);
-      console.log("commonProblams---touched", Problams);
+      // console.log("commonProblams---touched", Problams);
       return res.status(Problams.status).json(Problams);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getWorker(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("worker---touched");
+      const worker = await this._workerUseCase.getWorker(req.params.id);
+      // console.log("worker---touched", worker);
+      return res.status(worker.status).json(worker);
     } catch (error) {
       next(error);
     }

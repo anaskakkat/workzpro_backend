@@ -112,6 +112,9 @@ class WorkerRepository implements IworkerRepo {
   async getServices() {
     return serviceModel.find();
   }
+  async FindWorkerById(workerId: string) {
+    return workerModel.findById(workerId);
+  }
   async commonProblams(workerId: string) {
     return await CommonProblemsModel.find({ workerId: workerId });
   }
