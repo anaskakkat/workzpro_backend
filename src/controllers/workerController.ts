@@ -79,6 +79,12 @@ class WorkerController {
         expires: new Date(0),
         sameSite: "strict",
       });
+      res.cookie("worker_refresh_token", "", {
+        httpOnly: true,
+        secure: NODE_ENV !== "development",
+        expires: new Date(0),
+        sameSite: "strict",
+      });
 
       return res.status(200).json({ message: "Logout successful" });
     } catch (error) {

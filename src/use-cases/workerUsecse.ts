@@ -250,6 +250,7 @@ class WorkerUsecase {
     } catch (error) {
       console.error("Error during login:", error);
       throw error;
+      
     }
   }
 
