@@ -15,6 +15,7 @@ declare global {
 }
 
 const workerAuth = async (req: Request, res: Response, next: NextFunction) => {
+  // console.log('path  ; ',req.path)
   let workerToken = req.cookies.worker_access_token;
   const workerRefreshTokens = req.cookies.worker_refresh_token;
   // console.log("---workerToken--:",workerToken);
@@ -63,6 +64,7 @@ const workerAuth = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     req.WorkerId = decodedData.decoded.workerId;
+    // console.log('all set...')
     next();
   } catch (error) {
     return next(new CostumeError(401, "Authentication failed"));

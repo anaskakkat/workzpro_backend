@@ -1,5 +1,5 @@
 import Otp from "../entities/otp";
-import Worker from "../entities/worker";
+import Worker, { Configuration, Services } from "../entities/worker";
 import NonVerifyWorkerModel from "../frameworks/models/nonVerifyWorker";
 import OtpModel from "../frameworks/models/otpModel";
 import IworkerRepo from "../use-cases/interfaces/workers/IworkerRepo";
@@ -10,6 +10,8 @@ import SlotModel from "../frameworks/models/slotsModel";
 import BookingModel from "../frameworks/models/bookingsModel";
 import UserModel from "../frameworks/models/nonVerifyUser";
 import CommonProblemsModel from "../frameworks/models/commonProblams";
+import { CostumeError } from "../frameworks/middlewares/customError";
+import Service from "../entities/services";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -112,78 +114,143 @@ class WorkerRepository implements IworkerRepo {
   async getServices() {
     return serviceModel.find();
   }
-  async FindWorkerById(workerId: string) {
-    return workerModel.findById(workerId);
-  }
+  // async FindWorkerById(workerId: string) {
+  //   return workerModel.findById(workerId);
+  // }
   async commonProblams(workerId: string) {
     return await CommonProblemsModel.find({ workerId: workerId });
   }
-  async saveSlots(slots: any, workerid: string) {
-    try {
-      const newSlot = new SlotModel({
-        workerId: workerid,
-        date: new Date(slots.date),
-        isBooked: false,
-        time: slots.time,
-      });
+  // async saveSlots(slots: any, workerid: string) {
+  //   try {
+  //     const newSlot = new SlotModel({
+  //       workerId: workerid,
+  //       date: new Date(slots.date),
+  //       isBooked: false,
+  //       time: slots.time,
+  //     });
 
-      return await newSlot.save();
-    } catch (error) {
-      console.error("worker-repo", error);
-      throw error;
-    }
-  }
-  async workerUpdateSlotsId(Workerid: string, slotId: string) {
+  //     return await newSlot.save();
+  //   } catch (error) {
+  //     console.error("worker-repo", error);
+  //     throw error;
+  //   }
+  // }
+  // async workerUpdateSlotsId(Workerid: string, slotId: string) {
+  //   try {
+  //     return await WorkerModel.updateOne(
+  //       { _id: Workerid },
+  //       { $push: { slots: slotId } }
+  //     );
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  // async getSlotsById(id: string) {
+  //   try {
+  //     const slots = SlotModel.find({ workerId: id });
+  //     return slots;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  // async deleteSlot(id: string) {
+  //   try {
+  //     const slots = SlotModel.findOneAndDelete({ _id: id });
+  //     return slots;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  // async bookingAccept(id: string) {
+  //   try {
+  //     const slots = await BookingModel.findByIdAndUpdate(
+  //       id,
+  //       { status: "accepted" },
+  //       { new: true }
+  //     );
+  //     return slots;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  // async saveAddProblam(
+  //   problemName: string,
+  //   estimatedHours: string,
+  //   workerId: string
+  // ) {
+  //   try {
+  //     const newProblem = new CommonProblemsModel({
+  //       workerId,
+  //       problemName,
+  //       estimatedHour: estimatedHours,
+  //     });
+  //     const savedProblem = await newProblem.save();
+  //     return savedProblem;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  async saveWorkingDays(workerId: string, configuration: Configuration) {
     try {
-      return await WorkerModel.updateOne(
-        { _id: Workerid },
-        { $push: { slots: slotId } }
-      );
-    } catch (error) {
-      throw error;
-    }
-  }
-  async getSlotsById(id: string) {
-    try {
-      const slots = SlotModel.find({ workerId: id });
-      return slots;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async deleteSlot(id: string) {
-    try {
-      const slots = SlotModel.findOneAndDelete({ _id: id });
-      return slots;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async bookingAccept(id: string) {
-    try {
-      const slots = await BookingModel.findByIdAndUpdate(
-        id,
-        { status: "accepted" },
+      console.log(workerId, "---", configuration);
+      return await WorkerModel.findByIdAndUpdate(
+        workerId,
+        {
+          $set: {
+            "configuration.workingDays": configuration.workingDays,
+            "configuration.slotSize": configuration.slotSize,
+            "configuration.bufferTime": configuration.bufferTime,
+          },
+        },
         { new: true }
       );
-      return slots;
     } catch (error) {
       throw error;
     }
   }
-  async saveAddProblam(
-    problemName: string,
-    estimatedHours: string,
-    workerId: string
-  ) {
+  async addService(workerId: string, serviceData: Services) {
     try {
-      const newProblem = new CommonProblemsModel({
+      // console.log(serviceData);
+      return await WorkerModel.findByIdAndUpdate(
         workerId,
-        problemName,
-        estimatedHour: estimatedHours,
-      });
-      const savedProblem = await newProblem.save();
-      return savedProblem;
+        {
+          $push: {
+            "configuration.services": serviceData,
+          },
+        },
+        { new: true }
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+  async deleteServiceById(workerId: string, serviceId: string) {
+    try {
+      // console.log(serviceData);
+      return await WorkerModel.findByIdAndUpdate(
+        workerId,
+        {
+          $pull: {
+            "configuration.services": { _id: serviceId },
+          },
+        },
+        { new: true }
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+  async editServices(workerId: string, serviceId: string, data: Service) {
+    try {
+      return await WorkerModel.findOneAndUpdate(
+        { _id: workerId, "configuration.services._id": serviceId },
+        {
+          $set: {
+            "configuration.services.$": { ...data, _id: serviceId },
+          },
+        },
+        { new: true }
+      );
     } catch (error) {
       throw error;
     }

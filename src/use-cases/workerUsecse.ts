@@ -9,6 +9,8 @@ import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 import Slot from "../entities/slots";
 import { generateWorkerId } from "../frameworks/utils/generateId";
 import WorkerModel from "../frameworks/models/workerModel";
+import { Configuration, Services } from "../entities/worker";
+import Service from "../entities/services";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -113,7 +115,7 @@ class WorkerUsecase {
       }
       const userData =
         await this._WorkerRepository.findNonVerifiedWorkerByEmail(email);
-      console.log("userData", userData);
+      // console.log("userData", userData);
 
       if (!userData)
         return {
@@ -134,7 +136,7 @@ class WorkerUsecase {
       if (!savedUser) {
         return { status: 500, message: "Failed to save user" };
       }
-      console.log("--savedworker--------------------------------", savedUser);
+      // console.log("--savedworker--------------------------------", savedUser);
 
       await this._WorkerRepository.deleteNonVerifiedWorkerByEmail(email);
 
@@ -206,7 +208,7 @@ class WorkerUsecase {
   ) {
     try {
       const worker = await this._WorkerRepository.findWorkerByEmail(email);
-      console.log("---worker---", worker);
+      // console.log("---worker---", worker);
       if (worker) {
         if (worker.isBlocked) {
           throw new CostumeError(400, "Sorry...., you are blocked!.");
@@ -250,7 +252,6 @@ class WorkerUsecase {
     } catch (error) {
       console.error("Error during login:", error);
       throw error;
-      
     }
   }
 
@@ -265,27 +266,15 @@ class WorkerUsecase {
       throw error;
     }
   }
-  async commonProblams(workerId: string) {
-    try {
-      const commonProblams = await this._WorkerRepository.commonProblams(
-        workerId
-      );
-      if (!commonProblams) {
-        throw new CostumeError(400, "not fetched commonProblams data");
-      }
-      return { commonProblams, status: 200, message: "fetched commonProblams" };
-    } catch (error) {
-      throw error;
-    }
-  }
+
   async getWorker(workerId: string) {
     try {
       const worker = await this._WorkerRepository.findWorkerById(workerId);
       if (!worker) {
         throw new CostumeError(400, "not fetched worker data");
       }
-      console.log('worker---',worker);
-      
+      // console.log("worker---", worker);
+
       return { worker, status: 200, message: "fetched worker data" };
     } catch (error) {
       throw error;
@@ -349,88 +338,188 @@ class WorkerUsecase {
       throw error;
     }
   }
-  async setSlots(slotData: Slot, Workerid: string): Promise<any> {
+
+  async workingdays(
+    workerId: string,
+    workingDays: Configuration
+  ): Promise<any> {
     try {
-      const savedSlot: any = await this._WorkerRepository.saveSlots(
-        slotData,
-        Workerid
+      const updatedWorker = await this._WorkerRepository.saveWorkingDays(
+        workerId,
+        workingDays
       );
-      console.log("slotData::----------------------:", savedSlot);
-      await this._WorkerRepository.workerUpdateSlotsId(Workerid, savedSlot._id);
-
-      // console.log('savedSlot:',savedSlot);
-
-      return savedSlot;
-    } catch (error) {
-      console.error("Error setting slots:", error);
-      throw error;
-    }
-  }
-  async fetchSlots(id: string): Promise<any> {
-    try {
-      const slots = await this._WorkerRepository.getSlotsById(id);
-      if (slots) {
-        return slots;
-      } else {
-        throw new CostumeError(400, "no slots");
-      }
-    } catch (error) {
-      console.error("Error setting slots:", error);
-      throw error;
-    }
-  }
-  async deleteSlot(id: string): Promise<any> {
-    try {
-      const slots = await this._WorkerRepository.deleteSlot(id);
-      console.log("slots:", slots);
-
-      if (slots) {
-        return slots;
-      } else {
-        new CostumeError(400, "fething slots an error");
-      }
-    } catch (error) {
-      console.error("Error setting slots:", error);
-      throw error;
-    }
-  }
-  async bookingAccept(id: string): Promise<any> {
-    try {
-      const booking = await this._WorkerRepository.bookingAccept(id);
-      // console.log('booking---:',booking);
-      if (!booking) {
-        throw new CostumeError(400, "Booking not found");
-      }
-      return booking;
-    } catch (error) {
-      console.error("Error setting slots:", error);
-      throw error;
-    }
-  }
-  async addProblam(
-    problemName: string,
-    estimatedHours: string,
-    workerId: string
-  ) {
-    try {
-      const newProblem = await this._WorkerRepository.saveAddProblam(
-        problemName,
-        estimatedHours,
-        workerId
-      );
-      // console.log('newProblem---:',newProblem);
-      if (!newProblem) {
-        throw new CostumeError(400, "newProblem not creted");
+      // console.log("updatedWorker---:", updatedWorker);
+      if (!updatedWorker) {
+        throw new CostumeError(400, "Worker not found");
       }
       return {
         status: 200,
-        message: "New Problem Created",
+        message: "working days Data updated",
+        updatedWorker,
       };
     } catch (error) {
       console.error("Error setting slots:", error);
       throw error;
     }
   }
+
+  async addService(workerId: string, serviceData: Services) {
+    try {
+      const newService = await this._WorkerRepository.addService(
+        workerId,
+        serviceData
+      );
+      return {
+        status: 200,
+        message: "Services Added",
+        newService,
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async service(workerId: string) {
+    try {
+      // console.log('service ---fake');
+
+      const worker = await this._WorkerRepository.findWorkerById(workerId);
+      if (!worker) {
+        throw new CostumeError(400, "Worker not found");
+      }
+      const services = worker.configuration?.services || [];
+      return {
+        status: 200,
+        message: "Services Added",
+        services,
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async deleteService(workerId: string, serviceId: string) {
+    try {
+      const deleteData = await this._WorkerRepository.deleteServiceById(
+        workerId,
+        serviceId
+      );
+      if (!deleteData) {
+        throw new CostumeError(400, "Not Deleted");
+      }
+      return {
+        status: 200,
+        message: "Services Deleted",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async editServices(workerId: string, serviceId: string, data: Service) {
+    try {
+      const updateService = await this._WorkerRepository.editServices(
+        workerId,
+        serviceId,
+        data
+      );
+      if (!updateService) {
+        throw new CostumeError(400, "Not updated service");
+      }
+      return {
+        status: 200,
+        message: "Services Updated",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+
+  // ----------------------------------------------------------------------------------------------------
+
+  // async bookingAccept(id: string): Promise<any> {
+  //   try {
+  //     const booking = await this._WorkerRepository.bookingAccept(id);
+  //     // console.log('booking---:',booking);
+  //     if (!booking) {
+  //       throw new CostumeError(400, "Booking not found");
+  //     }
+  //     return booking;
+  //   } catch (error) {
+  //     console.error("Error setting slots:", error);
+  //     throw error;
+  //   }
+  // }
+  // async addProblam(
+  //   problemName: string,
+  //   estimatedHours: string,
+  //   workerId: string
+  // ) {
+  //   try {
+  //     const newProblem = await this._WorkerRepository.saveAddProblam(
+  //       problemName,
+  //       estimatedHours,
+  //       workerId
+  //     );
+  //     // console.log('newProblem---:',newProblem);
+  //     if (!newProblem) {
+  //       throw new CostumeError(400, "newProblem not creted");
+  //     }
+  //     return {
+  //       status: 200,
+  //       message: "New Problem Created",
+  //     };
+  //   } catch (error) {
+  //     console.error("Error setting slots:", error);
+  //     throw error;
+  //   }
+  // }
+  // async setSlots(slotData: Slot, Workerid: string): Promise<any> {
+  //   try {
+  //     const savedSlot: any = await this._WorkerRepository.saveSlots(
+  //       slotData,
+  //       Workerid
+  //     );
+  //     // console.log("slotData::----------------------:", savedSlot);
+  //     await this._WorkerRepository.workerUpdateSlotsId(Workerid, savedSlot._id);
+
+  //     // console.log('savedSlot:',savedSlot);
+
+  //     return savedSlot;
+  //   } catch (error) {
+  //     console.error("Error setting slots:", error);
+  //     throw error;
+  //   }
+  // }
+  // async fetchSlots(id: string): Promise<any> {
+  //   try {
+  //     const slots = await this._WorkerRepository.getSlotsById(id);
+  //     if (slots) {
+  //       return slots;
+  //     } else {
+  //       throw new CostumeError(400, "no slots");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error setting slots:", error);
+  //     throw error;
+  //   }
+  // }
+  // async deleteSlot(id: string): Promise<any> {
+  //   try {
+  //     const slots = await this._WorkerRepository.deleteSlot(id);
+  //     console.log("slots:", slots);
+
+  //     if (slots) {
+  //       return slots;
+  //     } else {
+  //       new CostumeError(400, "fething slots an error");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error setting slots:", error);
+  //     throw error;
+  //   }
+  // }
 }
 
 export default WorkerUsecase;

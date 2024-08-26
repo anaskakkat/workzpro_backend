@@ -36,7 +36,6 @@ const workerController = new WorkerController(workerUsecase);
 
 // Define the routes
 workerRouter.post("/signup", (req, res, next) => {
-  //   console.log("signUp reached", req.body);
   workerController.signUp(req, res, next);
 });
 workerRouter.post("/otp", (req, res, next) => {
@@ -52,8 +51,8 @@ workerRouter.post("/googleAuth/", (req, res, next) => {
 workerRouter.post("/logout", workerAuth, (req, res, next) => {
   workerController.logout(req, res, next);
 });
-workerRouter.get("/services", workerAuth, (req, res, next) => {
-  workerController.services(req, res, next);
+workerRouter.get("/allServices", (req, res, next) => {
+  workerController.allServices(req, res, next);
 });
 workerRouter.post(
   "/setProfile",
@@ -63,26 +62,53 @@ workerRouter.post(
     workerController.setProfile(req, res, next);
   }
 );
-workerRouter.post("/addProblam", workerAuth, (req, res, next) => {
-  workerController.addProblam(req, res, next);
-});
-workerRouter.post("/slots/:id", workerAuth, (req, res, next) => {
-  workerController.setSlots(req, res, next);
-});
-workerRouter.get("/slots/:id", workerAuth, (req, res, next) => {
-  workerController.fetchSlots(req, res, next);
-});
-workerRouter.delete("/slots/:id", workerAuth, (req, res, next) => {
-  workerController.deleteSlot(req, res, next);
-});
-workerRouter.patch("/booking/:id", workerAuth, (req, res, next) => {
-  workerController.bookingAccept(req, res, next);
-});
 
-workerRouter.get("/commonProblams/:id", workerAuth, (req, res, next) => {
-  workerController.commonProblams(req, res, next);
-});
 workerRouter.get("/:id", workerAuth, (req, res, next) => {
   workerController.getWorker(req, res, next);
 });
+
+workerRouter.patch("/workingdays/:id", workerAuth, (req, res, next) => {
+  workerController.workingdays(req, res, next);
+});
+
+workerRouter.get("/service/:id", workerAuth, (req, res, next) => {
+  workerController.service(req, res, next);
+});
+workerRouter.post("/addService/:id", workerAuth, (req, res, next) => {
+  workerController.addService(req, res, next);
+});
+workerRouter.patch("/services/:id", workerAuth, (req, res, next) => {
+  workerController.editServices(req, res, next);
+});
+
+workerRouter.patch("/deleteService/:id", workerAuth, (req, res, next) => {
+  workerController.deleteService(req, res, next);
+});
+
+// --------------------------------------------------------------------------------------------------------------------------
+// workerRouter.post("/addProblam", workerAuth, (req, res, next) => {
+//   workerController.addProblam(req, res, next);
+// });
+
+// workerRouter.post("/slots/:id", workerAuth, (req, res, next) => {
+//   workerController.setSlots(req, res, next);
+// });
+// workerRouter.get("/slots/:id", workerAuth, (req, res, next) => {
+//   workerController.fetchSlots(req, res, next);
+// });
+// workerRouter.delete("/slots/:id", workerAuth, (req, res, next) => {
+//   workerController.deleteSlot(req, res, next);
+// });
+
+// workerRouter.patch("/booking/:id", workerAuth, (req, res, next) => {
+//   workerController.bookingAccept(req, res, next);
+// });
+//
+// workerRouter.get("/commonProblams/:id", workerAuth, (req, res, next) => {
+//   workerController.commonProblams(req, res, next);
+// });
+//
+// workerRouter.get("/allServices",  (req, res, next) => {
+//   workerController.services(req, res, next);
+// });
 export default workerRouter;

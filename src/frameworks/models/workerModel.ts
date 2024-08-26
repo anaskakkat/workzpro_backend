@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, ObjectId, Document } from "mongoose";
 import Worker from "../../entities/worker";
+import CommonProblemsModel from "./commonProblams";
 
 const workingDaySchema: Schema = new Schema({
   start: {
@@ -116,9 +117,9 @@ const WorkerSchema: Schema<Worker & Document> = new Schema(
       bufferTime: { type: Number, default: 30 },
       services: [
         {
-          description: { type: String },
+          service: { type: String },
           amount: { type: Number },
-          slots: { type: Number },
+          slot: { type: Number },
         },
       ],
       leaves: [

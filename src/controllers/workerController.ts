@@ -122,50 +122,6 @@ class WorkerController {
     }
   }
 
-  async addProblam(req: Request, res: Response, next: NextFunction) {
-    try {
-      // console.log("--data--", req.body);
-      const { problemName, estimatedHours, workerId } = req.body;
-      const newProblem = await this._workerUseCase.addProblam(
-        problemName,
-        estimatedHours,
-        workerId
-      );
-      if (newProblem.status === 200) {
-        return res.status(newProblem.status).json(newProblem.message);
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
-  async services(req: Request, res: Response, next: NextFunction) {
-    try {
-      const services = await this._workerUseCase.services();
-      // console.log('services---touched',services);
-      return res.status(200).json(services);
-    } catch (error) {
-      next(error);
-    }
-  }
-  async commonProblams(req: Request, res: Response, next: NextFunction) {
-    try {
-      const Problams = await this._workerUseCase.commonProblams(req.params.id);
-      // console.log("commonProblams---touched", Problams);
-      return res.status(Problams.status).json(Problams);
-    } catch (error) {
-      next(error);
-    }
-  }
-  async getWorker(req: Request, res: Response, next: NextFunction) {
-    try {
-      // console.log("worker---touched");
-      const worker = await this._workerUseCase.getWorker(req.params.id);
-      // console.log("worker---touched", worker);
-      return res.status(worker.status).json(worker);
-    } catch (error) {
-      next(error);
-    }
-  }
   async setProfile(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log('--req.body---',req.body);
@@ -181,47 +137,23 @@ class WorkerController {
       next(error);
     }
   }
-  async setSlots(req: Request, res: Response, next: NextFunction) {
-    try {
-      // console.log("-controller-body--", req.body);
-      // console.log("-controller-body--", req.params.id);
 
-      const slotData: Slot = req.body;
-      const updatedWorker = await this._workerUseCase.setSlots(
-        slotData,
-        req.params.id
+  async workingdays(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("workingdays-----", req.body);
+      const updateWorker = await this._workerUseCase.workingdays(
+        req.params.id,
+        req.body
       );
-      return res.status(200).json({ success: true, data: updatedWorker });
+      return res.status(updateWorker.status).json({
+        message: updateWorker.message,
+        data: updateWorker.updatedWorker,
+      });
     } catch (error) {
       next(error);
     }
   }
-  async fetchSlots(req: Request, res: Response, next: NextFunction) {
-    try {
-      const slots = await this._workerUseCase.fetchSlots(req.params.id);
-      res.status(200).json({ success: true, data: slots });
-    } catch (error) {
-      next(error);
-    }
-  }
-  async deleteSlot(req: Request, res: Response, next: NextFunction) {
-    try {
-      // console.log("i", req.params.id);
-      const data = await this._workerUseCase.deleteSlot(req.params.id);
-      return res.status(200).json({ message: "Slot SucussFully Deleted" });
-    } catch (error) {
-      next(error);
-    }
-  }
-  async bookingAccept(req: Request, res: Response, next: NextFunction) {
-    try {
-      // console.log("i", req.params.id);
-      const data = await this._workerUseCase.bookingAccept(req.params.id);
-      return res.status(200).json({ message: "Booking Request Accepted" });
-    } catch (error) {
-      next(error);
-    }
-  }
+
   async googleAuth(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, name, picture, googleId } = req.body;
@@ -232,7 +164,7 @@ class WorkerController {
         picture,
         googleId
       );
-      console.log("--cntrl-data-", verified);
+      // console.log("--cntrl-data-", verified);
       if (
         verified?.status === 200 &&
         verified?.tokens?.accessToken &&
@@ -276,6 +208,176 @@ class WorkerController {
       next(error);
     }
   }
+
+  async getWorker(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("worker---touched");
+      const worker = await this._workerUseCase.getWorker(req.params.id);
+      // console.log("worker---touched", worker);
+      return res.status(worker.status).json(worker);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addService(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("-controller-body--");
+      // console.log("-controller-body--", req.params.id);
+
+      const updatedWorker = await this._workerUseCase.addService(
+        req.params.id,
+        req.body
+      );
+      console.log("updatedWorker---", updatedWorker);
+
+      return res.status(200).json({ data: updatedWorker });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteService(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("-controller-body--", req.params.id);
+      // console.log("-controller-body--", req.body.serviceId);
+
+      const data = await this._workerUseCase.deleteService(
+        req.params.id,
+        req.body.serviceId
+      );
+      // console.log("service---", service);
+
+      return res.status(data.status).json({ data: data.message });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async editServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("-controller-body--", req.params.id);
+      console.log("-controller-body--", req.body.serviceId);
+      console.log("-controller-body--", req.body.data);
+
+      const data = await this._workerUseCase.editServices(
+        req.params.id,
+        req.body.serviceId,
+        req.body.data
+      );
+      // console.log("data---", data);
+
+      return res.status(data.status).json({ data: data.message });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async allServices(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("allServices---touched");
+      const services = await this._workerUseCase.services();
+      // console.log('services---touched',services);
+      return res.status(200).json(services);
+      //
+    } catch (error) {
+      console.error("errorr allService,", error);
+      next(error);
+    }
+  }
+
+  // -------------------------------------------------------------------------------------------------------
+  async service(req: Request, res: Response, next: NextFunction) {
+    try {
+
+      // console.log("-controller-body--", req.params.id);
+
+      const service = await this._workerUseCase.service(req.params.id);
+      // console.log("service---", service);
+
+      return res.status(200).json({ data: service });
+    } catch (error) {
+      next(error);
+    }
+  }
+  // async bookingAccept(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     // console.log("i", req.params.id);
+  //     const data = await this._workerUseCase.bookingAccept(req.params.id);
+  //     return res.status(200).json({ message: "Booking Request Accepted" });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+
+  // async setSlots(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     // console.log("-controller-body--", req.body);
+  //     // console.log("-controller-body--", req.params.id);
+
+  //     const slotData: Slot = req.body;
+  //     const updatedWorker = await this._workerUseCase.setSlots(
+  //       slotData,
+  //       req.params.id
+  //     );
+  //     return res.status(200).json({ success: true, data: updatedWorker });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  // async fetchSlots(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const slots = await this._workerUseCase.fetchSlots(req.params.id);
+  //     res.status(200).json({ success: true, data: slots });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  // async deleteSlot(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     // console.log("i", req.params.id);
+  //     const data = await this._workerUseCase.deleteSlot(req.params.id);
+  //     return res.status(200).json({ message: "Slot SucussFully Deleted" });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  // async addProblam(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     // console.log("--data--", req.body);
+  //     const { problemName, estimatedHours, workerId } = req.body;
+  //     const newProblem = await this._workerUseCase.addProblam(
+  //       problemName,
+  //       estimatedHours,
+  //       workerId
+  //     );
+  //     if (newProblem.status === 200) {
+  //       return res.status(newProblem.status).json(newProblem.message);
+  //     }
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  // async services(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     console.log("services---touched");
+  //     // const services = await this._workerUseCase.services();
+  //     // console.log('services---touched',services);
+  //     // return res.status(200).json(services);
+  //   } catch (error) {
+  //     console.log(error);
+  //     next(error);
+  //   }
+  // }
+  // async commonProblams(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const Problams = await this._workerUseCase.commonProblams(req.params.id);
+  //     // console.log("commonProblams---touched", Problams);
+  //     return res.status(Problams.status).json(Problams);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  //
 }
 
 export default WorkerController;
