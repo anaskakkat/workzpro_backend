@@ -214,6 +214,22 @@ class AdminController {
       next(error);
     }
   }
+  async requestReject(req: Request, res: Response, next: NextFunction) {
+    try {
+      const workerId = req.params.id;
+      console.log("uid-", workerId, "req.body", req.body);
+
+      const result = await this._adminUsecase.requestReject(
+        workerId,
+        req.body.reason
+      );
+      // console.log('result:',result);
+
+      return res.status(result.status).json({ message: result.message });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default AdminController;

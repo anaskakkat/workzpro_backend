@@ -1,21 +1,24 @@
 import { CostumeError } from "../frameworks/middlewares/customError";
 import EncryptPassword from "../frameworks/utils/bcryptPassword";
 import JWTService from "../frameworks/utils/generateToken";
+import NodemailerEmailService from "../frameworks/utils/sentMail";
 import AdminRepository from "../repository/adminRepository";
 
 class AdminUsecase {
   private _adminRepository: AdminRepository;
   private _encryptPassword: EncryptPassword;
   private _genrateToken: JWTService;
-
+  private _nodeMailerService: NodemailerEmailService;
   constructor(
     adminrepository: AdminRepository,
     encryptPassword: EncryptPassword,
-    generateToken: JWTService
+    generateToken: JWTService,
+    nodeMiler: NodemailerEmailService
   ) {
     this._adminRepository = adminrepository;
     this._encryptPassword = encryptPassword;
     this._genrateToken = generateToken;
+    this._nodeMailerService = nodeMiler;
   }
 
   async verifylogin(email: string, password: string) {
@@ -37,7 +40,7 @@ class AdminUsecase {
       // console.log(email, password);
 
       const admin = await this._adminRepository.FindAdminByEmail(email);
-      console.log('---admin----',admin);
+      console.log("---admin----", admin);
       if (!admin) {
         return {
           status: 400,
@@ -335,6 +338,22 @@ class AdminUsecase {
       } else {
         throw new CostumeError(404, "Worker not found");
       }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async requestReject(id: string, reason: string) {
+    try {
+      const worker = await this._adminRepository.FindWorkerById(id);
+      if (!worker) {
+        throw new CostumeError(400, "Worker not found.");
+      }
+      await this._nodeMailerService.sendRejectionEmail(worker.email, reason);
+      const delWorker = await this._adminRepository.deleteWorkerById(id);
+      return {
+        status: 200,
+        message: "Request Rejected",
+      };
     } catch (error) {
       throw error;
     }

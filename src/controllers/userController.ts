@@ -200,6 +200,7 @@ class UserController {
   }
   async services(req: Request, res: Response, next: NextFunction) {
     try {
+      // console.log('services---touched');
       const services = await this._userUsecase.services();
       // console.log('services---touched',services);
       return res.status(200).json(services);
@@ -209,13 +210,18 @@ class UserController {
   }
   async fetchWorkers(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log("Workers---touched", req.body);
-      const Workers = await this._userUsecase.fetchWorkers(req.body.serviceId,req.body.locationData);
+      console.log("Workers---touched", req.body);
+      const Workers = await this._userUsecase.fetchWorkers(
+        req.body.serviceId,
+        req.body.locationData
+      );
+
+      // console.log("Workers---touched", Workers);
       return res.status(200).json(Workers);
     } catch (error) {
       next(error);
     }
-  } 
+  }
   async fetchWorkerByID(req: Request, res: Response, next: NextFunction) {
     try {
       const Workers = await this._userUsecase.fetchWorkerByID(req.params.id);

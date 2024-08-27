@@ -9,7 +9,7 @@ import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 import Slot from "../entities/slots";
 import { generateWorkerId } from "../frameworks/utils/generateId";
 import WorkerModel from "../frameworks/models/workerModel";
-import { Configuration, Services } from "../entities/worker";
+import { Configuration, Leave, Services } from "../entities/worker";
 import Service from "../entities/services";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
@@ -365,6 +365,24 @@ class WorkerUsecase {
 
   async addService(workerId: string, serviceData: Services) {
     try {
+      console.log("serviceData", serviceData);
+
+      const worker = await this._WorkerRepository.findWorkerById(workerId);
+      if (!worker) {
+        throw new CostumeError(400, "worker data not ");
+      }
+      if (!worker.configuration) {
+        throw new CostumeError(400, "Worker configuration is not defined");
+      }
+      // console.log("worker ", worker);
+      const serviceExists =
+        worker &&
+        worker.configuration.services.some(
+          (s: { service: any }) => s.service === serviceData.service
+        );
+      if (serviceExists) {
+        throw new CostumeError(400, "Service already exists");
+      }
       const newService = await this._WorkerRepository.addService(
         workerId,
         serviceData
@@ -435,91 +453,60 @@ class WorkerUsecase {
       throw error;
     }
   }
-
-  // ----------------------------------------------------------------------------------------------------
-
-  // async bookingAccept(id: string): Promise<any> {
-  //   try {
-  //     const booking = await this._WorkerRepository.bookingAccept(id);
-  //     // console.log('booking---:',booking);
-  //     if (!booking) {
-  //       throw new CostumeError(400, "Booking not found");
-  //     }
-  //     return booking;
-  //   } catch (error) {
-  //     console.error("Error setting slots:", error);
-  //     throw error;
-  //   }
-  // }
-  // async addProblam(
-  //   problemName: string,
-  //   estimatedHours: string,
-  //   workerId: string
-  // ) {
-  //   try {
-  //     const newProblem = await this._WorkerRepository.saveAddProblam(
-  //       problemName,
-  //       estimatedHours,
-  //       workerId
-  //     );
-  //     // console.log('newProblem---:',newProblem);
-  //     if (!newProblem) {
-  //       throw new CostumeError(400, "newProblem not creted");
-  //     }
-  //     return {
-  //       status: 200,
-  //       message: "New Problem Created",
-  //     };
-  //   } catch (error) {
-  //     console.error("Error setting slots:", error);
-  //     throw error;
-  //   }
-  // }
-  // async setSlots(slotData: Slot, Workerid: string): Promise<any> {
-  //   try {
-  //     const savedSlot: any = await this._WorkerRepository.saveSlots(
-  //       slotData,
-  //       Workerid
-  //     );
-  //     // console.log("slotData::----------------------:", savedSlot);
-  //     await this._WorkerRepository.workerUpdateSlotsId(Workerid, savedSlot._id);
-
-  //     // console.log('savedSlot:',savedSlot);
-
-  //     return savedSlot;
-  //   } catch (error) {
-  //     console.error("Error setting slots:", error);
-  //     throw error;
-  //   }
-  // }
-  // async fetchSlots(id: string): Promise<any> {
-  //   try {
-  //     const slots = await this._WorkerRepository.getSlotsById(id);
-  //     if (slots) {
-  //       return slots;
-  //     } else {
-  //       throw new CostumeError(400, "no slots");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error setting slots:", error);
-  //     throw error;
-  //   }
-  // }
-  // async deleteSlot(id: string): Promise<any> {
-  //   try {
-  //     const slots = await this._WorkerRepository.deleteSlot(id);
-  //     console.log("slots:", slots);
-
-  //     if (slots) {
-  //       return slots;
-  //     } else {
-  //       new CostumeError(400, "fething slots an error");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error setting slots:", error);
-  //     throw error;
-  //   }
-  // }
+  async addLeave(workerId: string, data: Leave) {
+    try {
+      const updateLeave = await this._WorkerRepository.addLeave(workerId, data);
+      if (!updateLeave) {
+        throw new CostumeError(400, "Not updated leave");
+      }
+      console.log('updateLeave--',updateLeave);
+      
+      return {
+        status: 200,
+        message: "Leave created",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async getLeave(workerId: string) {
+    try {
+      const worker = await this._WorkerRepository.findWorkerById(workerId);
+      if (!worker) {
+        throw new CostumeError(400, "Worker not found");
+      }
+      const leaves = worker.configuration?.leaves || [];
+      return {
+        status: 200,
+        message: "Leave fetched",
+        data: leaves,
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async deleteLeave(workerId: string, leaveId: string) {
+    try {
+      const worker = await this._WorkerRepository.deleteLeavesById(
+        workerId,
+        leaveId
+      );
+      if (!worker) {
+        throw new CostumeError(400, "Worker not found");
+      }
+      const leaves = worker.configuration?.leaves || [];
+      return {
+        status: 200,
+        message: "Deleted Leaves",
+        data: leaves,
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
 }
 
 export default WorkerUsecase;

@@ -7,6 +7,7 @@ import EncryptPassword from "../utils/bcryptPassword";
 import JWTService from "../utils/generateToken";
 import { log } from "console";
 import adminAuth from "../middlewares/adminAuth";
+import NodemailerEmailService from "../utils/sentMail";
 
 const adminRouter = express.Router();
 
@@ -16,12 +17,14 @@ const adminRouter = express.Router();
 const adminRepository = new AdminRepository();
 const encryptPassword = new EncryptPassword();
 const jwtService = new JWTService();
+const nodeMailerService = new NodemailerEmailService();
 
 //useCases----------------
 const adminUsecase = new AdminUsecase(
   adminRepository,
   encryptPassword,
-  jwtService
+  jwtService,
+  nodeMailerService
 );
 //controllers-------------
 const adminController = new AdminController(adminUsecase);
@@ -67,6 +70,9 @@ adminRouter.patch("/workers/:id/unblock", adminAuth, (req, res, next) => {
 });
 adminRouter.patch("/request/:id", adminAuth, (req, res, next) => {
   adminController.worker_request(req, res, next);
+});
+adminRouter.patch("/requestReject/:id", adminAuth, (req, res, next) => {
+  adminController.requestReject(req, res, next);
 });
 
 export default adminRouter;

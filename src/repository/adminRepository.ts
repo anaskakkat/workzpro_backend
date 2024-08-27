@@ -22,6 +22,9 @@ class AdminRepository implements IAdminRepo {
   async FindWorkerById(id: any) {
     return WorkerModel.findById(id);
   }
+  async deleteWorkerById(id: string) {
+    return WorkerModel.findByIdAndDelete(id);
+  }
   async saveAdmin(admin: Admin) {
     try {
       console.log("repo", admin);
@@ -66,7 +69,7 @@ class AdminRepository implements IAdminRepo {
     return serviceModel.find();
   }
   async getWorkers() {
-    return WorkerModel.find() 
+    return WorkerModel.find();
   }
 
   async findServicesById(id: any) {

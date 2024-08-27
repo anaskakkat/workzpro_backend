@@ -41,6 +41,7 @@ export interface WorkingDay {
   isWorking: boolean;
 }
 export interface Services {
+  service: any;
   description: string;
   amount: number;
   slots: number;
@@ -51,4 +52,8 @@ export interface Configuration {
   bufferTime: number;
   services: Services[];
   leaves: { date: string | Date; reason: string }[];
+}
+export interface Leave {
+  date: string | Date;
+  reason: string;
 }

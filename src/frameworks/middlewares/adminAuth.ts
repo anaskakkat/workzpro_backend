@@ -17,8 +17,8 @@ const _adminRepo = new AdminRepository();
 const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
   let adminToken = req.cookies.admin_access_token;
   const adminRefreshTokens = req.cookies.admin_refresh_token;
-  console.log("--adminAuthToken--:", adminToken);
-  console.log("---adminAuthRefreshTokens--:", adminRefreshTokens);
+  // console.log("--adminAuthToken--:", adminToken);
+  // console.log("---adminAuthRefreshTokens--:", adminRefreshTokens);
 
   if (!adminRefreshTokens) {
     return next(new CostumeError(401, "Not authorized, no refresh token"));

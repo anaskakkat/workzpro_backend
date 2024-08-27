@@ -285,10 +285,8 @@ class WorkerController {
     }
   }
 
-  // -------------------------------------------------------------------------------------------------------
   async service(req: Request, res: Response, next: NextFunction) {
     try {
-
       // console.log("-controller-body--", req.params.id);
 
       const service = await this._workerUseCase.service(req.params.id);
@@ -299,85 +297,42 @@ class WorkerController {
       next(error);
     }
   }
-  // async bookingAccept(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     // console.log("i", req.params.id);
-  //     const data = await this._workerUseCase.bookingAccept(req.params.id);
-  //     return res.status(200).json({ message: "Booking Request Accepted" });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+  async addLeave(req: Request, res: Response, next: NextFunction) {
+    try {
+      //  console.log("addLeave---", req.params.id);
+      // console.log("addLeave---", req.body);
+      const leave = await this._workerUseCase.addLeave(req.params.id, req.body);
+      return res.status(200).json({ leave });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getLeave(req: Request, res: Response, next: NextFunction) {
+    try {
+      
+      const leave = await this._workerUseCase.getLeave(req.params.id);
+      // console.log("service---", leave);
 
-  // async setSlots(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     // console.log("-controller-body--", req.body);
-  //     // console.log("-controller-body--", req.params.id);
+      return res.status(200).json({ data: leave });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async deleteLeave(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("deleteLeave---", req.params.id);
+      // console.log("deleteLeave---", req.body.leaveId);
 
-  //     const slotData: Slot = req.body;
-  //     const updatedWorker = await this._workerUseCase.setSlots(
-  //       slotData,
-  //       req.params.id
-  //     );
-  //     return res.status(200).json({ success: true, data: updatedWorker });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
-  // async fetchSlots(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const slots = await this._workerUseCase.fetchSlots(req.params.id);
-  //     res.status(200).json({ success: true, data: slots });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
-  // async deleteSlot(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     // console.log("i", req.params.id);
-  //     const data = await this._workerUseCase.deleteSlot(req.params.id);
-  //     return res.status(200).json({ message: "Slot SucussFully Deleted" });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
-  // async addProblam(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     // console.log("--data--", req.body);
-  //     const { problemName, estimatedHours, workerId } = req.body;
-  //     const newProblem = await this._workerUseCase.addProblam(
-  //       problemName,
-  //       estimatedHours,
-  //       workerId
-  //     );
-  //     if (newProblem.status === 200) {
-  //       return res.status(newProblem.status).json(newProblem.message);
-  //     }
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
-  // async services(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     console.log("services---touched");
-  //     // const services = await this._workerUseCase.services();
-  //     // console.log('services---touched',services);
-  //     // return res.status(200).json(services);
-  //   } catch (error) {
-  //     console.log(error);
-  //     next(error);
-  //   }
-  // }
-  // async commonProblams(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const Problams = await this._workerUseCase.commonProblams(req.params.id);
-  //     // console.log("commonProblams---touched", Problams);
-  //     return res.status(Problams.status).json(Problams);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
-  //
+      const leave = await this._workerUseCase.deleteLeave(
+        req.params.id,
+        req.body.leaveId
+      );
+
+      return res.status(200).json({ data: leave });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default WorkerController;

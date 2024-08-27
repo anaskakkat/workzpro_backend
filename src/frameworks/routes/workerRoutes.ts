@@ -51,7 +51,7 @@ workerRouter.post("/googleAuth/", (req, res, next) => {
 workerRouter.post("/logout", workerAuth, (req, res, next) => {
   workerController.logout(req, res, next);
 });
-workerRouter.get("/allServices", (req, res, next) => {
+workerRouter.get("/allServices", workerAuth, (req, res, next) => {
   workerController.allServices(req, res, next);
 });
 workerRouter.post(
@@ -84,31 +84,14 @@ workerRouter.patch("/services/:id", workerAuth, (req, res, next) => {
 workerRouter.patch("/deleteService/:id", workerAuth, (req, res, next) => {
   workerController.deleteService(req, res, next);
 });
+workerRouter.post("/leave/:id", workerAuth, (req, res, next) => {
+  workerController.addLeave(req, res, next);
+});
+workerRouter.get("/leave/:id", workerAuth, (req, res, next) => {
+  workerController.getLeave(req, res, next); 
+});
+workerRouter.patch("/deleteLeave/:id", workerAuth, (req, res, next) => {
+  workerController.deleteLeave(req, res, next);
+});
 
-// --------------------------------------------------------------------------------------------------------------------------
-// workerRouter.post("/addProblam", workerAuth, (req, res, next) => {
-//   workerController.addProblam(req, res, next);
-// });
-
-// workerRouter.post("/slots/:id", workerAuth, (req, res, next) => {
-//   workerController.setSlots(req, res, next);
-// });
-// workerRouter.get("/slots/:id", workerAuth, (req, res, next) => {
-//   workerController.fetchSlots(req, res, next);
-// });
-// workerRouter.delete("/slots/:id", workerAuth, (req, res, next) => {
-//   workerController.deleteSlot(req, res, next);
-// });
-
-// workerRouter.patch("/booking/:id", workerAuth, (req, res, next) => {
-//   workerController.bookingAccept(req, res, next);
-// });
-//
-// workerRouter.get("/commonProblams/:id", workerAuth, (req, res, next) => {
-//   workerController.commonProblams(req, res, next);
-// });
-//
-// workerRouter.get("/allServices",  (req, res, next) => {
-//   workerController.services(req, res, next);
-// });
 export default workerRouter;

@@ -29,4 +29,21 @@ export default class NodemailerEmailService {
       `,
     });
   }
+  async sendRejectionEmail(email: string, reason: string): Promise<void> {
+    await this.transporter.sendMail({
+      from: AUTH_MAIL,
+      to: email,
+      subject: "WorkzPro Email Verification",
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; text-align: center; background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
+      <h2 style="color: #ff4d4f;">WorkzPro Worker Request Rejection</h2>
+      <p>Hello,</p>
+      <p>We regret to inform you that your request has been rejected for the following reason:</p>
+      <p style="color: #d32f2f; font-weight: bold;">${reason}</p>
+      <p style="margin-top: 20px;">If you have any questions or need further clarification, please contact us.</p>
+      <p>Thank you,<br>WorkzPro Team</p>
+    </div>
+  `,
+    });
+  }
 }
