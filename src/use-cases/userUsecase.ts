@@ -310,55 +310,8 @@ class UserUsecase {
       throw error;
     }
   }
-  async fetchSlotById(id: string) {
-    try {
-      const slot = await this._userRepository.fetchSlotById(id);
-      if (!slot) {
-        throw new CostumeError(400, "not fetched slot data");
-      }
-      // console.log('slot---touched',slot);
 
-      return slot;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async booking(userId: string, data: IBooking) {
-    try {
-      const bookingData = await this._userRepository.saveBooking(userId, data);
-      // console.log("--uc-bookingData::", bookingData);
-      if (!bookingData) {
-        throw new CostumeError(500, "Failed to save booking");
-      }
-      const slot = await this._userRepository.fetchSlotID(
-        bookingData.selectedSlot
-      );
-      if (!slot) {
-        throw new CostumeError(400, "Slot not found");
-      }
-      const updatedSlot = await this._userRepository.updateSlot(slot._id);
-
-      if (!updatedSlot) {
-        throw new CostumeError(500, "Failed to update slot");
-      }
-      return bookingData;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async getBooking(id: string) {
-    try {
-      const bookingData = await this._userRepository.findBookingById(id);
-      if (!bookingData) {
-        new CostumeError(400, "no booking data");
-      }
-      // console.log('boking::_-',bookingData);
-
-      return bookingData;
-    } catch (error) {
-      throw error;
-    }
-  }
+ 
 }
 
 export default UserUsecase;

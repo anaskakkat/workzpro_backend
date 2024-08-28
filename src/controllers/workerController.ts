@@ -300,7 +300,7 @@ class WorkerController {
   async addLeave(req: Request, res: Response, next: NextFunction) {
     try {
       //  console.log("addLeave---", req.params.id);
-      // console.log("addLeave---", req.body);
+      console.log("addLeave---", req.body);
       const leave = await this._workerUseCase.addLeave(req.params.id, req.body);
       return res.status(200).json({ leave });
     } catch (error) {

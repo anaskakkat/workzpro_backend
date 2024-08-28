@@ -7,9 +7,6 @@ import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 import mongoose, { ObjectId } from "mongoose";
-import SlotModel from "../frameworks/models/slotsModel";
-import IBooking from "../entities/booking";
-import BookingModel from "../frameworks/models/bookingsModel";
 import { error } from "console";
 
 class UserRepository implements IUserRepo {
@@ -132,55 +129,8 @@ class UserRepository implements IUserRepo {
   async fetchWorkerByID(id: string) {
     return await WorkerModel.findById(id).populate("service");
   }
-  async fetchSlotById(id: string) {
-    // console.log('id:',id)
-    return await SlotModel.find({ workerId: id });
-  }
-  async fetchSlotID(id: ObjectId) {
-    // console.log('id:',id)
-    return await SlotModel.findById(id);
-  }
-  async findSlotById(id: string) {
-    console.log("id:", id);
 
-    return await SlotModel.aggregate([
-      { $unwind: "$slots" },
-      { $match: { "slots._id": new mongoose.Types.ObjectId(id) } },
-      { $project: { _id: 0, workerId: 0 } },
-    ]);
-  }
-  async saveBooking(userId: string, data: IBooking) {
-    // console.log('booking-repo',data);
 
-    const newBooking = new BookingModel({
-      userId: userId,
-      workerId: data.workerId,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      address: data.address,
-      selectedSlot: data.selectedSlot,
-      location: data.location,
-      date: data.date,
-    });
-    const savedBooking = await newBooking.save();
-
-    return savedBooking;
-  }
-
-  async updateSlot(slotId: ObjectId) {
-    return SlotModel.findByIdAndUpdate(
-      slotId,
-      { isBooked: true },
-      { new: true }
-    ).exec();
-  }
-  async findBookingById(id: string) {
-    return BookingModel.findById(id)
-      .populate("userId")
-      .populate("workerId")
-      .populate("selectedSlot");
-  }
 }
 
 export default UserRepository;

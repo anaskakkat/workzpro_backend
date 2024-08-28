@@ -7,7 +7,6 @@ import workerModel from "../frameworks/models/workerModel";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 
-import CommonProblemsModel from "../frameworks/models/commonProblams";
 import Service from "../entities/services";
 
 class WorkerRepository implements IworkerRepo {
@@ -112,9 +111,6 @@ class WorkerRepository implements IworkerRepo {
     return serviceModel.find();
   }
 
-  async commonProblams(workerId: string) {
-    return await CommonProblemsModel.find({ workerId: workerId });
-  }
 
   async saveWorkingDays(workerId: string, configuration: Configuration) {
     try {

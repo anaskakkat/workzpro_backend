@@ -1,6 +1,5 @@
 import mongoose, { Model, Schema, ObjectId, Document } from "mongoose";
 import Worker from "../../entities/worker";
-import CommonProblemsModel from "./commonProblams";
 
 const workingDaySchema: Schema = new Schema({
   start: {

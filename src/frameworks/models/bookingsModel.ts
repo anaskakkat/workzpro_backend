@@ -1,63 +1,96 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 import IBooking from "../../entities/booking";
 
-// Define the booking schema
-const bookingSchema: Schema<IBooking & Document> = new Schema(
+// Define the address schema separately
+const AddressSchema = new Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", 
-    },
-    workerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Worker", 
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    phone: {
-      type: String,
-      required: true,
-    },
-    address: {
-      type: String,
-      required: true,
-    },
-    selectedSlot: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Slot", 
+    houseNumber: { type: String, required: true },
+    street: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    pincode: {
+      type: Schema.Types.Mixed, 
       required: true,
     },
     location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+        
+      },
+    },
+  },
+  { _id: false }
+);
+
+// Define the service schema
+const ServiceSchema = new Schema(
+  {
+    _id: { type: Schema.Types.ObjectId, required: false },
+    service: { type: String, required: true },
+    amount: { type: Number, required: true, min: 0 },
+    slot: { type: Number, required: true, min: 1 },
+  },
+  { _id: false }
+);
+
+// Define the payment details schema
+const PaymentDetailsSchema = new Schema(
+  {
+    status: {
       type: String,
+      enum: ["pending", "success"],
+      default: "pending",
+      required: true,
+    },
+    date: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
+const BookingSchema: Schema<IBooking & Document> = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User", 
+      required: true,
+    },
+    workerId: {
+      type: Schema.Types.ObjectId,
+      ref: "Worker", 
+      required: true,
+      index: true,
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "completed", "cancelled"],
+      enum: ["pending", "confirmed", "completed", "cancelled"],  
       default: "pending",
+      index: true,
     },
-    comments: {
-      type: String,
-      default: "", 
-    },
-    date: {
-      type: Date,
+    bookingNumber: {
+      type: Schema.Types.Mixed,  
       required: true,
     },
+    description: { type: String, required: true },
+    bookingDate: { type: Date, required: true, index: true },
+    slots: { type: String, required: true },
+    service: { type: ServiceSchema, required: true },
+    address: { type: AddressSchema, required: true },
+    paymentDetails: { type: PaymentDetailsSchema, required: true },
   },
   {
     timestamps: true, 
   }
 );
 
-// Create the booking model
-const BookingModel: Model<IBooking & Document> = mongoose.model<
-  IBooking & Document
->("Booking", bookingSchema);
+const BookingModel: Model<IBooking & Document> = mongoose.model<IBooking & Document>(
+  "Booking",
+  BookingSchema
+);
 
 export default BookingModel;

@@ -67,15 +67,4 @@ userRouter.get("/workers/:id", authenticateToken, (req, res, next) => {
   userController.fetchWorkerByID(req, res, next);
 });
 
-userRouter.get("/fetchSlot/:id", authenticateToken, (req, res, next) => {
-  userController.fetchSlotById(req, res, next);
-});
-``;
-userRouter.post("/booking/:id", authenticateToken, (req, res, next) => {
-  userController.booking(req, res, next);
-});
-userRouter.get("/booking/:id", authenticateToken, (req, res, next) => {
-  userController.getBooking(req, res, next);
-});
-
 export default userRouter;

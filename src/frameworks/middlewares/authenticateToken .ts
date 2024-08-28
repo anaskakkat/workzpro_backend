@@ -22,8 +22,8 @@ const authenticateToken = async (
   let userToken = req.cookies.user_access_token;
   const userRefreshTokens = req.cookies.user_refresh_token;
 
-//   console.log("---userToken--:",userToken);
-// console.log("---workerToken--:",userRefreshTokens);
+  console.log("---userToken--:",userToken);
+console.log("---userRefreshTokens--:",userRefreshTokens);
 
 
 
@@ -36,7 +36,7 @@ const authenticateToken = async (
       console.log('i dont have access ')
       const newUserToken = await refreshAccessToken(userRefreshTokens);
       res.cookie("user_access_token", newUserToken, {
-        maxAge: 15 * 60 * 60 * 1000,
+        maxAge: 15*60* 1000,
         httpOnly: true,
         sameSite: "strict",
         secure: process.env.NODE_ENV !== "development",
@@ -79,8 +79,10 @@ const refreshAccessToken = async (refreshToken: string) => {
     if (!decoded) {
       throw new Error("Invalid refresh token");
     }
-    const {accessToken} = _jwtToken.generateToken(
-      decoded.decoded.userId,
+    // console.log('refreshAccessToken---decoded-----',decoded);
+    
+    const {accessToken} = _jwtToken.generateToken( 
+      decoded.decoded.id,
       decoded.decoded.role
     );
     return accessToken;

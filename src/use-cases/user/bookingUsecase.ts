@@ -8,28 +8,7 @@ class BookingUsecase {
     this._bookingRepository = bookingReopsitory;
   }
 
-  async getBooking(id: string) {
-    try {
-      const bookings = await this._bookingRepository.findBookingsByUserId(id);
-      if (!bookings) {
-        throw new CostumeError(400, "not fetched bookings data");
-      }
-      return bookings;
-    } catch (error) {
-      throw error;
-    }
-  }
-  async getBookingWorker(id: string) {
-    try {
-      const bookings = await this._bookingRepository.findBookingsByWorkerId(id);
-      if (!bookings) {
-        throw new CostumeError(400, "not fetched bookings data");
-      }
-      return bookings;
-    } catch (error) {
-      throw error;
-    }
-  }
+
 }
 
 export default BookingUsecase;
