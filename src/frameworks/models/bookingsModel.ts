@@ -81,7 +81,7 @@ const BookingSchema: Schema<IBooking & Document> = new Schema(
     slots: { type: String, required: true },
     service: { type: ServiceSchema, required: true },
     address: { type: AddressSchema, required: true },
-    paymentDetails: { type: PaymentDetailsSchema, required: true },
+    paymentDetails: { type: PaymentDetailsSchema, },
   },
   {
     timestamps: true, 

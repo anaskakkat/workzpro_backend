@@ -7,10 +7,10 @@ import WorkerRepository from "../repository/workerRepository";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 import Slot from "../entities/slots";
-import { generateWorkerId } from "../frameworks/utils/generateId";
 import WorkerModel from "../frameworks/models/workerModel";
 import { Configuration, Leave, Services } from "../entities/worker";
 import Service from "../entities/services";
+import { generateId } from "../frameworks/utils/generateId";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -67,7 +67,7 @@ class WorkerUsecase {
       const hashedOtp = await this._encryptOtp.encrypt(otp);
       const hashedPassword = await this._encryptPassword.encrypt(password);
       // - worker id generator
-      const workerId = generateWorkerId();
+      const workerId = generateId();
       // console.log("workerId:",  workerId);
       const worker = {
         workerId,

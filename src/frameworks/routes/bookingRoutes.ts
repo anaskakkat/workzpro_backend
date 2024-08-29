@@ -15,6 +15,14 @@ const bookingUsecase = new BookingUsecase(bookingRepository);
 //controller-----
 const bookingController = new BookingController(bookingUsecase);
 
-bookingRouter.use(authenticateToken);
+bookingRouter.post("/:id", authenticateToken, (req, res, next) => {
+  bookingController.bookingData(req, res, next);
+});
+bookingRouter.get("/:id", authenticateToken, (req, res, next) => {
+  bookingController.getbookingData(req, res, next);
+});
+bookingRouter.get("/user/:id", authenticateToken, (req, res, next) => {
+  bookingController.getUserBookings(req, res, next);
+});
 
 export default bookingRouter;

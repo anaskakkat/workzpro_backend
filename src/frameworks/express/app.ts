@@ -28,7 +28,7 @@ app.use(
 app.use("/api/user", userRoutes);
 app.use("/api/worker", workerRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/booking", bookingRouter);
+app.use("/api/user/booking", bookingRouter);
 app.use(errorHandle);
 
 export default app;

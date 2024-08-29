@@ -22,8 +22,8 @@ const authenticateToken = async (
   let userToken = req.cookies.user_access_token;
   const userRefreshTokens = req.cookies.user_refresh_token;
 
-  console.log("---userToken--:",userToken);
-console.log("---userRefreshTokens--:",userRefreshTokens);
+  // console.log("---userToken--:",userToken);
+// console.log("---userRefreshTokens--:",userRefreshTokens);
 
 
 
