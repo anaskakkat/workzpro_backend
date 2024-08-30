@@ -1,8 +1,8 @@
 import express, { Router } from "express";
-import BookingRepository from "../../repository/user/bookingRepository";
-import BookingUsecase from "../../use-cases/user/bookingUsecase";
-import BookingController from "../../controllers/user/bookingController";
+import BookingUsecase from "../../use-cases/bookingUsecase";
+import BookingController from "../../controllers/bookingController";
 import authenticateToken from "../middlewares/authenticateToken ";
+import BookingRepository from "../../repository/bookingRepository";
 
 const bookingRouter = express.Router();
 

@@ -309,7 +309,6 @@ class WorkerController {
   }
   async getLeave(req: Request, res: Response, next: NextFunction) {
     try {
-      
       const leave = await this._workerUseCase.getLeave(req.params.id);
       // console.log("service---", leave);
 
@@ -329,6 +328,26 @@ class WorkerController {
       );
 
       return res.status(200).json({ data: leave });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async bookings(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("bookings---", req.params.id);
+
+      const bookings = await this._workerUseCase.bookings(req.params.id);
+
+      return res.status(bookings.status).json(bookings.bookings);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async acceptBooking(req: Request, res: Response, next: NextFunction) {
+    try {
+      const bookings = await this._workerUseCase.acceptBooking(req.params.id);
+      // console.log("bookings---", bookings);
+      return res.status(bookings.status).json(bookings.message);
     } catch (error) {
       next(error);
     }

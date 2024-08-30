@@ -11,6 +11,7 @@ import WorkerModel from "../frameworks/models/workerModel";
 import { Configuration, Leave, Services } from "../entities/worker";
 import Service from "../entities/services";
 import { generateId } from "../frameworks/utils/generateId";
+import { log } from "console";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
@@ -459,8 +460,8 @@ class WorkerUsecase {
       if (!updateLeave) {
         throw new CostumeError(400, "Not updated leave");
       }
-      console.log('updateLeave--',updateLeave);
-      
+      console.log("updateLeave--", updateLeave);
+
       return {
         status: 200,
         message: "Leave created",
@@ -501,6 +502,45 @@ class WorkerUsecase {
         status: 200,
         message: "Deleted Leaves",
         data: leaves,
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async bookings(workerId: string) {
+    try {
+      const bookings = await this._WorkerRepository.findBookingByWorkerId(
+        workerId
+      );
+      if (!bookings) {
+        throw new CostumeError(400, "worker bookings not found");
+      }
+      // console.log('booo-----',bookings);
+
+      return {
+        status: 200,
+        bookings,
+        message: "Deleted Leaves",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async acceptBooking(bookingId: string) {
+    try {
+      const bookings = await this._WorkerRepository.confirmBookingById(
+        bookingId
+      );
+      if (!bookings) {
+        throw new CostumeError(400, " bookings not accetped");
+      }
+      // console.log('booo-----',bookings);
+
+      return {
+        status: 200,
+        message: "Booking Accepted",
       };
     } catch (error) {
       console.error("Error setting slots:", error);

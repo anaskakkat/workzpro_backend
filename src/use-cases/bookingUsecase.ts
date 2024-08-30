@@ -1,7 +1,7 @@
 import { log } from "console";
-import IBooking from "../../entities/booking";
-import { CostumeError } from "../../frameworks/middlewares/customError";
-import BookingRepository from "../../repository/user/bookingRepository";
+import IBooking from "../entities/booking";
+import { CostumeError } from "../frameworks/middlewares/customError";
+import BookingRepository from "../repository/bookingRepository";
 
 class BookingUsecase {
   private _bookingRepository: BookingRepository;
@@ -48,12 +48,12 @@ class BookingUsecase {
   }
   async getUserBookings(userId: string) {
     try {
-      const booking = await this._bookingRepository.findBookingsById(userId);
+      const booking = await this._bookingRepository.findBookingsByUserId(userId);
       if (!booking) {
-        throw new CostumeError(400, "not fetching  UserBookings data");
+        throw new CostumeError(400, "not fetching  userBookings data");
       }
 
-      console.log('booking----------',booking);
+      // console.log('booking----------',booking);
 
       return {
         status: 200,

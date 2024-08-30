@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
-import IBooking from "../../entities/booking";
-import BookingModel from "../../frameworks/models/bookingsModel";
-import { generateId } from "../../frameworks/utils/generateId";
+import BookingModel from "../frameworks/models/bookingsModel";
+import IBooking from "../entities/booking";
+import { generateId } from "../frameworks/utils/generateId";
+
 
 class BookingRepository {
   async findBookingsById(id: string) {
@@ -27,10 +28,14 @@ class BookingRepository {
     return await BookingModel.create(booking);
   }
   async findBookingsByUserId(id: string) {
-    // console.log("id--", id);
     return BookingModel.find({ userId: id })
       .populate("userId")
-      .populate("workerId")
+      .populate({
+        path: "workerId",
+        populate: {
+          path: "service",
+        },
+      })
       .populate("service");
   }
 }

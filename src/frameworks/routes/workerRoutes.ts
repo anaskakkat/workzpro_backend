@@ -88,10 +88,16 @@ workerRouter.post("/leave/:id", workerAuth, (req, res, next) => {
   workerController.addLeave(req, res, next);
 });
 workerRouter.get("/leave/:id", workerAuth, (req, res, next) => {
-  workerController.getLeave(req, res, next); 
+  workerController.getLeave(req, res, next);
 });
 workerRouter.patch("/deleteLeave/:id", workerAuth, (req, res, next) => {
   workerController.deleteLeave(req, res, next);
+});
+workerRouter.get("/bookings/:id", workerAuth, (req, res, next) => {
+  workerController.bookings(req, res, next);
+});
+workerRouter.patch("/bookings/:id", workerAuth, (req, res, next) => {
+  workerController.acceptBooking(req, res, next);
 });
 
 export default workerRouter;

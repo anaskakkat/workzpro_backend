@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import BookingUsecase from "../../use-cases/user/bookingUsecase";
+import BookingUsecase from "../use-cases/bookingUsecase";
 
 class BookingController {
   private _BookingUseCase: BookingUsecase;

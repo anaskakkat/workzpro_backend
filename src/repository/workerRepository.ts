@@ -8,6 +8,7 @@ import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 
 import Service from "../entities/services";
+import BookingModel from "../frameworks/models/bookingsModel";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -111,7 +112,6 @@ class WorkerRepository implements IworkerRepo {
     return serviceModel.find();
   }
 
-
   async saveWorkingDays(workerId: string, configuration: Configuration) {
     try {
       // console.log(workerId, "---", configuration);
@@ -209,6 +209,25 @@ class WorkerRepository implements IworkerRepo {
     } catch (error) {
       throw error;
     }
+  }
+  async findBookingByWorkerId(workerId: string) {
+    return await BookingModel.find({ workerId })
+      .populate("userId")
+      .populate({
+        path: "workerId",
+        populate: {
+          path: "service",
+        },
+      })
+      .populate("service")
+      .exec();
+  }
+  async confirmBookingById(bookingId: string) {
+    return await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { $set: { status: "confirmed" } },
+      { new: true }
+    );
   }
 }
 
