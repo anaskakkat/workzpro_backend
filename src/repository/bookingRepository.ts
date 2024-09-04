@@ -3,7 +3,6 @@ import BookingModel from "../frameworks/models/bookingsModel";
 import IBooking from "../entities/booking";
 import { generateId } from "../frameworks/utils/generateId";
 
-
 class BookingRepository {
   async findBookingsById(id: string) {
     // console.log("id--", id);
@@ -36,7 +35,34 @@ class BookingRepository {
           path: "service",
         },
       })
-      .populate("service");
+      .populate("service")
+      .sort({ bookingDate: -1 })
+      .exec();
+  }
+  async findBookingsByBookingId(workerId: string, date: string) {
+    const targetDate = new Date(date);
+    const formattedDate = targetDate.toISOString().split("T")[0];
+    return (
+      BookingModel.find({
+        workerId: workerId,
+        $expr: {
+          $eq: [
+            { $dateToString: { format: "%Y-%m-%d", date: "$bookingDate" } },
+            formattedDate,
+          ],
+        },
+      })
+        // .populate("userId")
+        // .populate({
+        //   path: "workerId",
+        //   populate: {
+        //     path: "service",
+        //   },
+        // })
+        // .populate("service")
+        // .sort({ bookingDate: -1 })
+        .exec()
+    );
   }
 }
 

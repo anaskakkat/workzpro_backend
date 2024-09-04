@@ -36,11 +36,21 @@ class BookingController {
   }
   async getUserBookings(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("getUserBookings---touched", req.params.id);
+      // console.log("getUserBookings---touched", req.params.id);
       const booking = await this._BookingUseCase.getUserBookings(req.params.id);
       return res
         .status(booking.status)
         .json({ message: booking.message, booking: booking.booking });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getBookingsByDate(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("getBookingsByDate---touched", req.params);
+      const { id, date } = req.params;
+      const booking = await this._BookingUseCase.getBookingsByDate(id, date);
+      return res.status(booking.status).json(booking);
     } catch (error) {
       next(error);
     }

@@ -99,5 +99,16 @@ workerRouter.get("/bookings/:id", workerAuth, (req, res, next) => {
 workerRouter.patch("/bookings/:id", workerAuth, (req, res, next) => {
   workerController.acceptBooking(req, res, next);
 });
+workerRouter.patch("/bookings/reject/:id", workerAuth, (req, res, next) => {
+  workerController.rejectBooking(req, res, next);
+});
+workerRouter.patch(
+  "/profile/:id",
+  workerAuth,
+  upload.single("profilePic"),
+  (req, res, next) => {
+    workerController.updateProfile(req, res, next);
+  }
+);
 
 export default workerRouter;

@@ -48,7 +48,9 @@ class BookingUsecase {
   }
   async getUserBookings(userId: string) {
     try {
-      const booking = await this._bookingRepository.findBookingsByUserId(userId);
+      const booking = await this._bookingRepository.findBookingsByUserId(
+        userId
+      );
       if (!booking) {
         throw new CostumeError(400, "not fetching  userBookings data");
       }
@@ -59,6 +61,24 @@ class BookingUsecase {
         status: 200,
         booking,
         message: "Booking fetched",
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getBookingsByDate(workerid: string, date: string) {
+    try {
+      const booking = await this._bookingRepository.findBookingsByBookingId(
+        workerid,
+        date
+      );
+      if (!booking) {
+        throw new CostumeError(400, "not fetching  userBookings data");
+      }
+      console.log("booking----------", booking);
+      return {
+        status: 200,
+        booking,
       };
     } catch (error) {
       throw error;

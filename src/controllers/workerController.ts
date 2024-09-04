@@ -3,6 +3,7 @@ import WorkerUsecase from "../use-cases/workerUsecse";
 import { NODE_ENV } from "../frameworks/constants/env";
 import Slot from "../entities/slots";
 import { log } from "console";
+import { CostumeError } from "../frameworks/middlewares/customError";
 
 class WorkerController {
   private _workerUseCase: WorkerUsecase;
@@ -300,7 +301,7 @@ class WorkerController {
   async addLeave(req: Request, res: Response, next: NextFunction) {
     try {
       //  console.log("addLeave---", req.params.id);
-      console.log("addLeave---", req.body);
+      // console.log("addLeave---", req.body);
       const leave = await this._workerUseCase.addLeave(req.params.id, req.body);
       return res.status(200).json({ leave });
     } catch (error) {
@@ -348,6 +349,48 @@ class WorkerController {
       const bookings = await this._workerUseCase.acceptBooking(req.params.id);
       // console.log("bookings---", bookings);
       return res.status(bookings.status).json(bookings.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async rejectBooking(req: Request, res: Response, next: NextFunction) {
+    try {
+      const bookings = await this._workerUseCase.rejectBooking(req.params.id);
+      // console.log("bookings---", bookings);
+      return res.status(bookings.status).json(bookings.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("update worker---", req.params.id);
+      const profilePic = req.file;
+      // console.log("update worker---", profilePic);
+      // console.log("update worker---", req.body);
+      if (profilePic) {
+        const profile = await this._workerUseCase.updateProfile(
+          req.params.id,
+          req.body,
+          profilePic
+        );
+        if (!profile) {
+          throw new CostumeError(400, "not updated profile");
+        }
+        // console.log("--profile-cntrlr--", profile);
+        return res.status(profile.status).json(profile.message);
+      } else {
+        const profile = await this._workerUseCase.updateProfilewithoutPicture(
+          req.params.id,
+          req.body
+        );
+        if (!profile) {
+          throw new CostumeError(400, "not updated profile");
+        }
+        return res.status(profile.status).json(profile.message);
+
+        // console.log("--profile-cntrlr- withouit picture-", profile);
+      }
     } catch (error) {
       next(error);
     }

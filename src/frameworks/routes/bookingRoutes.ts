@@ -3,6 +3,7 @@ import BookingUsecase from "../../use-cases/bookingUsecase";
 import BookingController from "../../controllers/bookingController";
 import authenticateToken from "../middlewares/authenticateToken ";
 import BookingRepository from "../../repository/bookingRepository";
+import { log } from "console";
 
 const bookingRouter = express.Router();
 
@@ -23,6 +24,10 @@ bookingRouter.get("/:id", authenticateToken, (req, res, next) => {
 });
 bookingRouter.get("/user/:id", authenticateToken, (req, res, next) => {
   bookingController.getUserBookings(req, res, next);
+});
+
+bookingRouter.get("/:id/date/:date", authenticateToken, (req, res, next) => {
+  bookingController.getBookingsByDate(req, res, next);
 });
 
 export default bookingRouter;

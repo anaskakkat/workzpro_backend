@@ -6,7 +6,6 @@ import UserModel from "../frameworks/models/userModel";
 import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
-import mongoose, { ObjectId } from "mongoose";
 import { error } from "console";
 
 class UserRepository implements IUserRepo {

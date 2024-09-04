@@ -15,7 +15,7 @@ class WorkerRepository implements IworkerRepo {
     return workerModel.findOne({ email: email }).exec();
   }
   async findWorkerById(id: string) {
-    return workerModel.findById(id).exec();
+    return workerModel.findById(id).populate("service").exec();
   }
 
   async updateWorkerById(workerId: string, updateData: any) {
@@ -178,6 +178,18 @@ class WorkerRepository implements IworkerRepo {
       throw error;
     }
   }
+  async findBookingByDate(date: Date) {
+    const startOfDay = new Date(date);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+    return await BookingModel.find({
+      status: "accepted",
+      bookingDate: { $gte: startOfDay, $lt: endOfDay },
+    });
+  }
   async addLeave(workerId: string, data: Leave) {
     try {
       // console.log('datee----',data);
@@ -220,6 +232,7 @@ class WorkerRepository implements IworkerRepo {
         },
       })
       .populate("service")
+      .sort({ bookingDate: -1 })
       .exec();
   }
   async confirmBookingById(bookingId: string) {
@@ -228,6 +241,60 @@ class WorkerRepository implements IworkerRepo {
       { $set: { status: "confirmed" } },
       { new: true }
     );
+  }
+  async rejectBookingById(bookingId: string) {
+    return await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { $set: { status: "cancelled" } },
+      { new: true }
+    );
+  }
+  async updateWorkerProfile(id: string, data: any, profilePic: string) {
+    try {
+      console.log("data--:-", data);
+
+      const filter = { _id: id };
+      const update = {
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        profilePicture: profilePic,
+      };
+      const options = { upsert: true, new: true };
+
+      const updatedWorker = await WorkerModel.findOneAndUpdate(
+        filter,
+        update,
+        options
+      ).exec();
+      // console.log("updatedWorker:-", updatedWorker);
+
+      return updatedWorker;
+    } catch (error) {
+      console.error("Error saving/updating non-verified worker data:", error);
+      throw new Error("Failed to save or update non-verified worker data.");
+    }
+  }
+  async updateWorkerProfileWithoutPicture(id: string, data: any) {
+    try {
+      const filter = { _id: id };
+      const update = {
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+      };
+      const options = { upsert: true, new: true };
+
+      const updatedWorker = await WorkerModel.findOneAndUpdate(
+        filter,
+        update,
+        options
+      ).exec();
+      // console.log("updatedWorker:-", updatedWorker);
+
+      return updatedWorker;
+    } catch (error) {
+      console.error("Error saving/updating non-verified worker data:", error);
+      throw new Error("Failed to save or update non-verified worker data.");
+    }
   }
 }
 

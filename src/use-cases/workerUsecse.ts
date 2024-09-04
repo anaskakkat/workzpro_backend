@@ -456,6 +456,23 @@ class WorkerUsecase {
   }
   async addLeave(workerId: string, data: Leave) {
     try {
+      console.log("data----", data);
+      const leaveDate =
+        typeof data.date === "string" ? new Date(data.date) : data.date;
+
+      const existingBookings = await this._WorkerRepository.findBookingByDate(
+        leaveDate
+      );
+      if (existingBookings.length > 0) {
+        console.log(
+          "You have a booking on this date, so you do not have access to leave."
+        );
+        throw new CostumeError(
+          400,
+          "You have a booking on this date, so you do not have access to leave."
+        );
+      }
+
       const updateLeave = await this._WorkerRepository.addLeave(workerId, data);
       if (!updateLeave) {
         throw new CostumeError(400, "Not updated leave");
@@ -541,6 +558,73 @@ class WorkerUsecase {
       return {
         status: 200,
         message: "Booking Accepted",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async rejectBooking(bookingId: string) {
+    try {
+      const bookings = await this._WorkerRepository.rejectBookingById(
+        bookingId
+      );
+      if (!bookings) {
+        throw new CostumeError(400, " bookings not accetped");
+      }
+      // console.log('booo-----',bookings);
+
+      return {
+        status: 200,
+        message: "Booking Accepted",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async updateProfile(id: string, data: any, profilePic?: Express.Multer.File) {
+    try {
+      if (profilePic) {
+        const profilePicUrl = await uploadToCloudinary(
+          profilePic,
+          "profile_pictures"
+        );
+        // console.log("profilepic---", data, profilePic);
+
+        const profile = await this._WorkerRepository.updateWorkerProfile(
+          id,
+          data,
+          profilePicUrl
+        );
+        // console.log("profile----", profile);
+        if (!profile) {
+          throw new CostumeError(400, "profile not updated ");
+        }
+        return {
+          status: 200,
+          message: "Profile Updated",
+        };
+      }
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
+  async updateProfilewithoutPicture(id: string, data: any) {
+    try {
+      const profile =
+        await this._WorkerRepository.updateWorkerProfileWithoutPicture(
+          id,
+          data
+        );
+      // console.log("profile----", profile);
+      if (!profile) {
+        throw new CostumeError(400, "profile not updated ");
+      }
+      return {
+        status: 200,
+        message: "Profile Updated",
       };
     } catch (error) {
       console.error("Error setting slots:", error);
