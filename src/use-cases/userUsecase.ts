@@ -6,7 +6,7 @@ import NodemailerEmailService from "../frameworks/utils/sentMail";
 import JWTService from "../frameworks/utils/generateToken";
 import logger from "../frameworks/config/logger";
 import { CostumeError } from "../frameworks/middlewares/customError";
-import IBooking from "../entities/booking";
+import ChatsModel from "../frameworks/models/chatsModel";
 class UserUsecase {
   private _userRepository: UserRepository;
   private _generateOtp: GenerateOtp;
@@ -139,6 +139,7 @@ class UserUsecase {
       return {
         status: 200,
         userData: {
+          _id: savedUser._id,
           email: savedUser.email,
           username: savedUser.userName,
           phone: savedUser.phoneNumber,
@@ -310,7 +311,7 @@ class UserUsecase {
       throw error;
     }
   }
-
+ 
  
 }
 

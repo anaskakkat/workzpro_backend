@@ -55,7 +55,7 @@ class BookingUsecase {
         throw new CostumeError(400, "not fetching  userBookings data");
       }
 
-      // console.log('booking----------',booking);
+      console.log('booking----------',booking.length);
 
       return {
         status: 200,

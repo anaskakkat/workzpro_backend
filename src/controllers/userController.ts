@@ -44,7 +44,7 @@ class UserController {
       const verified = await this._userUsecase.verifyOtp(email, otp);
       // logger.info("otp--", verified);
       if (verified.status === 200 && verified.token) {
-        res.cookie("user_access_token", verified.token, {
+        res.cookie("user_access_token", verified.token.accessToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
           maxAge: 15 * 60 * 60 * 1000,
@@ -233,7 +233,6 @@ class UserController {
     }
   }
 
-
-  
+ 
 }
 export default UserController;

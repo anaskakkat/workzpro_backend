@@ -8,6 +8,7 @@ import workerRoutes from "../routes/workerRoutes";
 import adminRoutes from "../routes/adminRoutes";
 import errorHandle from "../middlewares/errorHandle";
 import bookingRouter from "../routes/bookingRoutes";
+import userChatRouter from "../routes/userChatRoutes";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -29,6 +30,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/worker", workerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/user/booking", bookingRouter);
+app.use("/api/user/chat", userChatRouter);
 app.use(errorHandle);
 
 export default app;

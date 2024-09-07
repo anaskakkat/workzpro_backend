@@ -36,8 +36,7 @@ class BookingRepository {
         },
       })
       .populate("service")
-      .sort({ bookingDate: -1 })
-      .exec();
+      .sort({ bookingDate: -1 }); 
   }
   async findBookingsByBookingId(workerId: string, date: string) {
     const targetDate = new Date(date);

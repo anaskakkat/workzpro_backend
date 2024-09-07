@@ -67,4 +67,6 @@ userRouter.get("/workers/:id", authenticateToken, (req, res, next) => {
   userController.fetchWorkerByID(req, res, next);
 });
 
+
+
 export default userRouter;
