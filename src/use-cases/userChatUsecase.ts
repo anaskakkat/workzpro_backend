@@ -8,12 +8,13 @@ class userChatUsecase {
     this._chatRepository = chatRepository;
   }
 
-  async chat(senderId: string, receiverId: string) {
+  async chat(senderId: string, receiverId: string, recieverName: string) {
     try {
       // Check if a chat already exists between the sender and receiver
-      const existingChat = await ChatsModel.findOne({
-        participants: { $all: [senderId, receiverId] },
-      });
+      const existingChat = await this._chatRepository.findExistChat(
+        senderId,
+        receiverId
+      );
 
       if (existingChat) {
         return {
@@ -21,12 +22,7 @@ class userChatUsecase {
           message: "Chat already exists",
         };
       }
-
-      // If no chat exists, create a new one
-      const newChat = new ChatsModel({
-        participants: [senderId, receiverId],
-      });
-      await newChat.save();
+      await this._chatRepository.saveChat(senderId, receiverId, recieverName);
 
       return {
         status: 200,
@@ -38,9 +34,7 @@ class userChatUsecase {
   }
   async userChats(userId: string) {
     try {
-      const data = await ChatsModel.find({
-        participants: { $in: [userId] },
-      });
+      const data = await this._chatRepository.findUserChats(userId);
       return {
         status: 200,
         chat: data,
@@ -49,11 +43,9 @@ class userChatUsecase {
       throw error;
     }
   }
-  async findChats(userId: string, receiverId: string) {
+  async findChats(userId: string) {
     try {
-      const data = await ChatsModel.find({
-        participants: { $all: [userId, receiverId] },
-      });
+      const data = this._chatRepository.findUserAllChats(userId);
       return {
         status: 200,
         chat: data,
@@ -62,19 +54,42 @@ class userChatUsecase {
       throw error;
     }
   }
-  async addMessage(chatId: string, sender: string, message: string) {
+  async addMessage(
+    chatId: string,
+    sender: string,
+    receiverId: string,
+    message: string
+  ) {
     try {
-      const data = new MessageModel({
+      const savedMessage = await this._chatRepository.saveMessage(
         chatId,
         sender,
-        message,
-      });
-      console.log("message----", data);
+        receiverId,
+        message
+      );
+      console.log("savedMessages", savedMessage);
 
-      const result = await data.save();
+      const result = await this._chatRepository.saveMessageIdToChats(
+        chatId,
+        savedMessage._id as string
+      );
+
       return {
         status: 200,
         chat: result,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async messages(chatId: string) {
+    try {
+      const messages = await ChatsModel.findById(chatId).populate("messages");
+      // console.log("message----", messages);
+
+      return {
+        status: 200,
+        messages,
       };
     } catch (error) {
       throw error;

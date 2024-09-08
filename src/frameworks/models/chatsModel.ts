@@ -3,6 +3,7 @@ import { IChat } from "../../entities/chats";
 
 const ChatsSchema: Schema<IChat & Document> = new Schema({
   participants: [{ type: Schema.Types.ObjectId }],
+  recieverName: { type: String },
   messages: [{ type: Schema.Types.ObjectId, ref: "Message" }],
   lastMessage: { type: Schema.Types.ObjectId, ref: "Message" },
   createdAt: { type: Date, default: Date.now },

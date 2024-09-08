@@ -15,13 +15,16 @@ const chatUsecase = new UserChatUsecase(chatRepository);
 const chatController = new UserChatController(chatUsecase);
 
 userChatRouter.post("/", (req, res, next) => {
-  chatController.chat(req, res, next);
+  chatController.addChat(req, res, next);
 });
 userChatRouter.get("/:userId", (req, res, next) => {
   chatController.userChats(req, res, next);
 });
-userChatRouter.get("/:userId/:receiverId", (req, res, next) => {
+userChatRouter.get("/:userId", (req, res, next) => {
   chatController.findChats(req, res, next);
+});
+userChatRouter.get("/messages/:chatId", (req, res, next) => {
+  chatController.messages(req, res, next);
 });
 userChatRouter.post("/addMessage", (req, res, next) => {
   chatController.addMessage(req, res, next);
