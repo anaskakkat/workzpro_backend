@@ -9,7 +9,7 @@ class UserChatController {
   }
   async addChat(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log("body---", req.body);
+      console.log("body---", req.body);
 
       const { senderId, recieverId, recieverName } = req.body;
       const chat = await this._chatUsecase.chat(

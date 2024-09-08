@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import WorkerUsecase from "../use-cases/workerUsecse";
+import WorkerUsecase from "../use-cases/workerUsecase";
 import { NODE_ENV } from "../frameworks/constants/env";
 import Slot from "../entities/slots";
 import { log } from "console";

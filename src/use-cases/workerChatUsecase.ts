@@ -1,18 +1,16 @@
-import { log } from "winston";
 import ChatsModel from "../frameworks/models/chatsModel";
-import MessageModel from "../frameworks/models/messageModel";
-import userChatRepository from "../repository/userChatRepository";
+import WorkerChatRepository from "../repository/workerChatRepository";
 
-class userChatUsecase {
-  private _chatRepository: userChatRepository;
-  constructor(chatRepository: userChatRepository) {
-    this._chatRepository = chatRepository;
+class WorkerChatUsecase {
+  private _workerChatRepository: WorkerChatRepository;
+  constructor(chatRepository: WorkerChatRepository) {
+    this._workerChatRepository = chatRepository;
   }
 
   async chat(senderId: string, receiverId: string, recieverName: string) {
     try {
       // Check if a chat already exists between the sender and receiver
-      const existingChat = await this._chatRepository.findExistChat(
+      const existingChat = await this._workerChatRepository.findExistChat(
         senderId,
         receiverId
       );
@@ -23,7 +21,11 @@ class userChatUsecase {
           message: "Chat already exists",
         };
       }
-      await this._chatRepository.saveChat(senderId, receiverId, recieverName);
+      await this._workerChatRepository.saveChat(
+        senderId,
+        receiverId,
+        recieverName
+      );
 
       return {
         status: 200,
@@ -33,9 +35,9 @@ class userChatUsecase {
       throw error;
     }
   }
-  async userChats(userId: string) {
+  async workerChats(workerId: string) {
     try {
-      const data = await this._chatRepository.findUserChats(userId);
+      const data = await this._workerChatRepository.findWorkerChats(workerId);
       return {
         status: 200,
         chat: data,
@@ -44,9 +46,9 @@ class userChatUsecase {
       throw error;
     }
   }
-  async findChats(userId: string) {
+  async findChats(workerId: string) {
     try {
-      const data = this._chatRepository.findUserAllChats(userId);
+      const data = this._workerChatRepository.findUserAllChats(workerId);
       return {
         status: 200,
         chat: data,
@@ -58,22 +60,19 @@ class userChatUsecase {
   async addMessage(
     chatId: string,
     sender: string,
-    receiver: string,
+    receiverId: string,
     message: string
   ) {
     try {
-
-      console.log('receiver----',receiver);
-      
-      const savedMessage = await this._chatRepository.saveMessage(
+      const savedMessage = await this._workerChatRepository.saveMessage(
         chatId,
         sender,
-        receiver,
+        receiverId,
         message
       );
       console.log("savedMessages", savedMessage);
 
-      const result = await this._chatRepository.saveMessageIdToChats(
+      const result = await this._workerChatRepository.saveMessageIdToChats(
         chatId,
         savedMessage._id as string
       );
@@ -101,4 +100,4 @@ class userChatUsecase {
   }
 }
 
-export default userChatUsecase;
+export default WorkerChatUsecase;

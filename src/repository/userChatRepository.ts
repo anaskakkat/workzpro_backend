@@ -33,7 +33,7 @@ class userChatRepository {
     const savedMessage = new MessageModel({
       chatId,
       sender,
-      receiverId,
+      receiver:receiverId,
       message,
     });
     return await savedMessage.save();

@@ -6,7 +6,7 @@ import EncryptPassword from "../utils/bcryptPassword";
 import NodemailerEmailService from "../utils/sentMail";
 import JWTService from "../utils/generateToken";
 import WorkerRepository from "../../repository/workerRepository";
-import WorkerUsecase from "../../use-cases/workerUsecse";
+import WorkerUsecase from "../../use-cases/workerUsecase";
 import WorkerController from "../../controllers/workerController";
 import { upload } from "../middlewares/multer";
 import workerAuth from "../middlewares/workerAuth";

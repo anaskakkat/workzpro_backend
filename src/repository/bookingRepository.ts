@@ -27,7 +27,7 @@ class BookingRepository {
     return await BookingModel.create(booking);
   }
   async findBookingsByUserId(id: string) {
-    return BookingModel.find({ userId: id })
+    return await BookingModel.find({ userId: id })
       .populate("userId")
       .populate({
         path: "workerId",
