@@ -63,7 +63,7 @@ class userChatUsecase {
   ) {
     try {
 
-      console.log('receiver----',receiver);
+      // console.log('receiver----',receiver);
       
       const savedMessage = await this._chatRepository.saveMessage(
         chatId,
@@ -71,7 +71,7 @@ class userChatUsecase {
         receiver,
         message
       );
-      console.log("savedMessages", savedMessage);
+      // console.log("savedMessages", savedMessage);
 
       const result = await this._chatRepository.saveMessageIdToChats(
         chatId,

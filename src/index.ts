@@ -1,13 +1,12 @@
-import app from './frameworks/express/app'
-
+import { app, server } from './frameworks/express/app';
 import { PORT } from "./frameworks/constants/env";
-import './frameworks/database/mongoDb'
+import './frameworks/database/mongoDb';
+import initializeSocket from './frameworks/config/socket';
 
+app.get("/", (req, res) => res.send("Server is Ready.."));
 
+const io = initializeSocket(server);
 
-
-app.get("/", (req, res) => res.send("Server is  Ready.."));
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`);
-  });
+server.listen(PORT, () => {
+  console.log(`Server is running on port http://localhost:${PORT}`);
+});

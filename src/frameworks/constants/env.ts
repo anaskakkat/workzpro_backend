@@ -9,7 +9,7 @@ const getEnv = (key: string, defaultValue?: string): string => {
   return value;
 };
 
-export const PORT = getEnv("PORT", "8000");
+export const PORT = getEnv("PORT", "4000");
 export const MONGO_URI = getEnv("DATABASE_URI");
 
 export const AUTH_MAIL = getEnv("AUTH_MAIL");

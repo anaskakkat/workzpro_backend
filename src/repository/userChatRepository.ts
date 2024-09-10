@@ -24,22 +24,28 @@ class userChatRepository {
       participants: { $in: [userId] },
     });
   }
+  
+  
   async saveMessage(
     chatId: string,
     sender: string,
-    receiverId: string,
+    receiver: string,
     message: string
   ) {
     const savedMessage = new MessageModel({
       chatId,
       sender,
-      receiver:receiverId,
+      receiver,
       message,
     });
     return await savedMessage.save();
   }
+
+
+
+
   async saveMessageIdToChats(chatId: string, messageId: string) {
-    console.log("--repo---saveMesage", chatId, "---", messageId);
+    // console.log("--repo---saveMesage", chatId, "---", messageId);
 
     return await ChatsModel.findOneAndUpdate(
       { _id: chatId },

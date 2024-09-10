@@ -45,17 +45,17 @@ class UserChatController {
   }
   async addMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("addMessage-------touched", req.body);
+      // console.log("addMessage-------touched", req.body);
 
-      const { chatId, senderId, receiverId,message} = req.body;
+      const { chatId, sender, receiver,message} = req.body;
       const chat = await this._chatUsecase.addMessage(
         chatId,
-        senderId,
-        receiverId,
+        sender,
+        receiver,
         message
       );
-      // // console.log('Workers---touched',Workers);
-      // return res.status(chat.status).json(chat.chat);
+      // console.log('Workers---touched',Workers);
+      return res.status(chat.status).json(chat.chat);
     } catch (error) {
       next(error);
     }

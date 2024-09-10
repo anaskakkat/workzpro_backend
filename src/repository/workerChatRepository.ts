@@ -16,6 +16,8 @@ class WorkerChatRepository {
     return await newChat.save();
   }
   async findWorkerChats(workerId: string) {
+    // console.log("workerId---", workerId);
+
     const messageDatas = await MessageModel.aggregate([
       { $match: { receiver: new mongoose.Types.ObjectId(workerId) } },
       {
@@ -36,7 +38,7 @@ class WorkerChatRepository {
       },
     ]);
 
-    console.log("iam message datas------", messageDatas);
+    // console.log("iam message datas------", messageDatas);
 
     const nameDatas = messageDatas.map((user) => {
       return {
@@ -44,9 +46,7 @@ class WorkerChatRepository {
         chatId: user.chatDetails[0],
       };
     });
-    console.log("iam nameDatas", nameDatas);
-
-    // let settedUsers = new Set();
+    // console.log("iam nameDatas", nameDatas);
 
     function getUniqueObjectsByName(nameDatas: any) {
       const uniqueMap = new Map();
@@ -63,7 +63,7 @@ class WorkerChatRepository {
 
     const uniqueObject = getUniqueObjectsByName(nameDatas);
     console.log(uniqueObject);
-    return uniqueObject
+    return uniqueObject;
   }
   async findUserAllChats(workerId: string) {
     return await ChatsModel.find({
@@ -84,8 +84,9 @@ class WorkerChatRepository {
     });
     return await savedMessage.save();
   }
+
   async saveMessageIdToChats(chatId: string, messageId: string) {
-    console.log("--repo---saveMesage", chatId, "---", messageId);
+    // console.log("--repo---saveMesage", chatId, "---", messageId);
 
     return await ChatsModel.findOneAndUpdate(
       { _id: chatId },
