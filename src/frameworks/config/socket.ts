@@ -1,7 +1,15 @@
 import { Server } from "socket.io";
 import colorize from "../utils/colorize";
+import { Server as HTTPServer } from "http";
 
-export default function initializeSocket(server: any) {
+interface User {
+  userId: string;
+  socketId: string;
+  online: boolean;
+  lastSeen: Date;
+}
+
+export default function initializeSocket(server: HTTPServer) {
   const io = new Server(server, {
     cors: {
       origin: "http://localhost:8000",
@@ -10,29 +18,63 @@ export default function initializeSocket(server: any) {
     },
   });
 
-  io.on("connection", (socket) => {
-    console.log("new client connected", socket.id);
+  let users: User[] = [];
 
-    const userId = socket.handshake.query.userId as string;
-    const workerId = socket.handshake.query.workerId as string;
-    console.log(
-      `${colorize("Received userId:", "blue")} ${colorize(userId, "green")}`
+  // Socket helper functions
+  const addUser = (userId: string, socketId: string) => {
+    const existingUserIndex = users.findIndex((user) => user.userId === userId);
+    if (existingUserIndex !== -1) {
+      users[existingUserIndex] = {
+        ...users[existingUserIndex],
+        socketId,
+        online: true,
+        lastSeen: new Date(),
+      };
+    } else {
+      users.push({ userId, socketId, online: true, lastSeen: new Date() });
+    }
+  };
+
+  const removeUser = (socketId: string) => {
+    users = users.map((user) =>
+      user.socketId === socketId
+        ? { ...user, online: false, lastSeen: new Date() }
+        : user
     );
-    socket.on("setup", (userId) => {
-      socket.join(userId);
-      
-      console.log("user connected", userId);
+  };
 
-      socket.emit("connected");
+  const getUser = (userId: string) => {
+    console.log("user ", users);
+    const ddd = users.find((user) => user.userId === userId);
+    console.log("ddd id", ddd);
+    return ddd
+    // return users.find((user) => user.userId === userId);
+  };
+
+  io.on("connection", (socket) => {
+    console.log(`${colorize("New client connected", "magenta")}`, socket.id);
+
+    socket.on("addUser", (userId) => {
+      console.log("userID--", userId);
+
+      addUser(userId, socket.id);
+      console.log("Users after add:", users);
+      io.emit("getUsers", users);
     });
-    socket.on("newMesage", (newMessage) => {
-      const { chatId, receiver } = newMessage;
-      socket.to(receiver).emit("messageReceived", newMessage);
-      console.log("New message sent:", newMessage);
+
+    socket.on("sendMessage", (data: any) => {
+      console.log("Sending message:", data);
+      const user = getUser(data.receiver);
+        socket.emit("hiii","hello shaham")
+      console.log("user:-----", user);
+        io.to(user?user.socketId:"").emit("newMessage",data);
+        
     });
 
     socket.on("disconnect", () => {
-      console.log("Client disconnected", socket.id);
+      console.log(`${colorize("Client disconnected", "red")}`, socket.id);
+      removeUser(socket.id);
+      io.emit("getUsers", users);
     });
   });
 }

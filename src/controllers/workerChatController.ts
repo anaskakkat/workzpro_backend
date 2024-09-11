@@ -47,7 +47,7 @@ class workerChatController {
   }
   async addMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("addMessage---worker----touched", req.body);
+      // console.log("addMessage---worker----touched", req.body);
 
       const { chatId, sender, receiver, message } = req.body;
       const chat = await this._workerchatUsecase.addMessage(

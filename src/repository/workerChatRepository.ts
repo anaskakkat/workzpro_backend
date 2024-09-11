@@ -57,12 +57,12 @@ class WorkerChatRepository {
         }
       }
 
-      console.log(uniqueMap);
+      // console.log(uniqueMap);
       return Array.from(uniqueMap.values());
     }
 
     const uniqueObject = getUniqueObjectsByName(nameDatas);
-    console.log(uniqueObject);
+    // console.log(uniqueObject);
     return uniqueObject;
   }
   async findUserAllChats(workerId: string) {
@@ -73,13 +73,13 @@ class WorkerChatRepository {
   async saveMessage(
     chatId: string,
     sender: string,
-    receiverId: string,
+    receiver: string,
     message: string
   ) {
     const savedMessage = new MessageModel({
       chatId,
       sender,
-      receiverId,
+      receiver,
       message,
     });
     return await savedMessage.save();

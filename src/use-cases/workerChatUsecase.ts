@@ -64,13 +64,18 @@ class WorkerChatUsecase {
     message: string
   ) {
     try {
+      // console.log("chatId:", chatId);
+      // console.log("sender:", sender);
+      // console.log("receiverId:", receiverId);
+      // console.log("message:", message);
+
       const savedMessage = await this._workerChatRepository.saveMessage(
         chatId,
         sender,
         receiverId,
         message
       );
-    //   console.log("savedMessages", savedMessage);
+      //   console.log("savedMessages", savedMessage); 
 
       const result = await this._workerChatRepository.saveMessageIdToChats(
         chatId,
@@ -79,7 +84,7 @@ class WorkerChatUsecase {
 
       return {
         status: 200,
-        chat: result,
+        chat: savedMessage,
       };
     } catch (error) {
       throw error;
