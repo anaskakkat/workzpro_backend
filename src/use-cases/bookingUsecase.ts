@@ -1,8 +1,9 @@
-import { log } from "console";
 import IBooking from "../entities/booking";
+import { STRIPE_SECRET_KEY } from "../frameworks/constants/env";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import BookingRepository from "../repository/bookingRepository";
-
+import Stripe from "stripe";
+const stripe = new Stripe(STRIPE_SECRET_KEY);
 class BookingUsecase {
   private _bookingRepository: BookingRepository;
 
@@ -30,7 +31,7 @@ class BookingUsecase {
   }
   async getbookingData(userId: string) {
     try {
-      const booking = await this._bookingRepository.findBookingsById(userId);
+      const booking = await this._bookingRepository.findBookingById(userId);
       if (!booking) {
         throw new CostumeError(400, "not fetching  booking data");
       }
@@ -55,7 +56,7 @@ class BookingUsecase {
         throw new CostumeError(400, "not fetching  userBookings data");
       }
 
-      console.log('booking----------',booking.length);
+      console.log("booking----------", booking.length);
 
       return {
         status: 200,
@@ -75,7 +76,6 @@ class BookingUsecase {
       if (!booking) {
         throw new CostumeError(400, "not fetching  userBookings data");
       }
-      console.log("booking----------", booking);
       return {
         status: 200,
         booking,
@@ -83,6 +83,39 @@ class BookingUsecase {
     } catch (error) {
       throw error;
     }
+  }
+  async processPayment(bookingId: string) {
+    const booking = await this._bookingRepository.findBookingById(bookingId);
+    console.log("booking----------", booking);
+    if (!booking) {
+      throw new CostumeError(404, "Booking not found");
+    }
+
+    // Create Stripe Checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "inr",
+            product_data: {
+              name: booking.service.service,
+              description: booking.description,
+            },
+            unit_amount: booking.service.amount * 100, 
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:8000/cancel`, 
+    });
+
+    return {
+      status: 200,
+      url: session.url, 
+    };
   }
 }
 

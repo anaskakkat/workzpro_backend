@@ -4,7 +4,7 @@ import IBooking from "../entities/booking";
 import { generateId } from "../frameworks/utils/generateId";
 
 class BookingRepository {
-  async findBookingsById(id: string) {
+  async findBookingById(id: string) {
     // console.log("id--", id);
     return BookingModel.findById(id)
       .populate("userId")

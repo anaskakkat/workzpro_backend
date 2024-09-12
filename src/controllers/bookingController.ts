@@ -55,6 +55,20 @@ class BookingController {
       next(error);
     }
   }
+  async processPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const bookingId = req.params.id;
+      // console.log("payment---touched", bookingId);
+
+      const updatedBooking = await this._BookingUseCase.processPayment(
+        bookingId
+      );
+
+      res.status(200).json(updatedBooking);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default BookingController;

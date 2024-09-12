@@ -21,3 +21,4 @@ export const REFRESH_KEY = getEnv("REFRESH_KEY");
 export const CLODINARY_CLOUD_NAME = getEnv("CLOUDINARY_CLOUD_NAME");
 export const CLOUDINARY_API_KEY = getEnv("CLOUDINARY_API_KEY");
 export const CLOUDINARY_API_SECRET = getEnv("CLOUDINARY_API_SECRET");
+export const STRIPE_SECRET_KEY = getEnv("STRIPE_SECRET_KEY");
