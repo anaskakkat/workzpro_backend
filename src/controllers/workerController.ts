@@ -362,6 +362,15 @@ class WorkerController {
       next(error);
     }
   }
+  async completeBooking(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("bookings---", req.params.id);
+      const bookings = await this._workerUseCase.completeBooking(req.params.id);
+      return res.status(bookings.status).json(bookings.message);
+    } catch (error) {
+      next(error);
+    }
+  }
   async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("update worker---", req.params.id);

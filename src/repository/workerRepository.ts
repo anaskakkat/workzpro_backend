@@ -249,6 +249,13 @@ class WorkerRepository implements IworkerRepo {
       { new: true }
     );
   }
+  async completeBooking(bookingId: string) {
+    return await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { $set: { status: "completed" } },
+      { new: true }
+    );
+  }
   async updateWorkerProfile(id: string, data: any, profilePic: string) {
     try {
       console.log("data--:-", data);

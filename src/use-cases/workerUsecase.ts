@@ -583,6 +583,23 @@ class WorkerUsecase {
       throw error;
     }
   }
+  async completeBooking(bookingId: string) {
+    try {
+      const bookings = await this._WorkerRepository.completeBooking(bookingId);
+      if (!bookings) {
+        throw new CostumeError(400, " booking  not updated");
+      }
+      // console.log('booo-----',bookings);
+
+      return {
+        status: 200,
+        message: "Booking Completed",
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
   async updateProfile(id: string, data: any, profilePic?: Express.Multer.File) {
     try {
       if (profilePic) {

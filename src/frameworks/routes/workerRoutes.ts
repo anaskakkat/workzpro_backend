@@ -102,6 +102,9 @@ workerRouter.patch("/bookings/:id", workerAuth, (req, res, next) => {
 workerRouter.patch("/bookings/reject/:id", workerAuth, (req, res, next) => {
   workerController.rejectBooking(req, res, next);
 });
+workerRouter.patch("/bookings/completeBooking/:id", workerAuth, (req, res, next) => {
+  workerController.completeBooking(req, res, next);
+});
 workerRouter.patch(
   "/profile/:id",
   workerAuth,
