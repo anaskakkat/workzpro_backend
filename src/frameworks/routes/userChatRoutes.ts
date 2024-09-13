@@ -2,6 +2,7 @@ import express from "express";
 import UserChatRepository from "../../repository/userChatRepository";
 import UserChatController from "../../controllers/userChatController";
 import UserChatUsecase from "../../use-cases/userChatUsecase";
+import { upload } from "../middlewares/multer";
 
 const userChatRouter = express.Router();
 
@@ -26,7 +27,8 @@ userChatRouter.get("/:userId", (req, res, next) => {
 userChatRouter.get("/messages/:chatId", (req, res, next) => {
   chatController.messages(req, res, next);
 });
-userChatRouter.post("/addMessage", (req, res, next) => {
+userChatRouter.post("/addMessage", upload.single("image"), (req, res, next) => {
+  // console.log("file------", req.file);
   chatController.addMessage(req, res, next);
 });
 

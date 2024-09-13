@@ -2,6 +2,7 @@ import { log } from "winston";
 import ChatsModel from "../frameworks/models/chatsModel";
 import MessageModel from "../frameworks/models/messageModel";
 import userChatRepository from "../repository/userChatRepository";
+import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 
 class userChatUsecase {
   private _chatRepository: userChatRepository;
@@ -59,16 +60,17 @@ class userChatUsecase {
     chatId: string,
     sender: string,
     receiver: string,
-    message: string
+    message?: string,
+    image?: string
   ) {
     try {
-      // console.log('receiver----',receiver);
 
       const savedMessage = await this._chatRepository.saveMessage(
         chatId,
         sender,
         receiver,
-        message
+        message,
+        image
       );
       // console.log("savedMessages", savedMessage);
 

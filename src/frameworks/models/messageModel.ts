@@ -5,7 +5,8 @@ const messageSchema: Schema<IMessage & Document> = new Schema({
   chatId: { type: Schema.Types.ObjectId },
   sender: { type: Schema.Types.ObjectId },
   receiver: { type: Schema.Types.ObjectId },
-  message: { type: String, required: true },
+  message: { type: String, },
+  image: { type: String },
   timestamp: { type: Date, default: Date.now },
   read: { type: Boolean, default: false },
 });

@@ -39,14 +39,14 @@ export default function initializeSocket(server: HTTPServer) {
     users = users.map((user) =>
       user.socketId === socketId
         ? { ...user, online: false, lastSeen: new Date() }
-        : user
+        : user 
     );
   };
 
   const getUser = (userId: string) => {
-    console.log("user ", users);
+    // console.log("user ", users);
     const ddd = users.find((user) => user.userId === userId);
-    console.log("ddd id", ddd);
+    // console.log("dddid", ddd);
     return ddd
     // return users.find((user) => user.userId === userId);
   };
@@ -55,23 +55,22 @@ export default function initializeSocket(server: HTTPServer) {
     console.log(`${colorize("New client connected", "magenta")}`, socket.id);
 
     socket.on("addUser", (userId) => {
-      console.log("userID--", userId);
+      // console.log("userID--", userId);
 
       addUser(userId, socket.id);
-      console.log("Users after add:", users);
+      // console.log("Users after add:", users);
       io.emit("getUsers", users);
     });
 
     socket.on("sendMessage", (data: any) => {
-      console.log("Sending message:", data);
+      // console.log("Sending message data--------------------:", data);
       const user = getUser(data.receiver);
-        socket.emit("hiii","hello shaham")
-      console.log("user:-----", user);
+      // console.log("sedmessage-----user:-----", user);
         io.to(user?user.socketId:"").emit("newMessage",data);
         
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", () => { 
       console.log(`${colorize("Client disconnected", "red")}`, socket.id);
       removeUser(socket.id);
       io.emit("getUsers", users);

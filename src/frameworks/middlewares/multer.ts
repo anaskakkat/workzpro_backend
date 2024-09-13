@@ -16,6 +16,7 @@ interface MulterRequest extends Request {
   files: {
     profilePic?: Express.Multer.File[];
     identityProof?: Express.Multer.File[];
+    image?: Express.Multer.File[];
   };
 }
 

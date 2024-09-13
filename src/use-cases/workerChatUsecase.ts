@@ -75,7 +75,7 @@ class WorkerChatUsecase {
         receiverId,
         message
       );
-      //   console.log("savedMessages", savedMessage); 
+      //   console.log("savedMessages", savedMessage);
 
       const result = await this._workerChatRepository.saveMessageIdToChats(
         chatId,

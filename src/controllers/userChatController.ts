@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import UserChatUsecase from "../use-cases/userChatUsecase";
+import { CostumeError } from "../frameworks/middlewares/customError";
+import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
 
 class UserChatController {
   private _chatUsecase: UserChatUsecase;
@@ -43,32 +45,40 @@ class UserChatController {
       next(error);
     }
   }
-  async addMessage(req: Request, res: Response, next: NextFunction) {
+  async messages(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log("addMessage-------touched", req.body);
-
-      const { chatId, sender, receiver,message} = req.body;
-      const chat = await this._chatUsecase.addMessage(
-        chatId,
-        sender,
-        receiver,
-        message
-      );
-      // console.log('Workers---touched',Workers);
-      return res.status(chat.status).json(chat.chat);
+      const message = await this._chatUsecase.messages(req.params.chatId);
+      return res.status(message.status).json(message.messages);
     } catch (error) {
       next(error);
     }
   }
-  async messages(req: Request, res: Response, next: NextFunction) {
+  async addMessage(req: Request, res: Response, next: NextFunction) {
     try {
-      // console.log("chatId-------touched", req.params.chatId);
+      // console.log("addMessage---body----touched", req.body);
+      // console.log("addMessage--image-----touched", req.file);
 
-      const message = await this._chatUsecase.messages(req.params.chatId);
-      // console.log('message---touched',message);
+      const { chatId, sender, receiver, message } = req.body;
+      const imageFile = req.file;
+      let imageUrl: string | undefined;
+      if (!message && !imageFile) {
+        throw new CostumeError(400, "Message or image is required.");
+      }
+      if (imageFile) {
+        imageUrl = await uploadToCloudinary(imageFile, "chat_pictures");
+      }
+      console.log("addMessage-------imageUrl", imageUrl);
 
-      return res.status(message.status).json(message.messages);
-    } catch (error) {
+      const chat = await this._chatUsecase.addMessage(
+        chatId,
+        sender,
+        receiver,
+        message,
+        imageUrl
+      );
+      console.log("--addmessage---", chat);
+      return res.status(chat.status).json(chat.chat);
+    } catch (error) { 
       next(error);
     }
   }

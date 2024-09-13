@@ -1,10 +1,11 @@
 import { ObjectId } from "mongoose";
 
 export interface IMessage extends Document {
-  chatId?:ObjectId
+  chatId?: ObjectId;
   sender?: ObjectId;
   receiver: ObjectId;
-  message: string;
+  message?: string;
+  image?: string;
   timestamp: Date;
   read: boolean;
 }

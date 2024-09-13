@@ -16,7 +16,7 @@ class WorkerChatRepository {
     return await newChat.save();
   }
   async findWorkerChats(workerId: string) {
-    // console.log("workerId---", workerId);
+    // console.log("--findWorkerChats----workerId---", workerId);
 
     const messageDatas = await MessageModel.aggregate([
       { $match: { receiver: new mongoose.Types.ObjectId(workerId) } },
@@ -24,7 +24,7 @@ class WorkerChatRepository {
         $lookup: {
           from: "users",
           localField: "sender",
-          foreignField: "_id",
+          foreignField: "_id", 
           as: "receiverDetails",
         },
       },
@@ -41,6 +41,8 @@ class WorkerChatRepository {
     // console.log("iam message datas------", messageDatas);
 
     const nameDatas = messageDatas.map((user) => {
+      // console.log("userdetaillss------.>>>>>>", user.receiverDetails);
+
       return {
         name: user.receiverDetails[0].userName,
         chatId: user.chatDetails[0],

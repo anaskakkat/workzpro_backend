@@ -9,7 +9,7 @@ class workerChatController {
   }
   async addChat(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("body---", req.body);
+      // console.log("body---", req.body);
 
       const { senderId, recieverId, recieverName } = req.body;
       const chat = await this._workerchatUsecase.chat(
@@ -23,16 +23,33 @@ class workerChatController {
       next(error);
     }
   }
+
   async workerChats(req: Request, res: Response, next: NextFunction) {
     try {
+        // console.log('workerChats---touched',);
+
       const { workerId } = req.params;
       const chat = await this._workerchatUsecase.workerChats(workerId);
-      //   console.log('chat---touched',chat);
       return res.status(chat.status).json(chat.chat);
     } catch (error) {
       next(error);
     }
   }
+
+  async findChats(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log('findChats---touched',);
+
+      const { userId } = req.params;
+      const chat = await this._workerchatUsecase.findChats(userId);
+      // console.log('Workers---touched',Workers);
+      return res.status(chat.status).json(chat.chat);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
   async messages(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("chatId-------touched", req.params.chatId);
@@ -53,7 +70,7 @@ class workerChatController {
       const chat = await this._workerchatUsecase.addMessage(
         chatId,
         sender,
-        receiver,
+        receiver, 
         message
       );
       // console.log('Workers---touched',Workers);

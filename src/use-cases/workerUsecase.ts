@@ -6,12 +6,9 @@ import JWTService from "../frameworks/utils/generateToken";
 import WorkerRepository from "../repository/workerRepository";
 import { CostumeError } from "../frameworks/middlewares/customError";
 import uploadToCloudinary from "../frameworks/utils/ClouinaryUpload";
-import Slot from "../entities/slots";
-import WorkerModel from "../frameworks/models/workerModel";
 import { Configuration, Leave, Services } from "../entities/worker";
 import Service from "../entities/services";
 import { generateId } from "../frameworks/utils/generateId";
-import { log } from "console";
 class WorkerUsecase {
   private _WorkerRepository: WorkerRepository;
 
