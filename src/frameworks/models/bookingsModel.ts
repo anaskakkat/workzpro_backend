@@ -4,7 +4,8 @@ import mongoose, { Model, Schema, Document } from "mongoose";
 interface IBooking extends Document {
   userId: mongoose.Types.ObjectId;
   workerId: mongoose.Types.ObjectId;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  review?: mongoose.Types.ObjectId;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   bookingNumber: string | number;
   description: string;
   bookingDate: Date;
@@ -21,11 +22,11 @@ interface IBooking extends Document {
     state: string;
     pincode: string | number;
     location: {
-      type: 'Point';
+      type: "Point";
       coordinates: [number, number];
     };
   };
-  paymentStatus: 'pending' | 'success';
+  paymentStatus: "pending" | "success";
   paymentDate?: Date;
   currentDate: Date;
 }
@@ -44,7 +45,7 @@ const AddressSchema = new Schema(
     location: {
       type: {
         type: String,
-        enum: ['Point'],
+        enum: ["Point"],
         required: true,
       },
       coordinates: {
@@ -70,19 +71,23 @@ const BookingSchema = new Schema<IBooking>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     workerId: {
       type: Schema.Types.ObjectId,
-      ref: 'Worker',
+      ref: "Worker",
       required: true,
       index: true,
     },
+    review: {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+    },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'completed', 'cancelled'],
-      default: 'pending',
+      enum: ["pending", "confirmed", "completed", "cancelled"],
+      default: "pending",
       index: true,
     },
     bookingNumber: {
@@ -96,8 +101,8 @@ const BookingSchema = new Schema<IBooking>(
     address: { type: AddressSchema, required: true },
     paymentStatus: {
       type: String,
-      enum: ['pending', 'success'],
-      default: 'pending',
+      enum: ["pending", "success"],
+      default: "pending",
       required: true,
     },
     paymentDate: { type: Date },
@@ -108,6 +113,6 @@ const BookingSchema = new Schema<IBooking>(
   }
 );
 
-const BookingModel = mongoose.model<IBooking>('Booking', BookingSchema);
+const BookingModel = mongoose.model<IBooking>("Booking", BookingSchema);
 
 export default BookingModel;

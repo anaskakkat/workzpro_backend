@@ -69,6 +69,35 @@ class BookingController {
       next(error);
     }
   }
+  async addReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("addReview---touched", req.body);
+      const { userId, bookingId, rating, comment } = req.body;
+      const newReview = await this._BookingUseCase.addReview(
+        userId,
+        bookingId,
+        rating,
+        comment
+      );
+      res.status(200).json(newReview.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async updateReview(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("addReview---touched", req.body);
+      const { userId, reviewId, rating, comment } = req.body;
+      const updatedReview = await this._BookingUseCase.updateReview(
+        reviewId,
+        rating,
+        comment
+      );
+      res.status(200).json(updatedReview.message);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default BookingController;

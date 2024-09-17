@@ -15,7 +15,7 @@ const bookingUsecase = new BookingUsecase(bookingRepository);
 //controller-----
 const bookingController = new BookingController(bookingUsecase);
 
-bookingRouter.post("/:id", authenticateToken, (req, res, next) => {
+bookingRouter.post("/add/:id", authenticateToken, (req, res, next) => {
 
   bookingController.bookingData(req, res, next);
 });
@@ -34,6 +34,12 @@ bookingRouter.get("/:id/date/:date", authenticateToken, (req, res, next) => {
 });
 bookingRouter.post("/payment/:id", authenticateToken, (req, res, next) => {
   bookingController.processPayment(req, res, next);
+});
+bookingRouter.post("/review", authenticateToken, (req, res, next) => {
+  bookingController.addReview(req, res, next);
+});
+bookingRouter.patch("/review", authenticateToken, (req, res, next) => {
+  bookingController.updateReview(req, res, next);
 });
 
 export default bookingRouter;

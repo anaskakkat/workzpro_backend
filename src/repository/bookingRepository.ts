@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import BookingModel from "../frameworks/models/bookingsModel";
 import IBooking from "../entities/booking";
 import { generateId } from "../frameworks/utils/generateId";
+import ReviewModel from "../frameworks/models/reviewModel";
 
 class BookingRepository {
   async findBookingById(id: string) {
@@ -36,31 +37,59 @@ class BookingRepository {
         },
       })
       .populate("service")
-      .sort({ bookingDate: -1 }); 
+      .populate("review")
+      .sort({ bookingDate: -1 });
   }
   async findBookingsByBookingId(workerId: string, date: string) {
     const targetDate = new Date(date);
     const formattedDate = targetDate.toISOString().split("T")[0];
-    return (
-      BookingModel.find({
-        workerId: workerId,
-        $expr: {
-          $eq: [
-            { $dateToString: { format: "%Y-%m-%d", date: "$bookingDate" } },
-            formattedDate,
-          ],
+    return BookingModel.find({
+      workerId: workerId,
+      $expr: {
+        $eq: [
+          { $dateToString: { format: "%Y-%m-%d", date: "$bookingDate" } },
+          formattedDate,
+        ],
+      },
+    })
+      .populate("userId")
+      .populate({
+        path: "workerId",
+        populate: {
+          path: "service",
         },
       })
-        // .populate("userId")
-        // .populate({
-        //   path: "workerId",
-        //   populate: {
-        //     path: "service",
-        //   },
-        // })
-        // .populate("service")
-        // .sort({ bookingDate: -1 })
-        .exec()
+      .populate("service")
+      .sort({ bookingDate: -1 })
+      .exec();
+  }
+  async addReview(
+    userId: string,
+    bookingId: string,
+    rating: number,
+    comment: string
+  ) {
+    const newReview = new ReviewModel({
+      user: userId,
+      booking: bookingId,
+      rating,
+      comment,
+    });
+
+    return await newReview.save();
+  }
+  async addReviewIdToBooking(bookingId: string, reviewId: Object) {
+    return await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { $set: { review: reviewId } },
+      { new: true }
+    );
+  }
+  async updateReview(reviewId: string, rating: number, comment: string) {
+    return await ReviewModel.findOneAndUpdate(
+      { _id: reviewId },
+      { rating, comment },
+      { new: true }
     );
   }
 }

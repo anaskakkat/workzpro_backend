@@ -96,8 +96,7 @@ class WorkerChatUsecase {
       // console.log("message----", messages);
 
       return {
-        status: 200,
-        messages,
+        messages
       };
     } catch (error) {
       throw error;

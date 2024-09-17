@@ -26,7 +26,7 @@ class workerChatController {
 
   async workerChats(req: Request, res: Response, next: NextFunction) {
     try {
-        // console.log('workerChats---touched',);
+      // console.log('workerChats---touched',);
 
       const { workerId } = req.params;
       const chat = await this._workerchatUsecase.workerChats(workerId);
@@ -49,15 +49,14 @@ class workerChatController {
     }
   }
 
-
   async messages(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("chatId-------touched", req.params.chatId);
 
       const message = await this._workerchatUsecase.messages(req.params.chatId);
-      //   console.log('message---touched',message);
+      console.log("message---touched", message);
 
-      return res.status(message.status).json(message.messages);
+      return res.status(200).json(message.messages);
     } catch (error) {
       next(error);
     }
@@ -70,7 +69,7 @@ class workerChatController {
       const chat = await this._workerchatUsecase.addMessage(
         chatId,
         sender,
-        receiver, 
+        receiver,
         message
       );
       // console.log('Workers---touched',Workers);

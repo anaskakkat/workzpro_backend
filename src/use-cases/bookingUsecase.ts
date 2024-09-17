@@ -102,20 +102,68 @@ class BookingUsecase {
               name: booking.service.service,
               description: booking.description,
             },
-            unit_amount: booking.service.amount * 100, 
+            unit_amount: booking.service.amount * 100,
           },
           quantity: 1,
         },
       ],
       mode: "payment",
       success_url: `http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://localhost:8000/cancel`, 
+      cancel_url: `http://localhost:8000/cancel`,
     });
 
     return {
       status: 200,
-      url: session.url, 
+      url: session.url,
     };
+  }
+  async addReview(
+    userId: string,
+    bookingId: string,
+    rating: number,
+    comment: string
+  ) {
+    try {
+      const review = await this._bookingRepository.addReview(
+        userId,
+        bookingId,
+        rating,
+        comment
+      );
+      const updatedBooking = await this._bookingRepository.addReviewIdToBooking(
+        bookingId,
+        review._id
+      );
+      console.log("updatedBooking--", updatedBooking);
+      if (!updatedBooking) {
+        throw new CostumeError(400, "not updated booking");
+      }
+      return {
+        status: 200,
+        message: "Review Added",
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async updateReview(reviewId: string, rating: number, comment: string) {
+    try {
+      const review = await this._bookingRepository.updateReview(
+        reviewId,
+        rating,
+        comment
+      );
+
+      if (!review) {
+        throw new CostumeError(400, "not updated review");
+      }
+      return {
+        status: 200,
+        message: "Review Updated",
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

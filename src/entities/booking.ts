@@ -1,38 +1,34 @@
 import { ObjectId, Schema } from "mongoose";
 
-interface IBooking {
-  _id?: ObjectId;
+// Define IBooking interface
+interface IBooking extends Document {
   userId: Schema.Types.ObjectId;
   workerId: Schema.Types.ObjectId;
-  status: string;
+
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   bookingNumber: string | number;
   description: string;
   bookingDate: Date;
   slots: string;
   service: {
-    _id?: ObjectId;
     service: string;
     amount: number;
     slot: number;
-  };
-  paymentDetails: {
-    status: "pending" | "success";
-    date: Date | null;
   };
   address: {
     houseNumber: string;
     street: string;
     city: string;
     state: string;
-    pincode: string | Number;
+    pincode: string | number;
     location: {
-      coordinates: [number, number];
       type: "Point";
+      coordinates: [number, number];
     };
-
-    createdAt?: Date;
-    updatedAt?: Date;
   };
+  paymentStatus: "pending" | "success";
+  paymentDate?: Date;
+  currentDate: Date;
 }
 
 export default IBooking;
