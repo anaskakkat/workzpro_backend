@@ -67,13 +67,15 @@ class BookingRepository {
     userId: string,
     bookingId: string,
     rating: number,
-    comment: string
+    comment: string,
+    workerId: string
   ) {
     const newReview = new ReviewModel({
       user: userId,
       booking: bookingId,
       rating,
       comment,
+      workerId,
     });
 
     return await newReview.save();
@@ -91,6 +93,10 @@ class BookingRepository {
       { rating, comment },
       { new: true }
     );
+  }
+  async findFetchReviews(workerId: string) {
+    // return await ReviewModel.findO(
+    // );
   }
 }
 

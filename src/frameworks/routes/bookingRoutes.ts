@@ -16,20 +16,16 @@ const bookingUsecase = new BookingUsecase(bookingRepository);
 const bookingController = new BookingController(bookingUsecase);
 
 bookingRouter.post("/add/:id", authenticateToken, (req, res, next) => {
-
   bookingController.bookingData(req, res, next);
 });
 bookingRouter.get("/:id", authenticateToken, (req, res, next) => {
-
   bookingController.getbookingData(req, res, next);
 });
 bookingRouter.get("/user/:id", authenticateToken, (req, res, next) => {
-
   bookingController.getUserBookings(req, res, next);
 });
 
 bookingRouter.get("/:id/date/:date", authenticateToken, (req, res, next) => {
-
   bookingController.getBookingsByDate(req, res, next);
 });
 bookingRouter.post("/payment/:id", authenticateToken, (req, res, next) => {
@@ -40,6 +36,9 @@ bookingRouter.post("/review", authenticateToken, (req, res, next) => {
 });
 bookingRouter.patch("/review", authenticateToken, (req, res, next) => {
   bookingController.updateReview(req, res, next);
+});
+bookingRouter.get("/review/:workerId", authenticateToken, (req, res, next) => {
+  bookingController.fetchReviews(req, res, next);
 });
 
 export default bookingRouter;

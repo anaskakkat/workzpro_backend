@@ -72,12 +72,13 @@ class BookingController {
   async addReview(req: Request, res: Response, next: NextFunction) {
     try {
       // console.log("addReview---touched", req.body);
-      const { userId, bookingId, rating, comment } = req.body;
+      const { userId, bookingId, rating, comment, workerId } = req.body;
       const newReview = await this._BookingUseCase.addReview(
         userId,
         bookingId,
         rating,
-        comment
+        comment,
+        workerId
       );
       res.status(200).json(newReview.message);
     } catch (error) {
@@ -86,14 +87,24 @@ class BookingController {
   }
   async updateReview(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("addReview---touched", req.body);
-      const { userId, reviewId, rating, comment } = req.body;
+      console.log("updateReview---touched", req.body);
+      const { reviewId, rating, comment } = req.body;
       const updatedReview = await this._BookingUseCase.updateReview(
         reviewId,
         rating,
         comment
       );
       res.status(200).json(updatedReview.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async fetchReviews(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("fetchReviews---touched", req.params.workerId);
+      const workerId = req.params.workerId;
+      const updatedReview = await this._BookingUseCase.fetchReviews(workerId);
+      // res.status(200).json(updatedReview.message);
     } catch (error) {
       next(error);
     }

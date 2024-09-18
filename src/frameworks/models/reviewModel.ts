@@ -8,6 +8,11 @@ const reviewSchema: Schema<IReview> = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    workerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Worker",
+      required: true,
+    },
     booking: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Booking",

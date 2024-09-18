@@ -121,20 +121,22 @@ class BookingUsecase {
     userId: string,
     bookingId: string,
     rating: number,
-    comment: string
+    comment: string,
+    workerId: string
   ) {
     try {
       const review = await this._bookingRepository.addReview(
         userId,
         bookingId,
         rating,
-        comment
+        comment,
+        workerId
       );
       const updatedBooking = await this._bookingRepository.addReviewIdToBooking(
         bookingId,
         review._id
       );
-      console.log("updatedBooking--", updatedBooking);
+      // console.log("updatedBooking--", updatedBooking);
       if (!updatedBooking) {
         throw new CostumeError(400, "not updated booking");
       }
@@ -157,6 +159,21 @@ class BookingUsecase {
       if (!review) {
         throw new CostumeError(400, "not updated review");
       }
+      return {
+        status: 200,
+        message: "Review Updated",
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async fetchReviews(workerId: string) {
+    try {
+      const review = await this._bookingRepository.findFetchReviews(workerId);
+
+      // if (!review) {
+      //   throw new CostumeError(400, "not updated review");
+      // }
       return {
         status: 200,
         message: "Review Updated",
