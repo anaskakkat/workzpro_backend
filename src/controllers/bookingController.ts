@@ -61,6 +61,7 @@ class BookingController {
   async processPayment(req: Request, res: Response, next: NextFunction) {
     try {
       const bookingId = req.params.id;
+      req.app.locals.bookingId = bookingId;
       // console.log("payment---touched", bookingId);
 
       const updatedBooking = await this._BookingUseCase.processPayment(
@@ -119,42 +120,55 @@ class BookingController {
 
   //stripe webhook-------------------------------------------------------------------------------
   async webhook(req: Request, res: Response, next: NextFunction) {
-    try {
-      console.log("webhook---touched");
+    const stripe = new Stripe(STRIPE_SECRET_KEY);
+    console.log('id------------',req.app.locals.bookingId);
+    
+    let event = req.body;
+    const endpointSecret =
+      "whsec_940bb197ba5228daa037e1e506cb5302b0d8352c81d9f10fc137ba9e3edb5855";
 
-      const sig = req.headers["stripe-signature"];
-      console.log("webhook-sig--", sig);
-      if (!sig) {
-        console.log("No Stripe signature found in the request");
-        return res.status(400).send("Webhook signature missing");
-      }
-      const endpointSecret =STRIPE_SECRET_KEY;
-      if (!endpointSecret) {
-        console.log("Stripe webhook secret is missing");
-        return res.status(500).send("Webhook secret is not configured");
-      } 
-      let event;
+    console.log(event);
+    if (endpointSecret) {
+      const sig: any = req.headers["stripe-signature"];
       try {
-        event = Stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-        console.log("Webhook event:", event);
+        const payloadString = JSON.stringify(req.body, null, 2);
+        const paymentIntentId = req.body?.data?.object?.payment_intent;
+        console.log(paymentIntentId, "paymentn inteten");
+        const header = stripe.webhooks.generateTestHeaderString({
+          payload: payloadString,
+          secret: endpointSecret,
+        });
+        event = stripe.webhooks.constructEvent(
+          payloadString,
+          header,
+          endpointSecret
+        );
+
+        if (paymentIntentId) {
+          console.log("pymnt intnt");
+          const paymentIntentResponse = await stripe.paymentIntents.retrieve(
+            paymentIntentId
+          );
+          const paymentIntent = paymentIntentResponse;
+          if (paymentIntentResponse.latest_charge) {
+            const chargeId = paymentIntentResponse.latest_charge;
+            console.log(chargeId, "koooooooooo");
+            req.app.locals.chargeId = chargeId;
+          } else {
+            return null;
+          }
+        }
       } catch (err) {
-        console.log("Error verifying webhook signature:", err);
-        // return res.status(400).send(`Webhook Error: ${err.message}`);
+        console.log("errrrr", err);
+        throw err;
       }
+    }
 
-      // // Handle the event here (e.g., checkout.session.completed, payment_intent.succeeded)
-      // switch (event.type) {
-      //   case "checkout.session.completed":
-      //     const session = event.data.object;
-      //     console.log("Checkout session completed:", session);
-      //     break;
-      //   default:
-      //     console.log(`Unhandled event type: ${event.type}`);
-      // }
-
-      res.json({ received: true });
-    } catch (error) {
-      next(error);
+    console.log(event.type);
+    if (event.type == "checkout.session.completed") {
+      console.log("hdfjhdjhf");
+      const updatePAymentstatus=await this._BookingUseCase.updatePayment(req.app.locals.bookingId)
+      
     }
   }
 }

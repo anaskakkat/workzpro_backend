@@ -88,6 +88,45 @@ class AdminRepository implements IAdminRepo {
       throw new Error("Failed to save or update non-verified user data.");
     }
   }
+
+  async findBlockedWorkers() {
+    return await WorkerModel.countDocuments({ isBlocked: true });
+  }
+  async findBlockedUsers() {
+    return await UserModel.countDocuments({ isBlocked: true });
+  }
+  async findPendingRequests() {
+    return await WorkerModel.countDocuments({ loginAccess: false });
+  }
+  async findTotalServices() {
+    return await serviceModel.countDocuments();
+  }
+  async findMonthlyUserCount() {
+    return await UserModel.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          totalUsers: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+  }
+  async findMonthlyWorkerCount() {
+    return await WorkerModel.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          totalWorkers: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+  }
 }
 
 export default AdminRepository;

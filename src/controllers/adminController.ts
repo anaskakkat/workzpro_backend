@@ -230,6 +230,18 @@ class AdminController {
       next(error);
     }
   }
+  async dashbord(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("---dashbord touched---");
+      const data = await this._adminUsecase.dashbord();
+
+      // console.log("dashborddata:-----", data);
+
+      return res.status(data.status).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default AdminController;

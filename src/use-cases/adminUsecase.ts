@@ -358,6 +358,31 @@ class AdminUsecase {
       throw error;
     }
   }
+  async dashbord() {
+    try {
+      const blockedWorkers = await this._adminRepository.findBlockedWorkers();
+      const blockedUsers = await this._adminRepository.findBlockedUsers();
+      const totalServices = await this._adminRepository.findTotalServices();
+      const pendingRequests = await this._adminRepository.findPendingRequests();
+
+      const userMonthlyData =
+        await this._adminRepository.findMonthlyUserCount();
+      const workerMonthlyData =
+        await this._adminRepository.findMonthlyWorkerCount();
+
+      return {
+        status: 200,
+        blockedWorkers,
+        blockedUsers,
+        totalServices,
+        userMonthlyData,
+        workerMonthlyData,
+        pendingRequests,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default AdminUsecase;

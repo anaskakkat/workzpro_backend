@@ -95,7 +95,16 @@ class BookingRepository {
     );
   }
   async findFetchReviews(workerId: string) {
-    return await ReviewModel.find({ workerId: workerId }).populate('user').populate('workerId')
+    return await ReviewModel.find({ workerId: workerId })
+      .populate("user")
+      .populate("workerId");
+  }
+  async updatePayment(bookingId: string) {
+    return await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { paymentStatus: "success", paymentDate: new Date() },
+      { new: true }
+    );
   }
 }
 

@@ -75,4 +75,9 @@ adminRouter.patch("/requestReject/:id", adminAuth, (req, res, next) => {
   adminController.requestReject(req, res, next);
 });
 
+// Dashboard................................................................................
+adminRouter.get("/dashbord", adminAuth, (req, res, next) => {
+  adminController.dashbord(req, res, next);
+});
+
 export default adminRouter;

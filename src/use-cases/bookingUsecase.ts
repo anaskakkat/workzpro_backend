@@ -86,6 +86,7 @@ class BookingUsecase {
   }
   async processPayment(bookingId: string) {
     const booking = await this._bookingRepository.findBookingById(bookingId);
+
     // console.log("booking----------", booking);
     if (!booking) {
       throw new CostumeError(404, "Booking not found");
@@ -108,13 +109,17 @@ class BookingUsecase {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `http://localhost:8000/success`,
       cancel_url: `http://localhost:8000/cancel`,
+      metadata: {
+        bookingId: bookingId,
+      },
     });
 
     return {
       status: 200,
       url: session.url,
+      bookingId,
     };
   }
   async addReview(
@@ -176,7 +181,6 @@ class BookingUsecase {
         throw new CostumeError(400, "not fethed  reviews data");
       }
 
-
       return {
         status: 200,
         message: "Review fethed",
@@ -186,11 +190,18 @@ class BookingUsecase {
       throw error;
     }
   }
-  async webhook(signature: string) {
+  async updatePayment(bookingId: string) {
     try {
-
-
-   
+      const updatedPayment = await this._bookingRepository.updatePayment(
+        bookingId
+      );
+      if (!updatedPayment) {
+        throw new CostumeError(400, "Booking not found");
+      }
+      return {
+        status: 200,
+        message: "Payment Success",
+      };
     } catch (error) {
       throw error;
     }
