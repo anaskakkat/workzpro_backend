@@ -40,5 +40,8 @@ bookingRouter.patch("/review", authenticateToken, (req, res, next) => {
 bookingRouter.get("/review/:workerId", authenticateToken, (req, res, next) => {
   bookingController.fetchReviews(req, res, next);
 });
+bookingRouter.post("/webhook",express.raw({type: 'application/json'}), (req, res, next) => {
+  bookingController.webhook(req, res, next);
+});
 
 export default bookingRouter;

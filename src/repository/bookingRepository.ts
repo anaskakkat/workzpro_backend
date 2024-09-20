@@ -95,8 +95,7 @@ class BookingRepository {
     );
   }
   async findFetchReviews(workerId: string) {
-    // return await ReviewModel.findO(
-    // );
+    return await ReviewModel.find({ workerId: workerId }).populate('user').populate('workerId')
   }
 }
 

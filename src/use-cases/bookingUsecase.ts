@@ -86,7 +86,7 @@ class BookingUsecase {
   }
   async processPayment(bookingId: string) {
     const booking = await this._bookingRepository.findBookingById(bookingId);
-    console.log("booking----------", booking);
+    // console.log("booking----------", booking);
     if (!booking) {
       throw new CostumeError(404, "Booking not found");
     }
@@ -159,6 +159,7 @@ class BookingUsecase {
       if (!review) {
         throw new CostumeError(400, "not updated review");
       }
+
       return {
         status: 200,
         message: "Review Updated",
@@ -171,13 +172,25 @@ class BookingUsecase {
     try {
       const review = await this._bookingRepository.findFetchReviews(workerId);
 
-      // if (!review) {
-      //   throw new CostumeError(400, "not updated review");
-      // }
+      if (!review) {
+        throw new CostumeError(400, "not fethed  reviews data");
+      }
+
+
       return {
         status: 200,
-        message: "Review Updated",
+        message: "Review fethed",
+        review,
       };
+    } catch (error) {
+      throw error;
+    }
+  }
+  async webhook(signature: string) {
+    try {
+
+
+   
     } catch (error) {
       throw error;
     }
