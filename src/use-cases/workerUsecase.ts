@@ -645,6 +645,43 @@ class WorkerUsecase {
       throw error;
     }
   }
+  async dashboardData(workerId: string) {
+    try {
+      const completedCount =
+        await this._WorkerRepository.findBokkingCompletedCount(workerId);
+      const canceledCount =
+        await this._WorkerRepository.findBokkingCanceledCount(workerId);
+      const pendingCount = await this._WorkerRepository.findBokkingPendingCount(
+        workerId
+      );
+      const requestCount = await this._WorkerRepository.findBokkingRequestCount(
+        workerId
+      );
+      const monthlyEarnings = await this._WorkerRepository.getMonthlyEarnings(
+        workerId
+      );
+
+      console.log(
+        "counts----",
+        completedCount,
+        canceledCount,
+        pendingCount,
+        requestCount,
+        monthlyEarnings
+      );
+      return {
+        status: 200,
+        completedCount,
+        canceledCount,
+        pendingCount,
+        requestCount,
+        monthlyEarnings,
+      };
+    } catch (error) {
+      console.error("Error setting slots:", error);
+      throw error;
+    }
+  }
 }
 
 export default WorkerUsecase;

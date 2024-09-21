@@ -404,6 +404,21 @@ class WorkerController {
       next(error);
     }
   }
+  async dashbord(req: Request, res: Response, next: NextFunction) {
+    try {
+      // console.log("dashbord worker---", req.params.id);
+
+      const dashbordData = await this._workerUseCase.dashboardData(
+        req.params.id
+      );
+      // console.log("dashbordData----", dashbordData);
+
+      return res.status(dashbordData.status).json(dashbordData)
+     
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default WorkerController;

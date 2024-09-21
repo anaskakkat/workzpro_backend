@@ -7,6 +7,7 @@ import IUserRepo from "../use-cases/interfaces/users/IuserRepo";
 import serviceModel from "../frameworks/models/serviceModel";
 import WorkerModel from "../frameworks/models/workerModel";
 import { error } from "console";
+import ReviewModel from "../frameworks/models/reviewModel";
 
 class UserRepository implements IUserRepo {
   async findUserByEmail(email: string) {
@@ -103,16 +104,38 @@ class UserRepository implements IUserRepo {
   async getServices() {
     return serviceModel.find();
   }
+
+  // async fetchWorkers(
+  //   serviceId: string,
+  //   location: { type: string; coordinates: [number, number] }
+  // ) {
+  //   const radiusInKm = 20;
+  //   const radiusInMeters = radiusInKm * 1000;
+  //   // console.log("location-------", location);
+  //   // console.log("serviceId-------", serviceId);
+
+  //   return await WorkerModel.find({
+  //     service: serviceId,
+  //     location: {
+  //       $near: {
+  //         $geometry: {
+  //           type: "Point",
+  //           coordinates: location.coordinates,
+  //         },
+  //         $maxDistance: radiusInMeters,
+  //       },
+  //     },
+  //   }).populate("service");
+  // }
   async fetchWorkers(
     serviceId: string,
     location: { type: string; coordinates: [number, number] }
   ) {
     const radiusInKm = 20;
     const radiusInMeters = radiusInKm * 1000;
-    // console.log("location-------", location);
-    // console.log("serviceId-------", serviceId);
 
-    return await WorkerModel.find({
+    // Find workers near the location
+    const workers = await WorkerModel.find({
       service: serviceId,
       location: {
         $near: {
@@ -124,12 +147,31 @@ class UserRepository implements IUserRepo {
         },
       },
     }).populate("service");
+
+    // Fetch ratings for each worker
+    const workersWithRatings = await Promise.all(
+      workers.map(async (worker) => {
+        // Fetch reviews for the current worker
+        const reviews = await ReviewModel.find({ workerId: worker._id });
+        const totalRating = reviews.reduce(
+          (sum, review) => sum + review.rating,
+          0
+        );
+        const averageRating = reviews.length ? totalRating / reviews.length : 0;
+
+        return {
+          ...worker.toObject(),
+          averageRating,
+        };
+      })
+    );
+
+    return workersWithRatings;
   }
+
   async fetchWorkerByID(id: string) {
     return await WorkerModel.findById(id).populate("service");
   }
-
-
 }
 
 export default UserRepository;

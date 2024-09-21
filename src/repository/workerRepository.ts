@@ -9,6 +9,7 @@ import WorkerModel from "../frameworks/models/workerModel";
 
 import Service from "../entities/services";
 import BookingModel from "../frameworks/models/bookingsModel";
+import mongoose from "mongoose";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -302,6 +303,77 @@ class WorkerRepository implements IworkerRepo {
       console.error("Error saving/updating non-verified worker data:", error);
       throw new Error("Failed to save or update non-verified worker data.");
     }
+  }
+
+  // dashbord dataaa---------------------------
+  async findBokkingCompletedCount(workerId: string) {
+    return await BookingModel.countDocuments({
+      workerId,
+      status: "completed",
+    });
+  }
+  async findBokkingCanceledCount(workerId: string) {
+    return await BookingModel.countDocuments({
+      workerId,
+      status: "canceled",
+    });
+  }
+  async findBokkingPendingCount(workerId: string) {
+    return await BookingModel.countDocuments({
+      workerId,
+      status: "confirmed",
+    });
+  }
+
+  async findBokkingRequestCount(workerId: string) {
+    return await BookingModel.countDocuments({
+      workerId,
+      status: "pending",
+    });
+  }
+  async getMonthlyEarnings(workerId: string) {
+    // console.log("Worker ID-------:", workerId);
+
+    const startDate = new Date();
+    startDate.setDate(1);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+    // console.log("Start Date-----:", startDate);
+    // console.log("End Date-------:", endDate);
+
+    const bookings = await BookingModel.find({
+      workerId: new mongoose.Types.ObjectId(workerId),
+      paymentStatus: "success",
+    });
+    // console.log("bookingssss----", bookings);
+
+    const aggregationPipeline = [
+      {
+        $match: {
+          workerId: new mongoose.Types.ObjectId(workerId),
+          paymentStatus: "success",
+          paymentDate: { $gte: startDate, $lt: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$paymentDate" },
+          totalEarnings: { $sum: "$service.amount" },
+        },
+      },
+    ];
+
+    console.log(
+      "Aggregation Pipeline:",
+      JSON.stringify(aggregationPipeline, null, 2)
+    );
+
+    const result = await BookingModel.aggregate(aggregationPipeline);
+    // console.log("Monthly Earnings Result:", result);
+
+    return result;
   }
 }
 

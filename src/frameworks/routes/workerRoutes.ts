@@ -102,16 +102,24 @@ workerRouter.patch("/bookings/:id", workerAuth, (req, res, next) => {
 workerRouter.patch("/bookings/reject/:id", workerAuth, (req, res, next) => {
   workerController.rejectBooking(req, res, next);
 });
-workerRouter.patch("/bookings/completeBooking/:id", workerAuth, (req, res, next) => {
-  workerController.completeBooking(req, res, next);
-});
+workerRouter.patch(
+  "/bookings/completeBooking/:id",
+  workerAuth,
+  (req, res, next) => {
+    workerController.completeBooking(req, res, next);
+  }
+);
+
 workerRouter.patch(
   "/profile/:id",
   workerAuth,
   upload.single("profilePic"),
   (req, res, next) => {
     workerController.updateProfile(req, res, next);
-  }
+  },
+  workerRouter.get("/dashbord/:id", workerAuth, (req, res, next) => {
+    workerController.dashbord(req, res, next);
+  })
 );
 
 export default workerRouter;

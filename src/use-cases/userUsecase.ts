@@ -291,7 +291,7 @@ class UserUsecase {
       if (!Workers) {
         throw new CostumeError(400, "not fetched Workers data");
       }
-      // console.log("workers-----", Workers);
+      console.log("workers-----", Workers);
 
       return Workers;
     } catch (error) {
