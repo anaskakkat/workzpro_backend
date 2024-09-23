@@ -38,10 +38,10 @@ adminRouter.post("/logout", adminAuth, (req, res, next) => {
 adminRouter.post("/users", adminAuth, (req, res, next) => {
   adminController.getUsers(req, res, next);
 });
-adminRouter.patch("/users/:id", adminAuth, (req, res, next) => {
+adminRouter.patch("/users/block/:id", adminAuth, (req, res, next) => {
   adminController.blockUser(req, res, next);
 });
-adminRouter.patch("/users/:id/unblock", adminAuth, (req, res, next) => {
+adminRouter.patch("/users/unblock/:id", adminAuth, (req, res, next) => {
   adminController.unblockUser(req, res, next);
 });
 adminRouter.post("/services", adminAuth, (req, res, next) => {

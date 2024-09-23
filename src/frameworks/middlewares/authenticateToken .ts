@@ -23,9 +23,7 @@ const authenticateToken = async (
   const userRefreshTokens = req.cookies.user_refresh_token;
 
   // console.log("---userToken--:",userToken);
-// console.log("---userRefreshTokens--:",userRefreshTokens);
-
-
+  // console.log("---userRefreshTokens--:",userRefreshTokens);
 
   if (!userRefreshTokens) {
     return next(new CostumeError(401, "Not authorized, no refresh token"));
@@ -33,10 +31,10 @@ const authenticateToken = async (
 
   if (!userToken) {
     try {
-      console.log('i dont have access ')
+      console.log("i dont have access ");
       const newUserToken = await refreshAccessToken(userRefreshTokens);
       res.cookie("user_access_token", newUserToken, {
-        maxAge: 15*60* 1000,
+        maxAge: 15 * 60 * 1000,
         httpOnly: true,
         sameSite: "strict",
         secure: process.env.NODE_ENV !== "development",
@@ -59,7 +57,7 @@ const authenticateToken = async (
       return next(new CostumeError(401, "User not found"));
     }
     if (user.isBlocked) {
-      return next(new CostumeError(401, "You are blocked by admin"));
+      return next(new CostumeError(401, "user are blocked by admin"));
     }
     if (!decodedData.decoded.role || decodedData.decoded.role !== "user") {
       return next(new CostumeError(401, "Not authorized, invalid role"));
@@ -80,8 +78,8 @@ const refreshAccessToken = async (refreshToken: string) => {
       throw new Error("Invalid refresh token");
     }
     // console.log('refreshAccessToken---decoded-----',decoded);
-    
-    const {accessToken} = _jwtToken.generateToken( 
+
+    const { accessToken } = _jwtToken.generateToken(
       decoded.decoded.id,
       decoded.decoded.role
     );

@@ -57,7 +57,7 @@ const workerAuth = async (req: Request, res: Response, next: NextFunction) => {
       return next(new CostumeError(401, "Worker not found"));
     }
     if (worker.isBlocked) {
-      return next(new CostumeError(401, "You are blocked by admin"));
+      return next(new CostumeError(401, "worker are blocked by admin"));
     }
     if (!decodedData.decoded.role || decodedData.decoded.role !== "worker") {
       return next(new CostumeError(401, "Not authorized, invalid role"));

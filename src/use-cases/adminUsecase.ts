@@ -115,7 +115,8 @@ class AdminUsecase {
       if (userdata) {
         userdata.isBlocked = true;
 
-        await userdata.save();
+        const userData = await userdata.save();
+        console.log("userData-------------", userData);
 
         return {
           status: 200,
