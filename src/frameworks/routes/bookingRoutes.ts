@@ -3,6 +3,9 @@ import BookingUsecase from "../../use-cases/bookingUsecase";
 import BookingController from "../../controllers/bookingController";
 import authenticateToken from "../middlewares/authenticateToken ";
 import BookingRepository from "../../repository/bookingRepository";
+import StripePayment from "../utils/stripeService";
+
+const stripePayment =new StripePayment()
 
 const bookingRouter = express.Router();
 
@@ -10,7 +13,7 @@ const bookingRouter = express.Router();
 const bookingRepository = new BookingRepository();
 
 //usecases----------
-const bookingUsecase = new BookingUsecase(bookingRepository);
+const bookingUsecase = new BookingUsecase(bookingRepository,stripePayment);
 
 //controller-----
 const bookingController = new BookingController(bookingUsecase);

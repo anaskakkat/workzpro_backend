@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId, Types } from "mongoose";
 import BookingModel from "../frameworks/models/bookingsModel";
 import IBooking from "../entities/booking";
 import { generateId } from "../frameworks/utils/generateId";
 import ReviewModel from "../frameworks/models/reviewModel";
+import PaymentModel from "../frameworks/models/paymentModel";
 
 class BookingRepository {
   async findBookingById(id: string) {
@@ -38,30 +39,34 @@ class BookingRepository {
       })
       .populate("service")
       .populate("review")
-      .sort({ bookingDate: -1 });
+      // .sort({ bookingDate: -1 });
+      .sort({ createdAt: -1 });
   }
   async findBookingsByBookingId(workerId: string, date: string) {
     const targetDate = new Date(date);
     const formattedDate = targetDate.toISOString().split("T")[0];
-    return BookingModel.find({
-      workerId: workerId,
-      $expr: {
-        $eq: [
-          { $dateToString: { format: "%Y-%m-%d", date: "$bookingDate" } },
-          formattedDate,
-        ],
-      },
-    })
-      .populate("userId")
-      .populate({
-        path: "workerId",
-        populate: {
-          path: "service",
+    return (
+      BookingModel.find({
+        workerId: workerId,
+        $expr: {
+          $eq: [
+            { $dateToString: { format: "%Y-%m-%d", date: "$bookingDate" } },
+            formattedDate,
+          ],
         },
       })
-      .populate("service")
-      .sort({ bookingDate: -1 })
-      .exec();
+        .populate("userId")
+        .populate({
+          path: "workerId",
+          populate: {
+            path: "service",
+          },
+        })
+        .populate("service")
+        // .sort({ bookingDate: -1 })
+        .sort({ createdAt: -1 })
+        .exec()
+    );
   }
   async addReview(
     userId: string,
@@ -103,6 +108,22 @@ class BookingRepository {
     return await BookingModel.findByIdAndUpdate(
       bookingId,
       { paymentStatus: "success", paymentDate: new Date() },
+      { new: true }
+    ).populate("paymentDetails");
+  }
+  // payment id save to booking
+  async updatePaymentDetails(bookingId: string, paymentId: string) {
+    return await BookingModel.findByIdAndUpdate(
+      bookingId,
+      { paymentDetails: paymentId },
+      { new: true }
+    );
+  }
+  // payment id updatePaymentDetailsStatus
+  async updatePaymentDetailsStatus(paymentDetailsId: Types.ObjectId) {
+    return await PaymentModel.findByIdAndUpdate(
+      paymentDetailsId,
+      { paymentStatus: "success" },
       { new: true }
     );
   }

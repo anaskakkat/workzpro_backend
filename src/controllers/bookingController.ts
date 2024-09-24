@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import BookingUsecase from "../use-cases/bookingUsecase";
-import { STRIPE_SECRET_KEY } from "../frameworks/constants/env";
-import { CostumeError } from "../frameworks/middlewares/customError";
-import Stripe from "stripe";
+
 
 class BookingController {
   private _BookingUseCase: BookingUsecase;
@@ -62,11 +60,12 @@ class BookingController {
     try {
       const bookingId = req.params.id;
       req.app.locals.bookingId = bookingId;
-      // console.log("payment---touched", bookingId);
+      console.log("payment---touched", bookingId,'-localss---',req.app.locals.bookingId);
 
       const updatedBooking = await this._BookingUseCase.processPayment(
         bookingId
       );
+      // console.log("payment---updatedBooking", updatedBooking);
 
       res.status(200).json(updatedBooking);
     } catch (error) {
@@ -120,55 +119,13 @@ class BookingController {
 
   //stripe webhook-------------------------------------------------------------------------------
   async webhook(req: Request, res: Response, next: NextFunction) {
-    const stripe = new Stripe(STRIPE_SECRET_KEY);
-    console.log('id------------',req.app.locals.bookingId);
-    
-    let event = req.body;
-    const endpointSecret =
-      "whsec_940bb197ba5228daa037e1e506cb5302b0d8352c81d9f10fc137ba9e3edb5855";
-
-    console.log(event);
-    if (endpointSecret) {
-      const sig: any = req.headers["stripe-signature"];
-      try {
-        const payloadString = JSON.stringify(req.body, null, 2);
-        const paymentIntentId = req.body?.data?.object?.payment_intent;
-        console.log(paymentIntentId, "paymentn inteten");
-        const header = stripe.webhooks.generateTestHeaderString({
-          payload: payloadString,
-          secret: endpointSecret,
-        });
-        event = stripe.webhooks.constructEvent(
-          payloadString,
-          header,
-          endpointSecret
-        );
-
-        if (paymentIntentId) {
-          console.log("pymnt intnt");
-          const paymentIntentResponse = await stripe.paymentIntents.retrieve(
-            paymentIntentId
-          );
-          const paymentIntent = paymentIntentResponse;
-          if (paymentIntentResponse.latest_charge) {
-            const chargeId = paymentIntentResponse.latest_charge;
-            console.log(chargeId, "koooooooooo");
-            req.app.locals.chargeId = chargeId;
-          } else {
-            return null;
-          }
-        }
-      } catch (err) {
-        console.log("errrrr", err);
-        throw err;
-      }
-    }
-
-    console.log(event.type);
-    if (event.type == "checkout.session.completed") {
-      console.log("hdfjhdjhf");
-      const updatePAymentstatus=await this._BookingUseCase.updatePayment(req.app.locals.bookingId)
-      
+    console.log("id------------", req.app.locals.bookingId);
+    try {
+      const result = await this._BookingUseCase.handleStripeWebhook(req,req.app.locals.bookingId);
+      return res.status(200).json(result);
+    } catch (err) {
+      console.log("errrrr", err);
+      throw err;
     }
   }
 }

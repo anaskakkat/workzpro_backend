@@ -27,7 +27,7 @@ interface IBooking extends Document {
     };
   };
   paymentStatus: "pending" | "success";
-  paymentDate?: Date;
+  paymentDetails?: mongoose.Types.ObjectId;
   currentDate: Date;
 }
 
@@ -105,7 +105,7 @@ const BookingSchema = new Schema<IBooking>(
       default: "pending",
       required: true,
     },
-    paymentDate: { type: Date },
+    paymentDetails: { type: Schema.Types.ObjectId, ref: "Payment" },
     currentDate: { type: Date, default: Date.now, required: true },
   },
   {

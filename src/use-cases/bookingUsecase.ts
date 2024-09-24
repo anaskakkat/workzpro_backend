@@ -1,14 +1,22 @@
 import IBooking from "../entities/booking";
-import { STRIPE_SECRET_KEY } from "../frameworks/constants/env";
+import {
+  STRIPE_ENDPOINT_SECRET,
+  STRIPE_SECRET_KEY,
+} from "../frameworks/constants/env";
 import { CostumeError } from "../frameworks/middlewares/customError";
+import PaymentModel from "../frameworks/models/paymentModel";
+import { calculatePayment } from "../frameworks/utils/calculatePayment";
 import BookingRepository from "../repository/bookingRepository";
 import Stripe from "stripe";
+import { IStripe } from "./interfaces/users/IStripe";
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 class BookingUsecase {
   private _bookingRepository: BookingRepository;
+  private stripePayments: IStripe;
 
-  constructor(bookingReopsitory: BookingRepository) {
+  constructor(bookingReopsitory: BookingRepository, stripePayments: IStripe) {
     this._bookingRepository = bookingReopsitory;
+    this.stripePayments = stripePayments;
   }
 
   async bookingData(userId: string, bookingData: IBooking) {
@@ -87,39 +95,45 @@ class BookingUsecase {
   async processPayment(bookingId: string) {
     const booking = await this._bookingRepository.findBookingById(bookingId);
 
-    // console.log("booking----------", booking);
+    // console.log("---processPayment---booking----------", booking);
     if (!booking) {
       throw new CostumeError(404, "Booking not found");
     }
+    const totalAmount = booking.service.amount;
+    const userId = booking.userId._id;
+    const workerId = booking.workerId._id;
+    // console.log(
+    //   "---processPayment---booking----------",
+    //   userId,
+    //   workerId,
+    //   totalAmount
+    // );
 
-    // Create Stripe Checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "inr",
-            product_data: {
-              name: booking.service.service,
-              description: booking.description,
-            },
-            unit_amount: booking.service.amount * 100,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `http://localhost:8000/success`,
-      cancel_url: `http://localhost:8000/cancel`,
-      metadata: {
-        bookingId: bookingId,
-      },
+    // payment save
+    const { workerAmount, adminProfit } = calculatePayment(totalAmount);
+    const payment = new PaymentModel({
+      userId,
+      workerId,
+      totalAmount,
+      workerAmount,
+      adminProfit,
     });
+    const paymentData = await payment.save();
+    // console.log("---processPayment---paymentData----------", paymentData);
+    await this._bookingRepository.updatePaymentDetails(
+      bookingId,
+      paymentData._id as string
+    );
+    // Create Stripe Checkout session
+
+    const session = await this.stripePayments.makePayment(
+      paymentData.totalAmount,
+      booking.service.service
+    );
 
     return {
       status: 200,
-      url: session.url,
-      bookingId,
+      url: session,
     };
   }
   async addReview(
@@ -190,22 +204,57 @@ class BookingUsecase {
       throw error;
     }
   }
-  async updatePayment(bookingId: string) {
+
+  async handleStripeWebhook(req: any, bookingId: string) {
+    // console.log("---updatePayment---bookingId----------", bookingId);
     try {
-      const updatedPayment = await this._bookingRepository.updatePayment(
-        bookingId
+      const verifyPayment = await this.stripePayments.verifySucessOfWebhook(
+        req
       );
-      if (!updatedPayment) {
-        throw new CostumeError(400, "Booking not found");
+      console.log("---verifyPayment---", verifyPayment);
+
+      if (verifyPayment) {
+        const updatedBooking  = await this._bookingRepository.updatePayment(
+          bookingId
+        );
+        console.log("-updatePayment---updatedPayment--", updatedBooking);
+
+        if (!updatedBooking) {
+          throw new CostumeError(400, "Booking not found");
+        }
+        if (updatedBooking.paymentDetails) {
+          const paymentDetailsId = updatedBooking.paymentDetails._id; 
+          await this._bookingRepository.updatePaymentDetailsStatus(paymentDetailsId);
+        }
       }
-      return {
-        status: 200,
-        message: "Payment Success",
-      };
     } catch (error) {
       throw error;
     }
   }
+
+  // async updatePayment(bookingId: string) {
+  //   console.log("---updatePayment---bookingId----------", bookingId);
+
+  //   try {
+  //     const updatedPayment = await this._bookingRepository.updatePayment(
+  //       bookingId
+  //     );
+  //     console.log(
+  //       "-----updatePayment---updatedPayment----------",
+  //       updatedPayment
+  //     );
+
+  //     if (!updatedPayment) {
+  //       throw new CostumeError(400, "Booking not found");
+  //     }
+  //     return {
+  //       status: 200,
+  //       message: "Payment Success",
+  //     };
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 }
 
 export default BookingUsecase;
