@@ -1,5 +1,6 @@
 import Admin from "../entities/admin";
 import AdminModel from "../frameworks/models/adminModel";
+import PaymentModel from "../frameworks/models/paymentModel";
 import serviceModel from "../frameworks/models/serviceModel";
 import UserModel from "../frameworks/models/userModel";
 import WorkerModel from "../frameworks/models/workerModel";
@@ -120,6 +121,52 @@ class AdminRepository implements IAdminRepo {
         $group: {
           _id: { $month: "$createdAt" },
           totalWorkers: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+  }
+
+  async YearlyEarnings() {
+    const currentYear = new Date().getFullYear();
+    return await PaymentModel.aggregate([
+      {
+        $match: {
+          paymentStatus: "success",
+        },
+      },
+      {
+        $project: {
+          year: { $year: "$createdAt" },
+          adminProfit: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$year",
+          totalEarnings: { $sum: "$adminProfit" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+  }
+  async monthlyEarnings() {
+    return await PaymentModel.aggregate([
+      {
+        $match: {
+          paymentStatus: "success", 
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%m", date: "$createdAt" }, 
+          },
+          totalAdminProfit: { $sum: "$adminProfit" }, 
         },
       },
       {

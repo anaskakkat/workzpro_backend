@@ -365,6 +365,9 @@ class AdminUsecase {
       const blockedUsers = await this._adminRepository.findBlockedUsers();
       const totalServices = await this._adminRepository.findTotalServices();
       const pendingRequests = await this._adminRepository.findPendingRequests();
+      const yearlyEarnings = await this._adminRepository.YearlyEarnings();
+      const monthlyEarnings  = await this._adminRepository.monthlyEarnings();
+      console.log("--dashbord---monthlyEarnings--", monthlyEarnings);
 
       const userMonthlyData =
         await this._adminRepository.findMonthlyUserCount();
@@ -379,6 +382,8 @@ class AdminUsecase {
         userMonthlyData,
         workerMonthlyData,
         pendingRequests,
+        yearlyEarnings,
+        monthlyEarnings
       };
     } catch (error) {
       throw error;

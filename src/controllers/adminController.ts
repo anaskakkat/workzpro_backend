@@ -232,7 +232,7 @@ class AdminController {
   }
   async dashbord(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("---dashbord touched---");
+      // console.log("---dashbord touched---");
       const data = await this._adminUsecase.dashbord();
 
       // console.log("dashborddata:-----", data);

@@ -15,6 +15,7 @@ import workerChatRouter from "../routes/workerChatRoute";
 
 // Import middleware
 import errorHandle from "../middlewares/errorHandle";
+import { FRONTEND_URL } from "../constants/env";
 
 dotenv.config();
 const app = express();
@@ -27,12 +28,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("tiny"));
 
+// read url from env pending
 app.use(
   cors({
-    origin: "http://localhost:8000",
+    origin: FRONTEND_URL,
     credentials: true,
   })
 );
+
 
 // Routes
 app.use("/api/admin", adminRoutes);

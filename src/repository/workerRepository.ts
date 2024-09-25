@@ -10,6 +10,7 @@ import WorkerModel from "../frameworks/models/workerModel";
 import Service from "../entities/services";
 import BookingModel from "../frameworks/models/bookingsModel";
 import mongoose from "mongoose";
+import PaymentModel from "../frameworks/models/paymentModel";
 
 class WorkerRepository implements IworkerRepo {
   async findWorkerByEmail(email: string) {
@@ -343,10 +344,10 @@ class WorkerRepository implements IworkerRepo {
     // console.log("Start Date-----:", startDate);
     // console.log("End Date-------:", endDate);
 
-    const bookings = await BookingModel.find({
-      workerId: new mongoose.Types.ObjectId(workerId),
-      paymentStatus: "success",
-    });
+    // const bookings = await BookingModel.find({
+    //   workerId: new mongoose.Types.ObjectId(workerId),
+    //   paymentStatus: "success",
+    // });
     // console.log("bookingssss----", bookings);
 
     const aggregationPipeline = [
@@ -354,26 +355,29 @@ class WorkerRepository implements IworkerRepo {
         $match: {
           workerId: new mongoose.Types.ObjectId(workerId),
           paymentStatus: "success",
-          paymentDate: { $gte: startDate, $lt: endDate },
+          createdAt: { $gte: startDate, $lt: endDate },
         },
       },
       {
         $group: {
-          _id: { $month: "$paymentDate" },
-          totalEarnings: { $sum: "$service.amount" },
+          _id: { $month: "$createdAt" },
+          totalEarnings: { $sum: "$workerAmount" },
         },
       },
     ];
 
-    console.log(
-      "Aggregation Pipeline:",
-      JSON.stringify(aggregationPipeline, null, 2)
-    );
+    // console.log(
+    //   "Aggregation Pipeline:",
+    //   JSON.stringify(aggregationPipeline, null, 2)
+    // );
 
-    const result = await BookingModel.aggregate(aggregationPipeline);
-    // console.log("Monthly Earnings Result:", result);
-
-    return result;
+    const result = await PaymentModel.aggregate(aggregationPipeline);
+    console.log("-------Monthly Earnings Result------:", result);
+    const formattedResult = result.map(item => ({
+      month: item._id,
+      totalEarnings: item.totalEarnings,
+    }));
+    return formattedResult;
   }
 }
 
