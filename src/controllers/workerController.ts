@@ -48,15 +48,15 @@ class WorkerController {
       if (verified.status === 200 && verified.token) {
         res.cookie("worker_access_token", verified.token.accessToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
+          secure:NODE_ENV === "production",
           maxAge: 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         res.cookie("worker_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
+          secure: NODE_ENV === "production",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
 
         return res
@@ -76,13 +76,13 @@ class WorkerController {
         httpOnly: true,
         secure: NODE_ENV === "production",
         expires: new Date(0),
-        sameSite: "strict",
+        sameSite: "none",
       });
       res.cookie("worker_refresh_token", "", {
         httpOnly: true,
         secure: NODE_ENV === "production",
         expires: new Date(0),
-        sameSite: "strict",
+        sameSite: "none",
       });
 
       return res.status(200).json({ message: "Logout successful" });
