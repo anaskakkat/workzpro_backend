@@ -97,17 +97,17 @@ class WorkerController {
 
       if (verified.status === 200 && verified.token) {
         res.cookie("worker_access_token", verified.token.accessToken, {
-          httpOnly: true,
+          // httpOnly: true,
           secure: NODE_ENV === "production",
           maxAge: 60 * 60 * 1000,
           // maxAge: 15 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         res.cookie("worker_refresh_token", verified.token.refreshToken, {
-          httpOnly: true,
+          // httpOnly: true,
           secure: NODE_ENV === "production",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
       }
       // console.log("verified:", verified);
