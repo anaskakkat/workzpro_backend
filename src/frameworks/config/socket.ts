@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import colorize from "../utils/colorize";
 import { Server as HTTPServer } from "http";
+import { FRONTEND_URL } from "../constants/env";
 
 interface User {
   userId: string;
@@ -12,7 +13,7 @@ interface User {
 export default function initializeSocket(server: HTTPServer) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:8000",
+      origin: FRONTEND_URL,
       methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
       credentials: true,
     },
@@ -39,7 +40,7 @@ export default function initializeSocket(server: HTTPServer) {
     users = users.map((user) =>
       user.socketId === socketId
         ? { ...user, online: false, lastSeen: new Date() }
-        : user 
+        : user
     );
   };
 
@@ -47,7 +48,7 @@ export default function initializeSocket(server: HTTPServer) {
     // console.log("user ", users);
     const ddd = users.find((user) => user.userId === userId);
     // console.log("dddid", ddd);
-    return ddd
+    return ddd;
     // return users.find((user) => user.userId === userId);
   };
 
@@ -66,11 +67,10 @@ export default function initializeSocket(server: HTTPServer) {
       // console.log("Sending message data--------------------:", data);
       const user = getUser(data.receiver);
       // console.log("sedmessage-----user:-----", user);
-        io.to(user?user.socketId:"").emit("newMessage",data);
-        
+      io.to(user ? user.socketId : "").emit("newMessage", data);
     });
 
-    socket.on("disconnect", () => { 
+    socket.on("disconnect", () => {
       console.log(`${colorize("Client disconnected", "red")}`, socket.id);
       removeUser(socket.id);
       io.emit("getUsers", users);
