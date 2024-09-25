@@ -42,18 +42,15 @@ class UserController {
       const { email, otp } = req.body;
 
       const verified = await this._userUsecase.verifyOtp(email, otp);
-      // logger.info("otp--", verified);
       if (verified.status === 200 && verified.token) {
         res.cookie("user_access_token", verified.token.accessToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
-          maxAge: 15 * 60 * 60 * 1000,
           sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
-          maxAge: 30 * 24 * 60 * 60 * 1000,
+          secure: NODE_ENV !== "development",
           sameSite: "none",
         });
         return res
@@ -90,15 +87,12 @@ class UserController {
       ) {
         res.cookie("user_access_token", verified.tokens.accessToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
-          maxAge: 15 * 60 * 60 * 1000,
-          // maxAge: 15* 1000,
+          secure: NODE_ENV === "production",
           sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
-          maxAge: 30 * 24 * 60 * 60 * 1000,
+          secure: NODE_ENV === "production",
           sameSite: "none",
         });
         const userData = {
@@ -144,13 +138,13 @@ class UserController {
       ) {
         res.cookie("user_access_token", verified.tokens.accessToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           maxAge: 15 * 60 * 60 * 1000,
           sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "none",
         });
@@ -183,13 +177,13 @@ class UserController {
     try {
       res.cookie("user_access_token", "", {
         httpOnly: true,
-        secure: NODE_ENV !== "development",
+        // secure: NODE_ENV !== "production",
         expires: new Date(0),
         sameSite: "strict",
       });
       res.cookie("user_refresh_token", "", {
         httpOnly: true,
-        secure: NODE_ENV !== "development",
+        // secure: NODE_ENV !== "production",
         expires: new Date(0),
         sameSite: "strict",
       });
@@ -232,7 +226,5 @@ class UserController {
       next(error);
     }
   }
-
- 
 }
 export default UserController;
