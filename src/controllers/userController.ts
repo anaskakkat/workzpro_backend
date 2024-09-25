@@ -48,13 +48,13 @@ class UserController {
           httpOnly: true,
           secure: NODE_ENV !== "development",
           maxAge: 15 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         return res
           .status(verified.status)
@@ -93,13 +93,13 @@ class UserController {
           secure: NODE_ENV !== "development",
           maxAge: 15 * 60 * 60 * 1000,
           // maxAge: 15* 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         const userData = {
           _id: verified.user._id,
@@ -146,13 +146,13 @@ class UserController {
           httpOnly: true,
           secure: NODE_ENV !== "development",
           maxAge: 15 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
           secure: NODE_ENV !== "development",
           maxAge: 30 * 24 * 60 * 60 * 1000,
-          sameSite: "strict",
+          sameSite: "none",
         });
         const userData = {
           _id: verified.user._id,

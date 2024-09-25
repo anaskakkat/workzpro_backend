@@ -9,7 +9,7 @@
     "server": "nodemon ./src/index.ts",
     "client": "cd ../frontend_workzBro && npm run dev",
     "lint": "eslint . --ext .ts,.js --max-warnings 0"
-  },
+  }, 
   "keywords": [],
   "author": "",
   "license": "ISC",
