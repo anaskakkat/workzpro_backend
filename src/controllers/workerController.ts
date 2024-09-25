@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import WorkerUsecase from "../use-cases/workerUsecase";
 import { NODE_ENV } from "../frameworks/constants/env";
-import Slot from "../entities/slots";
-import { log } from "console";
 import { CostumeError } from "../frameworks/middlewares/customError";
 
 class WorkerController {
@@ -50,13 +48,13 @@ class WorkerController {
       if (verified.status === 200 && verified.token) {
         res.cookie("worker_access_token", verified.token.accessToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
+          secure: process.env.NODE_ENV === "production",
           maxAge: 60 * 60 * 1000,
           sameSite: "strict",
         });
         res.cookie("worker_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
+          secure: process.env.NODE_ENV === "production",
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
@@ -76,13 +74,13 @@ class WorkerController {
     try {
       res.cookie("worker_access_token", "", {
         httpOnly: true,
-        secure: NODE_ENV !== "development",
+        secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
       });
       res.cookie("worker_refresh_token", "", {
         httpOnly: true,
-        secure: NODE_ENV !== "development",
+        secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
       });
@@ -100,14 +98,14 @@ class WorkerController {
       if (verified.status === 200 && verified.token) {
         res.cookie("worker_access_token", verified.token.accessToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           maxAge: 60 * 60 * 1000,
           // maxAge: 15 * 1000,
           sameSite: "strict",
         });
         res.cookie("worker_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
@@ -173,13 +171,13 @@ class WorkerController {
       ) {
         res.cookie("worker_access_token", verified.tokens.accessToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV !== "production",
           maxAge: 15 * 60 * 60 * 1000,
           sameSite: "strict",
         });
         res.cookie("worker_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV !== "production",
           maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "strict",
         });
@@ -413,8 +411,7 @@ class WorkerController {
       );
       // console.log("dashbordData----", dashbordData);
 
-      return res.status(dashbordData.status).json(dashbordData)
-     
+      return res.status(dashbordData.status).json(dashbordData);
     } catch (error) {
       next(error);
     }
