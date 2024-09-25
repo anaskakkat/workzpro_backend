@@ -45,12 +45,12 @@ class UserController {
       if (verified.status === 200 && verified.token) {
         res.cookie("user_access_token", verified.token.accessToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.token.refreshToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           sameSite: "none",
         });
         return res
@@ -177,13 +177,13 @@ class UserController {
     try {
       res.cookie("user_access_token", "", {
         httpOnly: true,
-        // secure: NODE_ENV !== "production",
+        secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
       });
       res.cookie("user_refresh_token", "", {
         httpOnly: true,
-        // secure: NODE_ENV !== "production",
+        secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
       });

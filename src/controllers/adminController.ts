@@ -21,12 +21,12 @@ class AdminController {
       ) {
         res.cookie("admin_access_token", verified.tokens.accessToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           sameSite: "none",
         });
         res.cookie("admin_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
-          secure: NODE_ENV !== "development",
+          secure: NODE_ENV === "production",
           sameSite: "none",
         });
         return res.status(verified.status).json({
@@ -46,13 +46,13 @@ class AdminController {
     try {
       res.cookie("admin_access_token", "", {
         httpOnly: true,
-        secure: NODE_ENV !== "development",
+        secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
       });
       res.cookie("admin_refresh_token", "", {
         httpOnly: true,
-        secure: NODE_ENV !== "development",
+        secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
       });
