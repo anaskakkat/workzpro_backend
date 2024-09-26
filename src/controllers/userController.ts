@@ -88,11 +88,13 @@ class UserController {
         res.cookie("user_access_token", verified.tokens.accessToken, {
           httpOnly: true,
           secure: NODE_ENV === "production",
+          maxAge: 60 * 60 * 1000,
           sameSite: "none",
         });
         res.cookie("user_refresh_token", verified.tokens.refreshToken, {
           httpOnly: true,
           secure: NODE_ENV === "production",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
           sameSite: "none",
         });
         const userData = {
