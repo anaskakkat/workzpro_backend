@@ -22,7 +22,8 @@ export default class StripePayment implements IStripe {
         },
       ],
       mode: "payment",
-      success_url: `http://localhost:8000/success`,
+      // success_url: `http://localhost:8000/success`,
+      success_url: `https://workzpro.vercel.app/success`,
       cancel_url: `http://localhost:8000/cancel`,
     });
     if (session.url) {
@@ -51,7 +52,7 @@ export default class StripePayment implements IStripe {
         );
 
         if (paymentIntentId) {
-        //   console.log("pymnt intnt");
+          //   console.log("pymnt intnt");
           const paymentIntentResponse = await stripe.paymentIntents.retrieve(
             paymentIntentId
           );
