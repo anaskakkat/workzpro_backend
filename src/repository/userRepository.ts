@@ -127,17 +127,25 @@ class UserRepository implements IUserRepo {
   //     },
   //   }).populate("service");
   // }
+
+
+  
   async fetchWorkers(
     serviceId: string,
-    location: { type: string; coordinates: [number, number] }
+    location?: { type: string; coordinates: [number, number] }
   ) {
     const radiusInKm = 20;
     const radiusInMeters = radiusInKm * 1000;
-
-    // Find workers near the location
-    const workers = await WorkerModel.find({
-      service: serviceId,
-      location: {
+  
+    let query: any = { service: serviceId };
+  
+    // Check if valid coordinates are provided
+    if (
+      location &&
+      location.coordinates &&
+      !(location.coordinates[0] === 0 && location.coordinates[1] === 0)
+    ) {
+      query.location = {
         $near: {
           $geometry: {
             type: "Point",
@@ -145,9 +153,12 @@ class UserRepository implements IUserRepo {
           },
           $maxDistance: radiusInMeters,
         },
-      },
-    }).populate("service");
-
+      };
+    }
+  
+    // Find workers based on the query
+    const workers = await WorkerModel.find(query).populate("service");
+  
     // Fetch ratings for each worker
     const workersWithRatings = await Promise.all(
       workers.map(async (worker) => {
@@ -158,16 +169,18 @@ class UserRepository implements IUserRepo {
           0
         );
         const averageRating = reviews.length ? totalRating / reviews.length : 0;
-
+  
         return {
           ...worker.toObject(),
           averageRating,
         };
       })
     );
-
+  
     return workersWithRatings;
   }
+
+
 
   async fetchWorkerByID(id: string) {
     return await WorkerModel.findById(id).populate("service");

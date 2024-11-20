@@ -184,7 +184,7 @@ class UserController {
         sameSite: "strict",
       });
       res.cookie("user_refresh_token", "", {
-        httpOnly: true,
+        httpOnly: true, 
         secure: NODE_ENV === "production",
         expires: new Date(0),
         sameSite: "strict",
@@ -207,11 +207,11 @@ class UserController {
   }
   async fetchWorkers(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("Workers---touched", req.body);
+      console.log("Workers--fetchWorkers--touched", req.body);
       const Workers = await this._userUsecase.fetchWorkers(
         req.body.serviceId,
         req.body.locationData
-      );
+      ); 
 
       // console.log("Workers---touched", Workers);
       return res.status(200).json(Workers);
